@@ -1,0 +1,42 @@
+# CATAGEO — Catasto Ipogei
+
+**CATAGEO** (CATAsto ipoGEi) è un'applicazione web per la gestione di un catasto di **cavità artificiali e naturali**: schede catastali, allegati, foto, video, rilievi 2D/3D, diari di esplorazione e visualizzazione cartografica.
+
+È progettata per essere installabile su **qualsiasi hosting PHP economico**, senza database: tutti i dati risiedono sul filesystem in file **XML** e **CSV**, strutturati secondo uno standard preciso e leggibili anche senza l'applicativo.
+
+## Caratteristiche principali
+
+- **Nessun database**: archivio su filesystem, dati umanamente leggibili e durevoli
+- **Nessuna dipendenza esterna**: PHP 8 e sole estensioni standard, zero librerie da installare
+- **Front-end self-hosted**: Bootstrap 5.3, Leaflet e three.js inclusi, nessuna CDN
+- **Mappa** degli ipogei con layer WMS aggiuntivi e tracciati dei rilievi da KML
+- **Scheda standard** uniforme per tutti gli ipogei, con storicizzazione automatica delle revisioni
+- **Rilievi 2D e 3D** con viewer integrato e sovrapposizione su mappa
+- **Diari di esplorazione** con gruppi speleologici, esploratori, orari, coordinate e foto
+- **Ricerca** per nome parziale, categoria, attributi e **area geografica** (punto GPS + raggio)
+- **Tre livelli di utenza**: amministratore (ADM), operatore (OPE), utente (USR)
+- **Tutela delle ubicazioni sensibili**: riservatezza per ipogeo con offuscamento delle coordinate
+
+## Stato del progetto
+
+🚧 **In sviluppo** — attualmente in fase di analisi.
+
+Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi.
+
+## Requisiti
+
+- PHP **8.0+** (compatibile 7.4) con `dom`, `libxml`, `simplexml`, `mbstring`, `json`, `fileinfo`, `session`
+- `gd` opzionale (generazione miniature, con fallback se assente)
+- Nessun database, nessun `mod_rewrite`, nessuna shell
+
+## Installazione
+
+Documentazione in arrivo (`docs/INSTALLAZIONE.md`). In sintesi: copia della cartella via FTP, copia di `config.xml.dist` in `config.xml`, esecuzione di `installa.php` per creare l'archivio e il primo utente amministratore.
+
+## Licenza
+
+[GNU General Public License v3.0](LICENSE) — © 2026 Dario Candela
+
+## Autore
+
+**Dario Candela** — darcan99@gmail.com

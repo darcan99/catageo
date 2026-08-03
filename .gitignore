@@ -1,0 +1,31 @@
+# ============================================================================
+#  CATAGEO — file esclusi dal versionamento
+# ============================================================================
+
+# Configurazione reale dell'installazione (versionato solo config.xml.dist)
+/config.xml
+
+# Archivio dati: contiene i dati del catasto, non va su GitHub
+/dati/
+
+# File temporanei di scrittura atomica
+*.tmp
+*.lock
+
+# Miniature generate e log applicativi
+_mini/
+_log/
+
+# Marcatore di installazione completata
+/installato.txt
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~

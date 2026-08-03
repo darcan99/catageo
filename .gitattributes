@@ -1,0 +1,25 @@
+# ============================================================================
+#  CATAGEO — normalizzazione dei fine riga
+#  Il codice viene distribuito su hosting Linux: nel repository si conserva
+#  sempre LF, indipendentemente dal sistema di sviluppo.
+# ============================================================================
+
+* text=auto eol=lf
+
+# File binari: nessuna conversione
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.kmz  binary
+*.ply  binary
+*.stl  binary
+*.glb  binary
+*.woff binary
+*.woff2 binary
+*.mp4  binary
+*.webm binary
