@@ -438,8 +438,35 @@ if ($azione === 'scheda' && $codice !== '') {
                   <dt class="col-sm-5 fw-normal text-body-secondary">Quota</dt>
                   <dd class="col-sm-7">
                     <?= (string) $scheda['ubicazione']['coordinate']['quota'] !== ''
-                        ? Testo::esc((string) $scheda['ubicazione']['coordinate']['quota']) . ' m'
+                        ? Testo::esc((string) $scheda['ubicazione']['coordinate']['quota']) . ' m s.l.m.'
                         : '<span class="text-body-tertiary">—</span>' ?>
+                  </dd>
+
+                  <?php
+                  // Precisione e metodo dicono quanto fidarsi del punto: senza di
+                  // loro una coordinata a sei decimali sembra esatta anche quando
+                  // e stata dedotta da una descrizione.
+                  $precisione = (string) $scheda['ubicazione']['coordinate']['precisione'];
+                  $metodo     = (string) $scheda['ubicazione']['coordinate']['metodo'];
+                  ?>
+                  <dt class="col-sm-5 fw-normal text-body-secondary">Precisione</dt>
+                  <dd class="col-sm-7">
+                    <?php if ($precisione !== ''): ?>
+                      &plusmn; <?= Testo::esc($precisione) ?> m
+                      <div class="catageo-nota">Raggio entro cui cercare l'ingresso.</div>
+                    <?php else: ?>
+                      <span class="text-body-tertiary">non dichiarata</span>
+                    <?php endif; ?>
+                  </dd>
+
+                  <dt class="col-sm-5 fw-normal text-body-secondary">Rilevamento</dt>
+                  <dd class="col-sm-7">
+                    <?= $metodo !== '' ? Testo::esc($metodo) : '<span class="text-body-tertiary">—</span>' ?>
+                    <?php if ((string) $scheda['ubicazione']['coordinate']['dataRilevamento'] !== ''): ?>
+                      <span class="text-body-secondary">
+                        · <?= Testo::esc((string) $scheda['ubicazione']['coordinate']['dataRilevamento']) ?>
+                      </span>
+                    <?php endif; ?>
                   </dd>
 
                   <dt class="col-sm-5 fw-normal text-body-secondary">Riservatezza</dt>
@@ -908,14 +935,21 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   <div class="invalid-feedback">Obbligatoria.</div>
                 </div>
                 <div class="col-md-2">
-                  <label for="quota" class="form-label">Quota</label>
+                  <label for="quota" class="form-label">Quota (m)</label>
                   <input type="text" class="form-control catageo-valore" id="quota" name="quota"
                          value="<?= $v('quota', $s['ubicazione']['coordinate']['quota']) ?>">
+                  <div class="catageo-nota">Sul livello del mare.</div>
                 </div>
                 <div class="col-md-2">
-                  <label for="precisione" class="form-label">Prec. m</label>
+                  <label for="precisione" class="form-label">Precisione (m)</label>
                   <input type="text" class="form-control catageo-valore" id="precisione" name="precisione"
+                         placeholder="5"
                          value="<?= $v('precisione', $s['ubicazione']['coordinate']['precisione']) ?>">
+                  <div class="catageo-nota">
+                    Incertezza della posizione: quanto raggio dovra battere chi va
+                    a cercarla. GPS in bosco 5-10, punto su carta 1:25.000 circa 25,
+                    posizione dedotta da una descrizione 100 o piu.
+                  </div>
                 </div>
 
                 <div class="col-md-4">
