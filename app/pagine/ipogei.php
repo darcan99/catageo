@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'crea':
                 Auth::esigi('modifica_scheda');
                 $nuovo = Ipogeo::crea((string) ($_POST['catalogo'] ?? ''), datiSchedaDaPost());
+                segnalaAvvisiCoordinate();
                 Auth::messaggio('successo', 'Ipogeo censito con codice ' . $nuovo . '.');
                 $ritorno = 'index.php?p=ipogei&azione=scheda&codice=' . urlencode($nuovo);
                 break;
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Auth::esigi('modifica_scheda');
                 $daAggiornare = trim((string) ($_POST['codice'] ?? ''));
                 Ipogeo::aggiorna($daAggiornare, datiSchedaDaPost());
+                segnalaAvvisiCoordinate();
                 Auth::messaggio('successo', 'Scheda aggiornata.');
                 $ritorno = 'index.php?p=ipogei&azione=scheda&codice=' . urlencode($daAggiornare);
                 break;
@@ -140,14 +142,7 @@ function datiSchedaDaPost(): array
             'comune'    => (string) ($_POST['comune'] ?? ''),
             'localita'  => (string) ($_POST['localita'] ?? ''),
             'indirizzo' => (string) ($_POST['indirizzo'] ?? ''),
-            'coordinate' => [
-                'latitudine'      => (string) ($_POST['latitudine'] ?? ''),
-                'longitudine'     => (string) ($_POST['longitudine'] ?? ''),
-                'quota'           => (string) ($_POST['quota'] ?? ''),
-                'precisione'      => (string) ($_POST['precisione'] ?? ''),
-                'metodo'          => (string) ($_POST['metodo'] ?? ''),
-                'dataRilevamento' => (string) ($_POST['dataRilevamento'] ?? ''),
-            ],
+            'coordinate' => coordinateDaPost(),
             'cartografia' => [
                 'tavolettaIGM' => (string) ($_POST['tavolettaIGM'] ?? ''),
                 'sezioneCTR'   => (string) ($_POST['sezioneCTR'] ?? ''),
@@ -201,6 +196,78 @@ function datiSchedaDaPost(): array
     }
 
     return $dati;
+}
+
+/**
+ * Avvisi prodotti dall'interpretazione delle coordinate, da mostrare dopo il
+ * salvataggio. Non sono errori: il dato viene accettato, ma vale la pena
+ * segnalare cosa e stato dedotto o cosa insospettisce.
+ *
+ * @var string[]
+ */
+$GLOBALS['catageoAvvisiCoordinate'] = [];
+
+/**
+ * Interpreta le coordinate inserite nel formato e nel sistema dichiarati,
+ * restituendo la forma canonica in gradi decimali WGS84 piu la memoria di come
+ * il dato era stato rilevato.
+ *
+ * @return array<string,string>
+ * @throws IpogeoEccezione
+ */
+function coordinateDaPost(): array
+{
+    $formato = (string) ($_POST['formatoCoordinate'] ?? 'decimali');
+
+    // Nel formato UTM i gradi WGS84 arrivano dai campi di ripiego, usati solo
+    // quando il sistema dichiarato non e convertibile.
+    $lat = $formato === 'utm' ? (string) ($_POST['latitudineWgs84'] ?? '') : (string) ($_POST['latitudine'] ?? '');
+    $lon = $formato === 'utm' ? (string) ($_POST['longitudineWgs84'] ?? '') : (string) ($_POST['longitudine'] ?? '');
+
+    try {
+        $esito = Coordinate::interpreta([
+            'formato'     => $formato,
+            'sistema'     => (string) ($_POST['sistemaCoordinate'] ?? Coordinate::CANONICO),
+            'latitudine'  => $lat,
+            'longitudine' => $lon,
+            'fuso'        => (string) ($_POST['utmFuso'] ?? ''),
+            'est'         => (string) ($_POST['utmEst'] ?? ''),
+            'nord'        => (string) ($_POST['utmNord'] ?? ''),
+            'emisfero'    => (string) ($_POST['utmEmisfero'] ?? 'N'),
+        ]);
+    } catch (CoordinateEccezione $e) {
+        // Si rilancia come errore di scheda: per chi compila e un problema
+        // della scheda, non di una libreria di conversione.
+        throw new IpogeoEccezione($e->getMessage(), 0, $e);
+    }
+
+    $GLOBALS['catageoAvvisiCoordinate'] = $esito['avvisi'];
+
+    return [
+        'latitudine'       => $esito['latitudine'],
+        'longitudine'      => $esito['longitudine'],
+        'quota'            => (string) ($_POST['quota'] ?? ''),
+        'precisione'       => (string) ($_POST['precisione'] ?? ''),
+        'metodo'           => (string) ($_POST['metodo'] ?? ''),
+        'dataRilevamento'  => (string) ($_POST['dataRilevamento'] ?? ''),
+        'sistemaOriginale' => $esito['sistemaOriginale'],
+        'formatoOriginale' => $esito['formatoOriginale'],
+        'valoreOriginale'  => $esito['valoreOriginale'],
+    ];
+}
+
+/**
+ * Accoda come messaggi gli avvisi maturati sulle coordinate.
+ *
+ * Legge con ripiego perche viene chiamata durante la gestione del POST, che nel
+ * file precede l'inizializzazione della variabile.
+ */
+function segnalaAvvisiCoordinate(): void
+{
+    foreach (($GLOBALS['catageoAvvisiCoordinate'] ?? []) as $avviso) {
+        Auth::messaggio('avviso', (string) $avviso);
+    }
+    $GLOBALS['catageoAvvisiCoordinate'] = [];
 }
 
 /**
@@ -427,13 +494,56 @@ if ($azione === 'scheda' && $codice !== '') {
                     <dd class="col-sm-7"><?= $valore !== '' ? Testo::esc($valore) : '<span class="text-body-tertiary">—</span>' ?></dd>
                   <?php endforeach; ?>
 
-                  <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate</dt>
+                  <?php
+                  // La stessa posizione nelle notazioni che si usano in campagna.
+                  // Su coordinate offuscate si mostrano solo i gradi: dare anche
+                  // l'UTM equivarrebbe a restituire la posizione al metro.
+                  $rappresentazioni = null;
+                  if (!$coord['offuscate'] && $coord['lat'] !== '' && $coord['lon'] !== '') {
+                      try {
+                          $rappresentazioni = Coordinate::rappresentazioni((float) $coord['lat'], (float) $coord['lon']);
+                      } catch (CoordinateEccezione $e) {
+                          $rappresentazioni = null;
+                      }
+                  }
+                  ?>
+                  <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate WGS84</dt>
                   <dd class="col-sm-7">
                     <span class="catageo-valore"><?= Testo::esc($coord['lat']) ?>, <?= Testo::esc($coord['lon']) ?></span>
                     <?php if ($coord['offuscate']): ?>
                       <span class="badge text-bg-warning" title="Posizione approssimata per riservatezza">approssimata</span>
                     <?php endif; ?>
                   </dd>
+
+                  <?php if ($rappresentazioni !== null): ?>
+                    <dt class="col-sm-5 fw-normal text-body-secondary">Gradi sessagesimali</dt>
+                    <dd class="col-sm-7"><span class="catageo-valore"><?= Testo::esc($rappresentazioni['gms']) ?></span></dd>
+
+                    <dt class="col-sm-5 fw-normal text-body-secondary">UTM WGS84</dt>
+                    <dd class="col-sm-7">
+                      <span class="catageo-valore"><?= Testo::esc($rappresentazioni['utm']) ?></span>
+                      <div class="catageo-nota"><?= Testo::esc($rappresentazioni['utmEpsg']) ?>, calcolato dai gradi.</div>
+                    </dd>
+                  <?php endif; ?>
+
+                  <?php
+                  // Se il dato era stato rilevato in un altro sistema, va mostrato
+                  // come dichiarato: e quello che fu letto sullo strumento.
+                  $sistemaOrig = (string) $scheda['ubicazione']['coordinate']['sistemaOriginale'];
+                  $valoreOrig  = (string) $scheda['ubicazione']['coordinate']['valoreOriginale'];
+                  ?>
+                  <?php if ($valoreOrig !== '' && !$coord['offuscate']): ?>
+                    <dt class="col-sm-5 fw-normal text-body-secondary">Rilevato come</dt>
+                    <dd class="col-sm-7">
+                      <span class="catageo-valore"><?= Testo::esc($valoreOrig) ?></span>
+                      <div class="catageo-nota">
+                        <?= Testo::esc(Coordinate::nomeSistema($sistemaOrig)) ?>
+                        <?php if (!Coordinate::convertibile($sistemaOrig)): ?>
+                          — datum diverso da WGS84, conservato come dichiarato e non convertito
+                        <?php endif; ?>
+                      </div>
+                    </dd>
+                  <?php endif; ?>
 
                   <dt class="col-sm-5 fw-normal text-body-secondary">Quota</dt>
                   <dd class="col-sm-7">
@@ -920,19 +1030,112 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                          value="<?= $v('indirizzo', $s['ubicazione']['indirizzo']) ?>">
                 </div>
 
-                <div class="col-md-4">
-                  <label for="latitudine" class="form-label">Latitudine <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control catageo-valore" id="latitudine" name="latitudine" required
-                         placeholder="41.856231"
-                         value="<?= $v('latitudine', $s['ubicazione']['coordinate']['latitudine']) ?>">
-                  <div class="invalid-feedback">Obbligatoria.</div>
+                <div class="col-12"><hr class="my-1"></div>
+
+                <?php
+                // Formato e sistema in cui le coordinate vengono DIGITATE. In
+                // archivio finiscono sempre in gradi decimali WGS84, ma il modo
+                // in cui erano state rilevate viene conservato accanto.
+                $formatoSel = (string) ($_POST['formatoCoordinate'] ?? ($s['ubicazione']['coordinate']['formatoOriginale'] ?: 'decimali'));
+                $sistemaSel = (string) ($_POST['sistemaCoordinate'] ?? ($s['ubicazione']['coordinate']['sistemaOriginale'] ?: Coordinate::CANONICO));
+                ?>
+
+                <div class="col-md-6">
+                  <label for="formatoCoordinate" class="form-label">Formato di inserimento</label>
+                  <select class="form-select" id="formatoCoordinate" name="formatoCoordinate"
+                          data-catageo-formato-coordinate>
+                    <?php foreach (Coordinate::FORMATI as $codice => $etichetta): ?>
+                      <option value="<?= Testo::esc($codice) ?>" <?= $formatoSel === $codice ? 'selected' : '' ?>>
+                        <?= Testo::esc($etichetta) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-6">
+                  <label for="sistemaCoordinate" class="form-label">Sistema di riferimento</label>
+                  <select class="form-select" id="sistemaCoordinate" name="sistemaCoordinate">
+                    <?php foreach (Coordinate::SISTEMI as $codice => $dati): ?>
+                      <option value="<?= Testo::esc($codice) ?>" <?= $sistemaSel === $codice ? 'selected' : '' ?>>
+                        <?= Testo::esc($dati['nome']) ?><?= $dati['convertibile'] ? '' : ' — non convertito' ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <div class="catageo-nota">
+                    I sistemi con datum diverso da WGS84 (Gauss-Boaga/Roma40, ED50)
+                    vengono conservati come dichiarati ma non convertiti: la
+                    trasformazione richiede parametri locali e sbaglierebbe di
+                    decine di metri.
+                  </div>
+                </div>
+
+                <!-- Gradi, in decimali o sessagesimali -->
+                <div class="col-md-4" data-catageo-formato="decimali gms gm">
+                  <label for="latitudine" class="form-label">Latitudine <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control catageo-valore" id="latitudine" name="latitudine"
+                         placeholder="41.856231 oppure 41&deg;51'22.4&quot;N"
+                         value="<?= $v('latitudine', $s['ubicazione']['coordinate']['latitudine']) ?>">
+                </div>
+                <div class="col-md-4" data-catageo-formato="decimali gms gm">
                   <label for="longitudine" class="form-label">Longitudine <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control catageo-valore" id="longitudine" name="longitudine" required
-                         placeholder="12.532104"
+                  <input type="text" class="form-control catageo-valore" id="longitudine" name="longitudine"
+                         placeholder="12.532104 oppure 12&deg;29'31.9&quot;E"
                          value="<?= $v('longitudine', $s['ubicazione']['coordinate']['longitudine']) ?>">
-                  <div class="invalid-feedback">Obbligatoria.</div>
+                </div>
+
+                <!-- UTM -->
+                <div class="col-md-2" data-catageo-formato="utm">
+                  <label for="utmFuso" class="form-label">Fuso</label>
+                  <input type="number" class="form-control catageo-valore" id="utmFuso" name="utmFuso"
+                         min="1" max="60" placeholder="33"
+                         value="<?= Testo::esc((string) ($_POST['utmFuso'] ?? '')) ?>">
+                </div>
+                <div class="col-md-3" data-catageo-formato="utm">
+                  <label for="utmEst" class="form-label">Est (m)</label>
+                  <input type="text" class="form-control catageo-valore" id="utmEst" name="utmEst"
+                         placeholder="295964"
+                         value="<?= Testo::esc((string) ($_POST['utmEst'] ?? '')) ?>">
+                </div>
+                <div class="col-md-3" data-catageo-formato="utm">
+                  <label for="utmNord" class="form-label">Nord (m)</label>
+                  <input type="text" class="form-control catageo-valore" id="utmNord" name="utmNord"
+                         placeholder="4678705"
+                         value="<?= Testo::esc((string) ($_POST['utmNord'] ?? '')) ?>">
+                </div>
+                <div class="col-md-2" data-catageo-formato="utm">
+                  <label for="utmEmisfero" class="form-label">Emisfero</label>
+                  <select class="form-select" id="utmEmisfero" name="utmEmisfero">
+                    <option value="N" <?= (string) ($_POST['utmEmisfero'] ?? 'N') === 'N' ? 'selected' : '' ?>>Nord</option>
+                    <option value="S" <?= (string) ($_POST['utmEmisfero'] ?? '') === 'S' ? 'selected' : '' ?>>Sud</option>
+                  </select>
+                </div>
+                <div class="col-12" data-catageo-formato="utm">
+                  <div class="catageo-nota">
+                    Il fuso puo restare vuoto se il sistema scelto lo dichiara
+                    (per esempio UTM WGS84 fuso 33N). Se il sistema non e WGS84
+                    servono anche latitudine e longitudine in gradi decimali,
+                    perche la conversione non viene fatta.
+                  </div>
+                </div>
+                <?php
+                // Nomi distinti da latitudine/longitudine: due campi con lo
+                // stesso nome fanno vincere l'ultimo del documento anche quando
+                // e nascosto, perche display:none non impedisce l'invio. Con lo
+                // stesso nome questi campi sovrascriverebbero i gradi decimali.
+                ?>
+                <div class="col-md-6" data-catageo-formato="utm">
+                  <label for="latitudineWgs84" class="form-label">
+                    Latitudine WGS84, se il sistema non e convertibile
+                  </label>
+                  <input type="text" class="form-control catageo-valore" id="latitudineWgs84" name="latitudineWgs84"
+                         placeholder="41.856231"
+                         value="<?= Testo::esc((string) ($_POST['latitudineWgs84'] ?? '')) ?>">
+                </div>
+                <div class="col-md-6" data-catageo-formato="utm">
+                  <label for="longitudineWgs84" class="form-label">Longitudine WGS84</label>
+                  <input type="text" class="form-control catageo-valore" id="longitudineWgs84" name="longitudineWgs84"
+                         placeholder="12.532104"
+                         value="<?= Testo::esc((string) ($_POST['longitudineWgs84'] ?? '')) ?>">
                 </div>
                 <div class="col-md-2">
                   <label for="quota" class="form-label">Quota (m)</label>

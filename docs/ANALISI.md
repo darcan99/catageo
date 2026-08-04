@@ -659,13 +659,22 @@ Il template è **unico per tutti gli ipogei**: la scheda contiene sempre tutte l
     <comune>Roma</comune>
     <localita>Quarto Miglio</localita>
     <indirizzo/>
+    <!-- Latitudine e longitudine sono SEMPRE in gradi decimali WGS84: e la
+         forma che serve a mappa, ricerca per raggio ed export, e una sola forma
+         canonica evita che due schede diventino inconfrontabili.
+         Accanto si conserva pero il dato COME E STATO RILEVATO (D13): un
+         catasto che ha misurato in UTM ha misurato in UTM, e riscrivere solo la
+         conversione perderebbe cosa fu letto sullo strumento. -->
     <coordinate sistema="EPSG:4326">
       <latitudine>41.856231</latitudine>
       <longitudine>12.532104</longitudine>
       <quota unita="m">62</quota>
       <precisione unita="m">5</precisione>
-      <metodo>GPS</metodo>            <!-- GPS | CTR | Google | Stima -->
+      <metodo>GPS</metodo>            <!-- GPS | CTR | cartografia | Google | stima -->
       <dataRilevamento>2024-05-12</dataRilevamento>
+      <sistemaOriginale>EPSG:32633</sistemaOriginale>   <!-- UTM WGS84 fuso 33N -->
+      <formatoOriginale>utm</formatoOriginale>          <!-- decimali|gms|gm|utm -->
+      <valoreOriginale>33 291952.00 4640623.00 N</valoreOriginale>
     </coordinate>
     <cartografia>
       <tavolettaIGM/>
@@ -1531,6 +1540,7 @@ Decisioni approvate dal committente il 2026-08-03 (D1–D4) e il 2026-08-04 (D5�
 | D10 | Nuove sezioni di scheda | **Bibliografia, dati scientifici, biospeleologia, archeologia, geologia**, ognuna su file dedicati nella cartella dell'ipogeo | §6.12–6.16. In `Dati.xml` restano solo sintesi ricalcolate, utili a ricerca, mappa e stampa |
 | D11 | Ambito geografico | **Italia con apertura all'estero** | `<stato>` ISO 3166-1 in scheda; liste italiane precompilate per regione e provincia, che diventano campi liberi con stato diverso da IT. Un catalogo può essere dedicato alle spedizioni estere |
 | D12 | Riservatezza | Confermato il meccanismo a tre livelli, **esteso alle colonie di chirotteri** con riservatezza indipendente e prevalente | §6.14 e §12 |
+| D13 | Sistemi di riferimento delle coordinate | Forma canonica **sempre** in gradi decimali WGS84, con **memoria del sistema, formato e valore originali**. Inserimento ammesso in gradi decimali, gradi sessagesimali, gradi e minuti decimali e **UTM**; conversione UTM↔geografiche esatta perché sul medesimo ellissoide. I sistemi con datum diverso (Gauss-Boaga/Roma40, UTM ED50) sono ammessi come dato originale ma **non convertiti**: richiedono parametri locali e sbaglierebbero di decine di metri | §6.8 e classe `Coordinate` |
 
 ### 16.1 Deroga documentata al vincolo "nessuna CDN"
 

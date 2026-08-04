@@ -91,6 +91,31 @@
             });
         });
 
+        // ------------------------------------ campi dipendenti dal formato coordinate
+        // I blocchi marcati con data-catageo-formato elencano i formati per cui
+        // hanno senso: si mostrano solo per quello selezionato. I campi nascosti
+        // vengono anche disabilitati, perche display:none NON impedisce l'invio
+        // e un valore rimasto in un campo invisibile arriverebbe al salvataggio.
+        var selettoreFormato = document.querySelector('[data-catageo-formato-coordinate]');
+        if (selettoreFormato) {
+            var blocchi = document.querySelectorAll('[data-catageo-formato]');
+
+            var applicaFormato = function () {
+                var scelto = selettoreFormato.value;
+                blocchi.forEach(function (blocco) {
+                    var previsti = (blocco.getAttribute('data-catageo-formato') || '').split(/\s+/);
+                    var visibile = previsti.indexOf(scelto) !== -1;
+                    blocco.hidden = !visibile;
+                    blocco.querySelectorAll('input, select, textarea').forEach(function (campo) {
+                        campo.disabled = !visibile;
+                    });
+                });
+            };
+
+            selettoreFormato.addEventListener('change', applicaFormato);
+            applicaFormato();
+        }
+
         // ------------------------------------------ validazione dei form Bootstrap
         document.querySelectorAll('form.needs-validation').forEach(function (form) {
             form.addEventListener('submit', function (evento) {

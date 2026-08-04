@@ -228,6 +228,13 @@
                     <xs:element name="precisione"      type="tMisura"       minOccurs="0"/>
                     <xs:element name="metodo"          type="xs:string"     minOccurs="0"/>
                     <xs:element name="dataRilevamento" type="tDataOVuota"   minOccurs="0"/>
+                    <!-- Memoria del dato come era stato rilevato: sistema di
+                         riferimento, formato e valore dichiarati all'origine.
+                         Latitudine e longitudine restano la forma canonica in
+                         gradi decimali WGS84. -->
+                    <xs:element name="sistemaOriginale" type="xs:string" minOccurs="0"/>
+                    <xs:element name="formatoOriginale" type="xs:string" minOccurs="0"/>
+                    <xs:element name="valoreOriginale"  type="xs:string" minOccurs="0"/>
                   </xs:all>
                   <xs:attribute name="sistema" type="xs:string"/>
                 </xs:complexType>

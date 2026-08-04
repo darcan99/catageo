@@ -6,6 +6,27 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+### Aggiunto
+- **Sistemi di riferimento e formati delle coordinate** (D13). L'archivio
+  conserva sempre gradi decimali WGS84 come forma canonica, ma accanto registra
+  il dato **come e stato rilevato**: sistema, formato e valore originali. Un
+  catasto che ha misurato in UTM ha misurato in UTM, e riscrivere solo la
+  conversione perderebbe cosa fu letto sullo strumento.
+- Inserimento in **gradi decimali, gradi sessagesimali, gradi e minuti decimali
+  e UTM**, con selettore di formato e di sistema nel form. La conversione
+  UTM/geografiche e esatta perche entrambe stanno sullo stesso ellissoide WGS84:
+  e una proiezione, non un cambio di datum.
+- I sistemi con **datum diverso** (Gauss-Boaga/Roma40, UTM ED50) si possono
+  dichiarare e vengono conservati, ma **non** vengono convertiti: la
+  trasformazione richiede parametri locali e sbaglierebbe di decine di metri.
+  In quel caso l'applicativo chiede anche i gradi WGS84, invece di produrre una
+  posizione plausibile ma sbagliata.
+- La scheda mostra la stessa posizione nelle notazioni che si usano in campagna:
+  gradi decimali, sessagesimali e UTM WGS84 ricalcolato, piu il valore originale
+  se il rilievo era stato fatto in un altro sistema.
+- Due controlli sugli errori di digitazione piu frequenti: fuso che contraddice
+  il codice EPSG del sistema (rifiutato) ed est/nord invertiti (segnalati).
+
 ### Corretto
 - **Appartenenze ai gruppi: lo stesso gruppo poteva comparire una volta sola.**
   Le appartenenze venivano deduplicate per identificativo di gruppo, quindi il

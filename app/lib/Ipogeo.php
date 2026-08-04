@@ -82,12 +82,20 @@ final class Ipogeo
                 'localita'   => '',
                 'indirizzo'  => '',
                 'coordinate' => [
+                    // Forma canonica: gradi decimali WGS84. E l'unica su cui
+                    // lavorano mappa, ricerca per raggio ed esportazioni.
                     'latitudine'      => '',
                     'longitudine'     => '',
                     'quota'           => '',
                     'precisione'      => '',
                     'metodo'          => '',
                     'dataRilevamento' => '',
+                    // Memoria di come il dato era stato rilevato: un catasto che
+                    // ha misurato in UTM ha misurato in UTM, e conservare solo la
+                    // conversione perderebbe cosa fu letto sullo strumento.
+                    'sistemaOriginale' => '',
+                    'formatoOriginale' => '',
+                    'valoreOriginale'  => '',
                 ],
                 'cartografia' => ['tavolettaIGM' => '', 'sezioneCTR' => ''],
                 'accesso'     => [
@@ -1007,6 +1015,9 @@ final class Ipogeo
         Xml::aggiungi($coord, 'precisione', (string) $s['ubicazione']['coordinate']['precisione'], ['unita' => 'm']);
         Xml::imposta($coord, 'metodo', (string) $s['ubicazione']['coordinate']['metodo']);
         Xml::imposta($coord, 'dataRilevamento', (string) $s['ubicazione']['coordinate']['dataRilevamento']);
+        Xml::imposta($coord, 'sistemaOriginale', (string) $s['ubicazione']['coordinate']['sistemaOriginale']);
+        Xml::imposta($coord, 'formatoOriginale', (string) $s['ubicazione']['coordinate']['formatoOriginale']);
+        Xml::imposta($coord, 'valoreOriginale', (string) $s['ubicazione']['coordinate']['valoreOriginale']);
 
         $carto = Xml::aggiungi($ub, 'cartografia');
         Xml::imposta($carto, 'tavolettaIGM', (string) $s['ubicazione']['cartografia']['tavolettaIGM']);
@@ -1155,7 +1166,8 @@ final class Ipogeo
         foreach (['regione', 'provincia', 'comune', 'localita', 'indirizzo'] as $campo) {
             $s['ubicazione'][$campo] = Xml::testo($doc, '/ipogeo/ubicazione/' . $campo);
         }
-        foreach (['latitudine', 'longitudine', 'quota', 'precisione', 'metodo', 'dataRilevamento'] as $campo) {
+        foreach (['latitudine', 'longitudine', 'quota', 'precisione', 'metodo', 'dataRilevamento',
+                  'sistemaOriginale', 'formatoOriginale', 'valoreOriginale'] as $campo) {
             $s['ubicazione']['coordinate'][$campo] = Xml::testo($doc, '/ipogeo/ubicazione/coordinate/' . $campo);
         }
         $s['ubicazione']['cartografia']['tavolettaIGM'] = Xml::testo($doc, '/ipogeo/ubicazione/cartografia/tavolettaIGM');
