@@ -46,7 +46,7 @@ $fasi = [
     ['1',  'Core, autenticazione, utenti, installer',         'fatta'],
     ['2',  'Anagrafiche: gruppi, esploratori, vocabolari',    'fatta'],
     ['2b', 'Cataloghi e serie di codifica',                   'fatta'],
-    ['3',  'Ipogei: scheda, censimento, indice',              'da fare'],
+    ['3',  'Ipogei: scheda, censimento, indice',              'fatta'],
     ['4',  'Mappa: Leaflet/OSM, marker, WMS',                 'da fare'],
     ['5',  'Allegati, foto, video',                           'da fare'],
     ['6',  'Rilievi 2D/3D, KML su mappa',                     'da fare'],

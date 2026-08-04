@@ -57,7 +57,7 @@ $pagine = [
     'esci'         => ['file' => 'esci.php',         'permesso' => null,                 'titolo' => 'Uscita'],
     'home'         => ['file' => 'home.php',         'permesso' => 'consulta',           'titolo' => 'Pagina iniziale'],
     'mappa'        => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Mappa'],
-    'ipogei'       => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Ipogei'],
+    'ipogei'       => ['file' => 'ipogei.php',       'permesso' => 'consulta',           'titolo' => 'Ipogei'],
     'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
     'esplorazioni' => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
     'anagrafiche'  => ['file' => 'anagrafiche.php',  'permesso' => 'anagrafiche',        'titolo' => 'Anagrafiche'],

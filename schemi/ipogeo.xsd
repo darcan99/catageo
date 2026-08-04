@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/ipogeo.xsd
+   Descrizione ..: Schema di validazione di "[codice] - Dati.xml", la scheda
+                   dell'ipogeo. Il template e unico per tutti gli ipogei e
+                   contiene sempre ogni sezione, anche vuota.
+
+                   Note sui tipi, tutte conseguenza di una scelta di progetto:
+                   - i numeri sono xs:string con pattern e non xs:decimal,
+                     perche l'applicativo scrive elementi vuoti quando il dato
+                     manca e xs:decimal non ammette la stringa vuota; il pattern
+                     accetta anche la virgola decimale, che chi compila digita;
+                   - le date sono xs:string con pattern, per lo stesso motivo;
+                   - i testi liberi sono xs:string senza maxLength: non hanno
+                     limiti di lunghezza (D6);
+                   - si usa xs:all e non xs:sequence dove l'ordine non porta
+                     informazione, perche l'archivio deve restare modificabile a
+                     mano e un ordine diverso non e un errore di contenuto.
+   Versione .....: 0.4.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <!-- Numero decimale, oppure vuoto. Ammette la virgola come separatore. -->
+  <xs:simpleType name="tNumeroOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[+\-]?[0-9]+([.,][0-9]+)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tInteroOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tDataOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tDataOraOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodice">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{1,40}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodiceOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Za-z0-9._\-]{1,40}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tStatoIso">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Za-z]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Codice di tassonomia, es. ART-IDR-CUN. Vuoto ammesso solo dove il
+       campo e opzionale. -->
+  <xs:simpleType name="tCodiceTassonomia">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Z0-9\-]{1,40}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tRiservatezza">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pubblica"/>
+      <xs:enumeration value="coordinate_offuscate"/>
+      <xs:enumeration value="riservata"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tStatoScheda">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="bozza"/>
+      <xs:enumeration value="verificata"/>
+      <xs:enumeration value="pubblicata"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tStatoAccesso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="aperto"/>
+      <xs:enumeration value="chiuso"/>
+      <xs:enumeration value="interrato"/>
+      <xs:enumeration value="distrutto"/>
+      <xs:enumeration value="non_localizzato"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tRiferimentoEsploratore">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|E[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tRiferimentoGruppo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|G[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Misura con unita dichiarata; il valore puo essere vuoto. -->
+  <xs:complexType name="tMisura">
+    <xs:simpleContent>
+      <xs:extension base="tNumeroOVuoto">
+        <xs:attribute name="unita" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="ipogeo">
+    <xs:complexType>
+      <xs:all>
+
+        <!-- ......................................... identificazione ..... -->
+        <xs:element name="identificazione">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="codice"         type="tCodice"/>
+              <xs:element name="nome"           type="xs:string"/>
+              <xs:element name="natura"         type="tCodiceTassonomia"/>
+              <xs:element name="tipologia"      type="tCodiceTassonomia"/>
+              <xs:element name="sottotipologia" type="tCodiceTassonomia" minOccurs="0"/>
+              <xs:element name="sinonimi" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="sinonimo" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <!-- Codici assegnati da ALTRI catasti, non gestiti da questa
+                   installazione. -->
+              <xs:element name="codiciEsterni" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="codiceEsterno" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="ente"    type="xs:string"/>
+                            <xs:attribute name="catasto" type="xs:string"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <!-- Codici INTERNI precedenti, dopo rinumerazione o migrazione. -->
+              <xs:element name="codiciStorici" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="codiceStorico" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="codice"       type="tCodice" use="required"/>
+                        <xs:attribute name="catalogo"     type="xs:string"/>
+                        <xs:attribute name="nomeCatalogo" type="xs:string"/>
+                        <xs:attribute name="dal"          type="tDataOVuota"/>
+                        <xs:attribute name="al"           type="tDataOVuota"/>
+                        <xs:attribute name="motivo"       type="xs:string"/>
+                        <xs:attribute name="utente"       type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- ............................................... ubicazione .... -->
+        <xs:element name="ubicazione">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="stato" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="codice" type="tStatoIso"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="regione"   type="xs:string" minOccurs="0"/>
+              <xs:element name="provincia" type="xs:string" minOccurs="0"/>
+              <xs:element name="comune"    type="xs:string" minOccurs="0"/>
+              <xs:element name="localita"  type="xs:string" minOccurs="0"/>
+              <xs:element name="indirizzo" type="xs:string" minOccurs="0"/>
+
+              <xs:element name="coordinate">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="latitudine"      type="tNumeroOVuoto"/>
+                    <xs:element name="longitudine"     type="tNumeroOVuoto"/>
+                    <xs:element name="quota"           type="tMisura"       minOccurs="0"/>
+                    <xs:element name="precisione"      type="tMisura"       minOccurs="0"/>
+                    <xs:element name="metodo"          type="xs:string"     minOccurs="0"/>
+                    <xs:element name="dataRilevamento" type="tDataOVuota"   minOccurs="0"/>
+                  </xs:all>
+                  <xs:attribute name="sistema" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="cartografia" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="tavolettaIGM" type="xs:string" minOccurs="0"/>
+                    <xs:element name="sezioneCTR"   type="xs:string" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="accesso" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="stato"               type="tStatoAccesso" minOccurs="0"/>
+                    <xs:element name="descrizione"         type="xs:string"     minOccurs="0"/>
+                    <xs:element name="proprieta"           type="xs:string"     minOccurs="0"/>
+                    <xs:element name="permessiNecessari"   type="tBooleano01"   minOccurs="0"/>
+                    <xs:element name="riferimentoPermessi" type="xs:string"     minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="riservatezza" type="tRiservatezza"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- .......................................... caratteristiche .... -->
+        <xs:element name="caratteristiche">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="sviluppoPlanimetrico" type="tMisura"      minOccurs="0"/>
+              <xs:element name="sviluppoSpaziale"     type="tMisura"      minOccurs="0"/>
+              <xs:element name="dislivelloPositivo"   type="tMisura"      minOccurs="0"/>
+              <xs:element name="dislivelloNegativo"   type="tMisura"      minOccurs="0"/>
+              <xs:element name="profonditaMassima"    type="tMisura"      minOccurs="0"/>
+              <xs:element name="numeroIngressi"       type="tInteroOVuoto" minOccurs="0"/>
+
+              <xs:element name="ingressi" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ingresso" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:all>
+                          <xs:element name="descrizione" type="xs:string"     minOccurs="0"/>
+                          <xs:element name="latitudine"  type="tNumeroOVuoto" minOccurs="0"/>
+                          <xs:element name="longitudine" type="tNumeroOVuoto" minOccurs="0"/>
+                          <xs:element name="quota"       type="tMisura"       minOccurs="0"/>
+                          <xs:element name="dimensioni"  type="xs:string"     minOccurs="0"/>
+                          <xs:element name="stato"       type="tStatoAccesso" minOccurs="0"/>
+                        </xs:all>
+                        <xs:attribute name="n" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="idrologia" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="presenzaAcqua" type="xs:string" minOccurs="0"/>
+                    <xs:element name="note"          type="xs:string" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="interesse" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="voce" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="percorribilita" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="difficolta"             type="xs:string" minOccurs="0"/>
+                    <xs:element name="attrezzaturaNecessaria" type="xs:string" minOccurs="0"/>
+                    <xs:element name="pericoli"               type="xs:string" minOccurs="0"/>
+                    <xs:element name="tempoPercorrenza"       type="xs:string" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- ............................................. descrizione ..... -->
+        <!-- Nessun limite di lunghezza su questi campi (D6). -->
+        <xs:element name="descrizione">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="sintesi" type="xs:string" minOccurs="0"/>
+              <xs:element name="testo"   type="xs:string" minOccurs="0"/>
+              <xs:element name="storia"  type="xs:string" minOccurs="0"/>
+              <xs:element name="note"    type="xs:string" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- ............................................ collegamenti ..... -->
+        <xs:element name="collegamenti" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ipogeoCorrelato" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="codice"    type="tCodice" use="required"/>
+                  <xs:attribute name="relazione" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <!-- ................................................. catasto ..... -->
+        <xs:element name="catasto">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="catalogo">
+                <xs:complexType>
+                  <xs:attribute name="sigla" type="xs:string" use="required"/>
+                  <xs:attribute name="nome"  type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="serieCodice" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="prefisso" type="tCodiceOVuoto"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="dataCensimento" type="tDataOVuota" minOccurs="0"/>
+              <xs:element name="censitoDa" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="esploratoreId" type="tRiferimentoEsploratore"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="gruppoCensore" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="id" type="tRiferimentoGruppo"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="statoScheda" type="tStatoScheda"/>
+              <xs:element name="creazione" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="tDataOraOVuota">
+                      <xs:attribute name="utente" type="xs:string"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="ultimaModifica" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="tDataOraOVuota">
+                      <xs:attribute name="utente" type="xs:string"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="revisione" type="tInteroOVuoto" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:all>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+      <xs:attribute name="catalogo"       type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

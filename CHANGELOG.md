@@ -22,7 +22,15 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
   iscrizioni contemporanee ne attribuiva arbitrariamente una. Sostituita da
   `gruppiAllaData()`, che restituisce l'elenco, piu `gruppiAttuali()`.
 
-### Aggiunto (fase 3, in corso)
+### Da fare
+- Fase 4: mappa Leaflet/OSM, marker, layer WMS
+- Schemi XSD per le anagrafiche introdotte nella 0.2.0
+
+## [0.4.0] — 2026-08-04
+
+Fase 3: il catasto comincia a contenere ipogei.
+
+### Aggiunto
 - `Sezioni`: sigle, nomi delle sottocartelle e nomi normativi dei file di
   risorsa in un unico punto, cosi lo standard di nomenclatura non puo divergere
   fra le parti che lo applicano.
@@ -37,12 +45,28 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 - `IndiceIpogei`: `dati/_indice/ipogei.csv` con aggiornamento per singolo ipogeo
   e ricostruzione integrale dalle sole schede. Percorsi scritti relativi, non
   assoluti, cosi un archivio spostato resta valido.
+- `schemi/ipogeo.xsd`: validazione della scheda, applicata a ogni salvataggio.
+- **Pagina degli ipogei**: elenco paginato con ricerca su codice, nome, comune e
+  localita e filtro per catalogo; scheda in consultazione con tab per ogni
+  sezione e barra degli avvisi in testa (bozza, accesso chiuso, autorizzazione
+  necessaria, pericoli, ubicazione riservata); form di censimento e modifica.
+- **Riservatezza applicata in lettura**: le schede `riservata` non compaiono in
+  elenco e non sono apribili dal livello USR; con `coordinate_offuscate` la
+  posizione viene arrotondata al raggio configurato, in modo deterministico
+  perche ricaricare la pagina non deve permettere di triangolare.
+- Cambio di codice e rimozione conservativa disponibili dall'interfaccia, con
+  conferma esplicita e spiegazione di cosa comportano.
 
-### Da fare
-- Fase 3: pagine di elenco, scheda e form; `schemi/ipogeo.xsd` (il codice usa
-  lo schema se presente e lo salta se assente, la validazione oggi e in PHP)
-- Schemi XSD per le anagrafiche introdotte nella 0.2.0: la validazione oggi e
-  fatta in PHP, il codice usa lo schema se presente e lo salta se assente
+### Verificato
+
+69 verifiche unitarie sul nucleo, su archivio temporaneo e mai su quello reale,
+piu 55 verifiche end-to-end dall'interfaccia. Le suite delle fasi 1, 2 e 2b
+rieseguite per regressione. Nessun fallimento, nessun errore applicativo.
+
+Lo schema della scheda e verificato in due sensi: la scheda generata deve
+risultare valida, e una controprova con un valore fuori enumerazione deve
+essere rifiutata. Senza la seconda, il primo controllo non dimostrerebbe che lo
+schema discrimini qualcosa.
 
 ## [0.3.0] — 2026-08-04
 
