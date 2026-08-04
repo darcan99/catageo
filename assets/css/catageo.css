@@ -82,6 +82,72 @@ tr.catageo-riga-attenzione { background-color: rgba(var(--bs-warning-rgb), 0.10)
     color: var(--bs-secondary-color);
 }
 
+/* ---------------------------------------------------------------------------
+   Elenchi di descrizione delle schede.
+
+   Etichetta e valore vanno distinti a colpo d'occhio: con lo stesso peso e
+   colori vicini, su tema scuro, si leggono come un unico blocco di testo e
+   trovare un dato costa fatica. Qui l'etichetta e piu piccola, spaziata e
+   attenuata; il valore ha il colore di massimo contrasto e peso maggiore.
+   La riga di separazione serve a seguire l'accoppiamento fra le due colonne
+   senza doverle allineare a occhio.
+   --------------------------------------------------------------------------- */
+.catageo-dl {
+    margin-bottom: 0;
+}
+
+.catageo-dl > dt {
+    font-weight: 400;
+    font-size: 0.78125rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
+    opacity: 0.85;
+}
+
+.catageo-dl > dd {
+    font-weight: 500;
+    color: var(--bs-emphasis-color);
+}
+
+/* Separatore continuo fra le due colonne della stessa riga. */
+.catageo-dl > dt,
+.catageo-dl > dd {
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+/* L'ultima riga non ha bisogno di chiudersi con una linea. */
+.catageo-dl > dd:last-of-type,
+.catageo-dl > dt:last-of-type {
+    border-bottom: 0;
+    margin-bottom: 0;
+}
+
+/* Un valore assente non deve pesare come uno presente. */
+.catageo-dl > dd .text-body-tertiary,
+.catageo-dl > dd.catageo-vuoto {
+    font-weight: 400;
+}
+
+/* Le note dentro un valore restano didascalie, non valori. */
+.catageo-dl > dd .catageo-nota {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+@media (max-width: 575.98px) {
+    /* In colonna singola la linea sotto l'etichetta spezzerebbe la coppia. */
+    .catageo-dl > dt {
+        border-bottom: 0;
+        padding-bottom: 0;
+        margin-bottom: 0.1rem;
+    }
+}
+
 /* Contenitore della mappa: altezza piena su desktop, proporzione fissa su
    mobile, dove una mappa a tutta altezza impedirebbe di scorrere la pagina. */
 .catageo-mappa {

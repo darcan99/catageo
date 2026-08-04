@@ -373,7 +373,7 @@ if ($azione === 'scheda' && $codice !== '') {
             <div class="card h-100">
               <div class="card-header bg-transparent"><h2 class="h6 mb-0">Identificazione</h2></div>
               <div class="card-body">
-                <dl class="row mb-0">
+                <dl class="row catageo-dl">
                   <?php
                   $identificazione = [
                       'Codice'         => '<span class="catageo-codice">' . Testo::esc($codiceCorrente) . '</span>',
@@ -412,7 +412,7 @@ if ($azione === 'scheda' && $codice !== '') {
             <div class="card h-100">
               <div class="card-header bg-transparent"><h2 class="h6 mb-0">Ubicazione</h2></div>
               <div class="card-body">
-                <dl class="row mb-0">
+                <dl class="row catageo-dl">
                   <?php
                   $ubicazione = [
                       'Stato'     => (string) $scheda['ubicazione']['statoNome'] !== ''
@@ -480,7 +480,7 @@ if ($azione === 'scheda' && $codice !== '') {
             <div class="card h-100">
               <div class="card-header bg-transparent"><h2 class="h6 mb-0">Caratteristiche</h2></div>
               <div class="card-body">
-                <dl class="row mb-0">
+                <dl class="row catageo-dl">
                   <?php
                   $misure = [
                       'Sviluppo planimetrico' => (string) $scheda['caratteristiche']['sviluppoPlanimetrico'],
@@ -519,7 +519,7 @@ if ($azione === 'scheda' && $codice !== '') {
             <div class="card h-100">
               <div class="card-header bg-transparent"><h2 class="h6 mb-0">Dati di catasto</h2></div>
               <div class="card-body">
-                <dl class="row mb-0">
+                <dl class="row catageo-dl">
                   <?php
                   $catasto = [
                       'Catalogo'        => (string) $scheda['catasto']['nomeCatalogo'] . ' (' . (string) $scheda['catasto']['catalogo'] . ')',
