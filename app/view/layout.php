@@ -22,6 +22,11 @@ declare(strict_types=1);
  * @var string $paginaAttiva  identificativo per evidenziare la voce di menu
  */
 
+// Seconda barriera contro l'accesso diretto via HTTP: questo file ha senso
+// solo se incluso da index.php, che definisce CATAGEO_ROOT. La guardia vale
+// anche sui server dove il file .htaccess non viene letto.
+defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
+
 $nomeCatasto = Config::caricata() ? Config::testo('catasto.nome', 'CATAGEO') : 'CATAGEO';
 $titolo      = $titolo ?? $nomeCatasto;
 $contenuto   = $contenuto ?? '';

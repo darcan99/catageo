@@ -1,0 +1,31 @@
+# ============================================================================
+#  CATAGEO - Catasto Ipogei
+# ============================================================================
+#  File .........: app/.htaccess
+#  Descrizione ..: La cartella app/ contiene librerie, controller e viste, che
+#                  vanno eseguiti solo attraverso index.php. Nessun file qui
+#                  dentro deve essere raggiungibile direttamente via HTTP.
+#
+#                  Questa e la prima delle due barriere: la seconda e la
+#                  guardia "defined('CATAGEO_ROOT') or exit" in testa ai file
+#                  di pagina e di vista, che vale anche sui server dove
+#                  .htaccess non viene letto (nginx, AllowOverride None).
+#  Versione .....: 0.1.0
+#  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+#  Licenza ......: GNU GPL v3.0 - vedi LICENSE
+#  Copyright ....: (c) 2026 Dario Candela
+# ----------------------------------------------------------------------------
+#  CRONOLOGIA
+#  0.1.0  2026-08-04  D.Candela  Prima stesura.
+# ============================================================================
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>
+
+Options -Indexes

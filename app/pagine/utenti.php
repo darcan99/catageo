@@ -18,6 +18,11 @@ declare(strict_types=1);
  * ============================================================================
  */
 
+// Seconda barriera contro l'accesso diretto via HTTP: questo file ha senso
+// solo se incluso da index.php, che definisce CATAGEO_ROOT. La guardia vale
+// anche sui server dove il file .htaccess non viene letto.
+defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
+
 Auth::esigi('gestisci_utenti');
 
 $azione     = isset($_GET['azione']) ? (string) $_GET['azione'] : 'elenco';

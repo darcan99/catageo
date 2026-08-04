@@ -23,8 +23,12 @@ DirectoryIndex index.php index.html
 
 # ---------------------------------------------------------------------- accessi
 
-# File di configurazione, documentazione e schemi non vanno serviti via HTTP.
-<FilesMatch "\.(xml|xsd|dist|md|log|lock|tmp|bak)$">
+# Configurazione, schemi e file di servizio non vanno serviti via HTTP.
+#
+# I file .md restano invece leggibili: la documentazione e pubblica per scelta
+# (progetto GPL con i documenti su GitHub) e l'interfaccia rimanda a
+# docs/ANALISI.md, che su un'installazione senza rete deve poter essere aperta.
+<FilesMatch "\.(xml|xsd|dist|log|lock|tmp|bak)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>

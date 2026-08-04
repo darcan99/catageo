@@ -16,6 +16,11 @@ declare(strict_types=1);
  * ============================================================================
  */
 
+// Seconda barriera contro l'accesso diretto via HTTP: questo file ha senso
+// solo se incluso da index.php, che definisce CATAGEO_ROOT. La guardia vale
+// anche sui server dove il file .htaccess non viene letto.
+defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
+
 // logout() chiude la sessione e ne apre subito una nuova con id rigenerato:
 // il messaggio scritto qui sotto sopravvive quindi al redirect.
 Auth::logout();

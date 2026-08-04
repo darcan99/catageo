@@ -59,6 +59,10 @@ completa e verificata.
   dimostrativo, poi si autodisabilita.
 - `schemi/utenti.xsd`: validazione di `utenti.xml`, con unicità di
   identificativi e username.
+- Doppia barriera contro l'accesso diretto via HTTP alla cartella `app/`:
+  `app/.htaccess` per Apache e guardia `defined('CATAGEO_ROOT') or exit` in
+  testa ai file di pagina e di vista, che vale anche dove `.htaccess` non viene
+  letto (nginx, `AllowOverride None`).
 
 ### Note tecniche
 

@@ -16,6 +16,11 @@ declare(strict_types=1);
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
+
+// Seconda barriera contro l'accesso diretto via HTTP: questo file ha senso
+// solo se incluso da index.php, che definisce CATAGEO_ROOT. La guardia vale
+// anche sui server dove il file .htaccess non viene letto.
+defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
 ?>
 <div class="row justify-content-center">
   <div class="col-lg-6">
