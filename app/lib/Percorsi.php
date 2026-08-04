@@ -18,8 +18,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class PercorsoEccezione extends RuntimeException {}
-
 final class Percorsi
 {
     /** Nomi delle sottocartelle di servizio dell'archivio. */

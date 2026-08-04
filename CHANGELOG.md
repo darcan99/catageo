@@ -7,9 +7,61 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 ## [Non rilasciato]
 
 ### Da fare
-- Fase 2: anagrafiche (gruppi speleologici, esploratori, tipologie, grandezze, periodi storici)
 - Fase 2b: cataloghi, serie di codifica, anteprima del codice
 - Fase 3: scheda ipogeo, censimento, indice CSV, storico
+- Schemi XSD per le anagrafiche introdotte nella 0.2.0: la validazione oggi e
+  fatta in PHP, il codice usa lo schema se presente e lo salta se assente
+
+## [0.2.0] — 2026-08-04
+
+Fase 2 del piano di sviluppo: le anagrafiche a cui le schede degli ipogei
+faranno riferimento.
+
+### Aggiunto
+
+- `Anagrafica`: base comune alle anagrafiche a elenco piatto (file, lock,
+  scrittura atomica, identificativi, integrita referenziale in cancellazione),
+  con l'identificativo configurabile fra progressivo generato e codice parlante.
+- `Gruppi`: gruppi speleologici, con sigla univoca, affiliazioni e validazione
+  dell'anno di fondazione.
+- `Esploratori`: persone censite con **appartenenza storicizzata** ai gruppi
+  (anno iniziale e finale), cosi che un diario del 1998 resti attribuito al
+  gruppo di allora. Funzione `gruppoAllaData()` per risolvere l'attribuzione.
+- `Tipologie`: tassonomia su tre livelli (natura, tipologia, sottotipologia) con
+  vincoli di gerarchia e percorso leggibile.
+- `Grandezze`: grandezze misurabili con unita, intervallo di plausibilita e
+  decimali, piu `verificaPlausibilita()` per marcare le letture fuori scala.
+- `Periodi`: cronologia con estremi in anni (negativi per le date a.C.),
+  ordinamento cronologico e `nellIntervallo()` per la futura ricerca temporale.
+- `VocabolariPredefiniti`: contenuto iniziale dei tre vocabolari, unica fonte
+  usata sia dall'installazione sia dalla creazione pigra.
+- Pagine: indice delle anagrafiche, gestione gruppi, gestione esploratori e
+  pagina unica dei tre vocabolari.
+- Un file per ogni classe di eccezione.
+
+### Corretto
+
+- `AnagraficaEccezione` era dichiarata dentro `Anagrafica.php`. `Tipologie` e
+  `Grandezze` non estendono quella classe, quindi l'autoload non caricava mai
+  quel file: ogni validazione fallita moriva con "class not found" invece di
+  mostrare il messaggio all'utente. Tutte le classi di eccezione sono state
+  estratte in file propri, come prevede la convenzione "una classe per file".
+- `Anagrafica::elenco()` non creava il file mancante, quindi i vocabolari con
+  contenuto predefinito restavano vuoti fino alla prima scrittura. Ora anche la
+  lettura inizializza l'anagrafica, con ripiego sull'elenco vuoto se l'archivio
+  non e scrivibile.
+- Ripristinato `installa.php`, rimosso per errore dal repository: la cartella di
+  progetto e collegata al webroot da una junction, quindi eliminarlo dal server
+  lo eliminava anche dal codice. Sul server l'installer resta comunque
+  disabilitato dal marcatore `installato.txt`, che e il meccanismo previsto.
+
+### Verificato
+
+48 verifiche automatiche sulla fase 2 e le 60 della fase 1, tutte superate:
+creazione pigra dei vocabolari, unicita delle sigle, omonimia degli esploratori,
+appartenenze con anni incoerenti, vincoli di gerarchia della tassonomia,
+intervalli di plausibilita, conversione delle date a.C., rifiuto della
+cancellazione di voci referenziate, permessi dei tre livelli.
 
 ## [0.1.0] — 2026-08-04
 

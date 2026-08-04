@@ -44,7 +44,7 @@ $numeroUtenti = count(Utenti::elenco());
 $fasi = [
     ['0',  'Struttura, configurazione, diagnostica',          'fatta'],
     ['1',  'Core, autenticazione, utenti, installer',         'fatta'],
-    ['2',  'Anagrafiche: gruppi, esploratori, tipologie',     'da fare'],
+    ['2',  'Anagrafiche: gruppi, esploratori, vocabolari',    'fatta'],
     ['2b', 'Cataloghi e serie di codifica',                   'da fare'],
     ['3',  'Ipogei: scheda, censimento, indice',              'da fare'],
     ['4',  'Mappa: Leaflet/OSM, marker, WMS',                 'da fare'],

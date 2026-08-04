@@ -18,8 +18,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class AuthEccezione extends RuntimeException {}
-
 final class Auth
 {
     /** Nome del cookie di sessione: distinto da PHPSESSID per non collidere

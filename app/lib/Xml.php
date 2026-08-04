@@ -19,11 +19,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-/**
- * Eccezione sollevata dalle operazioni su XML.
- */
-class XmlEccezione extends RuntimeException {}
-
 final class Xml
 {
     /**

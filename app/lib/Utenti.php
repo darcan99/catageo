@@ -18,8 +18,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class UtenteEccezione extends RuntimeException {}
-
 final class Utenti
 {
     /** Livelli ammessi, dal piu al meno potente. */

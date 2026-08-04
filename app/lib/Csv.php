@@ -19,8 +19,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class CsvEccezione extends RuntimeException {}
-
 final class Csv
 {
     /** Separatore di campo, uniforme in tutto l'archivio. */
