@@ -9,13 +9,20 @@
 - **Nessun database**: archivio su filesystem, dati umanamente leggibili e durevoli
 - **Nessuna dipendenza esterna**: PHP 8 e sole estensioni standard, zero librerie da installare
 - **Front-end self-hosted**: Bootstrap 5.3, Leaflet e three.js inclusi, nessuna CDN
+- **Cataloghi multipli** in una sola installazione, ciascuno con le proprie regole di codifica e contatori indipendenti: si adatta a catasti già esistenti senza rinumerarli
+- **Migrazione fra cataloghi** conservando la memoria del codice di origine, così che i riferimenti pubblicati continuino a risolvere
 - **Mappa** degli ipogei con layer WMS aggiuntivi e tracciati dei rilievi da KML
 - **Scheda standard** uniforme per tutti gli ipogei, con storicizzazione automatica delle revisioni
 - **Rilievi 2D e 3D** con viewer integrato e sovrapposizione su mappa
 - **Diari di esplorazione** con gruppi speleologici, esploratori, orari, coordinate e foto
-- **Ricerca** per nome parziale, categoria, attributi e **area geografica** (punto GPS + raggio)
+- **Bibliografia** con catalogo delle opere condivise, citazioni puntuali e link esterni
+- **Dati scientifici** con serie storiche di temperature, gas, radon, radioattività, idrologia e flussi d'aria: descrittore XML e letture in CSV, importabili da datalogger
+- **Biospeleologia** con particolare attenzione alle colonie di chirotteri, conteggi storicizzati e avviso dei periodi critici
+- **Archeologia** con inquadramento cronologico, evidenze e regime di tutela
+- **Geologia** con inquadramento desunto dalla cartografia pubblica e registro di morfologie e campioni
+- **Ricerca** per nome parziale, catalogo, attributi, contenuti specialistici e **area geografica** (punto GPS + raggio)
 - **Tre livelli di utenza**: amministratore (ADM), operatore (OPE), utente (USR)
-- **Tutela delle ubicazioni sensibili**: riservatezza per ipogeo con offuscamento delle coordinate
+- **Tutela delle ubicazioni sensibili**: riservatezza per ipogeo e per colonia di chirotteri, con offuscamento delle coordinate
 
 ## Stato del progetto
 
