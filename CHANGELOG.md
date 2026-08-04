@@ -7,10 +7,57 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 ## [Non rilasciato]
 
 ### Da fare
-- Fase 2b: cataloghi, serie di codifica, anteprima del codice
 - Fase 3: scheda ipogeo, censimento, indice CSV, storico
 - Schemi XSD per le anagrafiche introdotte nella 0.2.0: la validazione oggi e
   fatta in PHP, il codice usa lo schema se presente e lo salta se assente
+
+## [0.3.0] — 2026-08-04
+
+Fase 2b: cataloghi multipli e codifica a serie, prerequisito del censimento.
+
+### Aggiunto
+
+- `Cataloghi`: scoperta dei cataloghi scandendo `dati/cataloghi/*/catalogo.xml`,
+  senza registro centrale che possa disallinearsi dai dati. Creazione con
+  cartella normativa `[sigla] - [nome]`, modifica con rinomina della cartella,
+  cancellazione consentita solo su catalogo vuoto e con la cartella priva di
+  file estranei. Catalogo attivo per sessione.
+- Serie di codifica per catalogo, con **contatore indipendente** e ordine
+  significativo: si aggiungono, si modificano e si riordinano con i pulsanti su
+  e giu, perche vince la prima serie i cui criteri combaciano. Cancellazione
+  rifiutata se la serie ha gia numerato codici o se e l'unica del catalogo.
+- `CodiceCatastale`: risoluzione della serie per criteri (natura, tipologia,
+  sottotipologia, stato, regione, provincia; piu valori separati da barra
+  verticale), composizione con **padding a soglia minima e nessun tetto** al
+  progressivo, scomposizione di un codice dando la precedenza al prefisso piu
+  lungo, verifica del codice inserito a mano con allineamento in avanti del
+  contatore per importare catasti esistenti.
+- **Anteprima del codice** nella gestione delle serie: si compilano i dati come
+  li avrebbe un ipogeo e si vede quale serie vince e quale codice ne uscirebbe,
+  senza toccare nessun contatore. Accanto alla configurazione della serie
+  compaiono gli esempi di numerazione, cosi il comportamento del padding si
+  vede invece di doverlo dedurre.
+- `IndiceCodici`: `dati/_indice/codici.csv`, che registra ogni codice mai
+  assegnato e lo risolve verso quello corrente. Una catena di due migrazioni
+  resta risolvibile perche anche le righe storiche vengono ripuntate.
+- `schemi/catalogo.xsd`, con unicita del prefisso fra le serie. Il contatore e
+  dichiarato come sequenza di cifre e non come intero, coerentemente con
+  l'assenza di tetto.
+
+### Verificato
+
+47 verifiche unitarie sulla logica di codifica, fra cui l'intera tabella del
+padding del documento di analisi (5.3) e la composizione a `PHP_INT_MAX` senza
+perdita di precisione; 40 verifiche end-to-end sulla fase 2b; le suite delle
+fasi 1 e 2 rieseguite per regressione. Nessun fallimento, nessun errore
+applicativo nel log.
+
+### Nota
+
+Due fallimenti iniziali dei test erano aspettative sbagliate, non difetti: la
+serie creata insieme al catalogo nasce **senza criteri** e fa quindi da caso
+generale, intercettando tutto prima delle serie successive. E il comportamento
+voluto, ed e la ragione per cui esiste il riordino delle serie.
 
 ## [0.2.0] — 2026-08-04
 

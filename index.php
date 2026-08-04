@@ -64,7 +64,7 @@ $pagine = [
     'gruppi'       => ['file' => 'gruppi.php',       'permesso' => 'anagrafiche',        'titolo' => 'Gruppi speleologici'],
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
     'vocabolari'   => ['file' => 'vocabolari.php',   'permesso' => 'anagrafiche',        'titolo' => 'Vocabolari'],
-    'cataloghi'    => ['file' => 'in-sviluppo.php',  'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],
+    'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],
     'strumenti'    => ['file' => 'in-sviluppo.php',  'permesso' => 'strumenti',          'titolo' => 'Strumenti'],
     'utenti'       => ['file' => 'utenti.php',       'permesso' => 'gestisci_utenti',    'titolo' => 'Gestione utenti'],
     'diagnostica'  => ['file' => 'diagnostica.php',  'permesso' => 'strumenti',          'titolo' => 'Diagnostica'],
