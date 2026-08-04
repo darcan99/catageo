@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: config.xml.dist
+   Descrizione ..: Template di configurazione. In fase di installazione viene
+                   copiato in config.xml e completato da installa.php.
+                   NON modificare questo file su un'installazione attiva:
+                   le modifiche vanno fatte su config.xml.
+   Versione .....: 0.1.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.1.0  2026-08-04  D.Candela  Prima stesura.
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<catageo versioneSchema="1.0">
+
+  <!-- Identita dell'installazione. Il nome compare in navbar, stampe ed export. -->
+  <catasto>
+    <nome>CATAGEO</nome>
+    <ente></ente>
+    <descrizione></descrizione>
+    <logo></logo>
+    <email></email>
+  </catasto>
+
+  <!-- I cataloghi sono autodescrittivi: l'applicativo li scopre scandendo
+       dati/cataloghi/*/catalogo.xml. Qui stanno solo le preferenze. -->
+  <cataloghi>
+    <predefinito>DEMO</predefinito>
+    <ricercaMulticatalogo>1</ricercaMulticatalogo>
+    <consentiMigrazione>1</consentiMigrazione>
+  </cataloghi>
+
+  <!-- Percorso dell'archivio. Relativo alla root dell'applicativo, oppure
+       assoluto per collocare i dati FUORI dal webroot (consigliato). -->
+  <percorsi>
+    <dati>dati</dati>
+  </percorsi>
+
+  <mappa>
+    <provider>osm</provider>
+    <chiaveApi></chiaveApi>
+    <centro lat="41.9028" lon="12.4964"/>
+    <zoom>6</zoom>
+    <zoomScheda>16</zoomScheda>
+    <clusterMarker>1</clusterMarker>
+    <baseLayers>
+      <layer id="osm" nome="OpenStreetMap" tipo="tms"
+             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+             attribuzione="&#169; OpenStreetMap contributors"
+             maxZoom="19" attivo="1"/>
+    </baseLayers>
+    <!-- Layer tematici: gli URL dei servizi vanno verificati e inseriti in
+         fase 4 (vedi ANALISI.md 6.16.1). Restano disattivati. -->
+    <overlayLayers/>
+  </mappa>
+
+  <upload>
+    <dimensioneMax unita="MB">32</dimensioneMax>
+    <estensioni sezione="allegati">pdf,doc,docx,odt,txt,rtf,xls,xlsx,ods,zip</estensioni>
+    <estensioni sezione="foto">jpg,jpeg,png,webp,tif,tiff</estensioni>
+    <estensioni sezione="video">mp4,webm,ogg,mov,avi</estensioni>
+    <estensioni sezione="rilievi">pdf,dxf,dwg,svg,png,jpg,kml,kmz,gpx,ply,obj,stl,gltf,glb,th,th2,3d,tro,plt</estensioni>
+    <estensioni sezione="scientifici">csv,txt,xls,xlsx,ods</estensioni>
+    <miniatureLarghezza>400</miniatureLarghezza>
+    <nomiFileAscii>0</nomiFileAscii>
+  </upload>
+
+  <sicurezza>
+    <riservatezzaPredefinita>pubblica</riservatezzaPredefinita>
+    <offuscamentoCoordinate unita="m">1000</offuscamentoCoordinate>
+    <tentativiLogin>5</tentativiLogin>
+    <bloccoMinuti>15</bloccoMinuti>
+    <durataSessioneMinuti>120</durataSessioneMinuti>
+    <!-- D2: login sempre obbligatorio. Predisposizione per apertura futura. -->
+    <accessoAnonimo>0</accessoAnonimo>
+  </sicurezza>
+
+  <sistema>
+    <versioneApp>0.1.0</versioneApp>
+    <fusoOrario>Europe/Rome</fusoOrario>
+    <lingua>it</lingua>
+    <versioniStorico>20</versioniStorico>
+    <tema>auto</tema>
+    <debug>0</debug>
+  </sistema>
+
+</catageo>

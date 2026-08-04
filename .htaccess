@@ -1,0 +1,90 @@
+# ============================================================================
+#  CATAGEO - Catasto Ipogei
+# ============================================================================
+#  File .........: .htaccess (root dell'applicativo)
+#  Descrizione ..: Irrobustimento della configurazione Apache. Tutte le
+#                  direttive sono racchiuse in <IfModule> perche su hosting
+#                  economico i moduli disponibili variano: una direttiva non
+#                  supportata fuori da IfModule causerebbe un errore 500.
+#  Versione .....: 0.1.0
+#  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+#  Licenza ......: GNU GPL v3.0 - vedi LICENSE
+#  Copyright ....: (c) 2026 Dario Candela
+# ----------------------------------------------------------------------------
+#  CRONOLOGIA
+#  0.1.0  2026-08-04  D.Candela  Prima stesura.
+# ============================================================================
+
+# Nessun elenco delle cartelle.
+Options -Indexes
+
+# L'applicativo non usa URL riscritti: index.php e raggiunto direttamente.
+DirectoryIndex index.php index.html
+
+# ---------------------------------------------------------------------- accessi
+
+# File di configurazione, documentazione e schemi non vanno serviti via HTTP.
+<FilesMatch "\.(xml|xsd|dist|md|log|lock|tmp|bak)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Il marcatore di installazione non deve rivelare nulla.
+<Files "installato.txt">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</Files>
+
+# File di sistema del versionamento, se il repository viene clonato sul server.
+<FilesMatch "^\.(git|gitignore|gitattributes)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# --------------------------------------------------------------- intestazioni
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "same-origin"
+    Header always set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+
+# ------------------------------------------------------------------- prestazioni
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    # Le librerie in assets/vendor sono versionate nel nome della cartella:
+    # una cache lunga e sicura, un aggiornamento cambia il percorso.
+    ExpiresByType text/css                "access plus 30 days"
+    ExpiresByType application/javascript  "access plus 30 days"
+    ExpiresByType font/woff2              "access plus 30 days"
+    ExpiresByType image/svg+xml           "access plus 7 days"
+    ExpiresByType image/jpeg              "access plus 7 days"
+    ExpiresByType image/png               "access plus 7 days"
+</IfModule>
+
+# --------------------------------------------------------------------- caratteri
+
+AddDefaultCharset UTF-8

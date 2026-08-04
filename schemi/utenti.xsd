@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/utenti.xsd
+   Descrizione ..: Schema di validazione di dati/utenti.xml.
+
+                   Nota sui tipi: date e riferimenti sono dichiarati xs:string
+                   e non xs:date. L'applicativo scrive elementi vuoti quando il
+                   dato non c'e (per esempio <ultimoAccesso/> di un utente che
+                   non ha mai effettuato l'accesso), e xs:date non ammette la
+                   stringa vuota. Il formato e comunque imposto dai pattern.
+   Versione .....: 0.1.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.1.0  2026-08-04  D.Candela  Prima stesura.
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tLivello">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ADM"/>
+      <xs:enumeration value="OPE"/>
+      <xs:enumeration value="USR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tUsername">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{3,40}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Hash BCRYPT: 60 caratteri con prefisso $2y$ (o $2a$/$2b$ su hash
+       generati da altre implementazioni). -->
+  <xs:simpleType name="tHashPassword">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\$2[aby]\$[0-9]{2}\$[A-Za-z0-9./]{53}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Data ISO (AAAA-MM-GG) oppure vuota. -->
+  <xs:simpleType name="tDataOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Data e ora ISO (AAAA-MM-GGTHH:MM:SS) oppure vuota. -->
+  <xs:simpleType name="tDataOraOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Identificativo di esploratore (E001) oppure vuoto. -->
+  <xs:simpleType name="tRiferimentoEsploratore">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|E[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tIdUtente">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="U[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="utenti">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="utente" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <!-- xs:all invece di xs:sequence: l'archivio deve restare
+                 modificabile a mano, e un ordine diverso degli elementi non
+                 e un errore di contenuto. -->
+            <xs:all>
+              <xs:element name="username"         type="tUsername"/>
+              <xs:element name="password"         type="tHashPassword"/>
+              <xs:element name="livello"          type="tLivello"/>
+              <xs:element name="nomeCompleto"     type="xs:string"              minOccurs="0"/>
+              <xs:element name="email"            type="xs:string"              minOccurs="0"/>
+              <xs:element name="esploratoreId"    type="tRiferimentoEsploratore" minOccurs="0"/>
+              <xs:element name="attivo"           type="tBooleano01"            minOccurs="0"/>
+              <xs:element name="dataCreazione"    type="tDataOVuota"            minOccurs="0"/>
+              <xs:element name="ultimoAccesso"    type="tDataOraOVuota"         minOccurs="0"/>
+              <xs:element name="tentativiFalliti" type="xs:nonNegativeInteger"  minOccurs="0"/>
+              <xs:element name="bloccatoFino"     type="tDataOraOVuota"         minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="id" type="tIdUtente" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- Unicita degli identificativi e degli username. -->
+    <xs:key name="chiaveIdUtente">
+      <xs:selector xpath="utente"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:unique name="unicitaUsername">
+      <xs:selector xpath="utente"/>
+      <xs:field xpath="username"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

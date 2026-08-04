@@ -1,0 +1,121 @@
+/* ============================================================================
+ *  CATAGEO — Catasto Ipogei
+ * ============================================================================
+ *  File .........: assets/css/catageo.css
+ *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
+ *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
+ *                  funzioni senza ricompilare Sass.
+ *  Versione .....: 0.1.0
+ *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+ *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
+ *  Copyright ....: (c) 2026 Dario Candela
+ * ----------------------------------------------------------------------------
+ *  CRONOLOGIA
+ *  0.1.0  2026-08-04  D.Candela  Prima stesura.
+ * ============================================================================
+ */
+
+/* Pagina di accesso: form centrato verticalmente. */
+.catageo-accesso {
+    max-width: 26rem;
+    margin: 0 auto;
+}
+
+.catageo-accesso .card {
+    border-color: var(--bs-border-color);
+}
+
+/* Esiti della diagnostica: pallino colorato a sinistra della riga. */
+.catageo-esito {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
+.catageo-esito-ok         { background-color: var(--bs-success); }
+.catageo-esito-attenzione { background-color: var(--bs-warning); }
+.catageo-esito-errore     { background-color: var(--bs-danger); }
+
+/* Riga di diagnostica in errore: fondo tenue, leggibile in entrambi i temi. */
+tr.catageo-riga-errore     { background-color: rgba(var(--bs-danger-rgb), 0.08); }
+tr.catageo-riga-attenzione { background-color: rgba(var(--bs-warning-rgb), 0.10); }
+
+/* Valori tecnici: font monospaziato ma non ingombrante. */
+.catageo-valore {
+    font-family: var(--bs-font-monospace);
+    font-size: 0.875em;
+}
+
+/* Codice catastale: evidenziato, perche e la chiave di lettura dell'archivio. */
+.catageo-codice {
+    font-family: var(--bs-font-monospace);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Intestazione di pagina con titolo e azioni sulla stessa riga. */
+.catageo-intestazione {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.catageo-intestazione h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+/* Tabelle dense: molte righe di archivio in poco spazio verticale. */
+.catageo-tabella td,
+.catageo-tabella th {
+    vertical-align: middle;
+}
+
+/* Note di aiuto sotto ai campi. */
+.catageo-nota {
+    font-size: 0.8125rem;
+    color: var(--bs-secondary-color);
+}
+
+/* Contenitore della mappa: altezza piena su desktop, proporzione fissa su
+   mobile, dove una mappa a tutta altezza impedirebbe di scorrere la pagina. */
+.catageo-mappa {
+    width: 100%;
+    height: 70vh;
+    min-height: 22rem;
+    border-radius: var(--bs-border-radius);
+    border: 1px solid var(--bs-border-color);
+}
+
+@media (max-width: 767.98px) {
+    .catageo-mappa {
+        height: 60vh;
+        min-height: 18rem;
+    }
+}
+
+/* Stampa della scheda: via tutto ciò che non è contenuto. */
+@media print {
+    .navbar,
+    footer,
+    .btn,
+    .alert-dismissible .btn-close,
+    .catageo-non-stampare {
+        display: none !important;
+    }
+
+    main.container-fluid {
+        padding: 0 !important;
+    }
+
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.75em;
+        color: #555;
+    }
+}
