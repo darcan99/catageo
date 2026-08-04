@@ -22,8 +22,25 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
   iscrizioni contemporanee ne attribuiva arbitrariamente una. Sostituita da
   `gruppiAllaData()`, che restituisce l'elenco, piu `gruppiAttuali()`.
 
+### Aggiunto (fase 3, in corso)
+- `Sezioni`: sigle, nomi delle sottocartelle e nomi normativi dei file di
+  risorsa in un unico punto, cosi lo standard di nomenclatura non puo divergere
+  fra le parti che lo applicano.
+- `Ipogeo`: censimento con assegnazione del codice dalla serie del catalogo o
+  inserito a mano, creazione dell'albero delle undici sottocartelle, lettura e
+  scrittura della scheda `[codice] - Dati.xml` con tutte le sezioni sempre
+  presenti, storicizzazione automatica con rotazione, rinomina della cartella al
+  cambio del nome, **cambio di codice** che rinomina sottocartelle, file di
+  risorsa e miniature conservando il codice precedente in scheda, e
+  **cancellazione conservativa** che sposta l'albero in `dati/_eliminati` invece
+  di rimuoverlo.
+- `IndiceIpogei`: `dati/_indice/ipogei.csv` con aggiornamento per singolo ipogeo
+  e ricostruzione integrale dalle sole schede. Percorsi scritti relativi, non
+  assoluti, cosi un archivio spostato resta valido.
+
 ### Da fare
-- Fase 3: scheda ipogeo, censimento, indice CSV, storico
+- Fase 3: pagine di elenco, scheda e form; `schemi/ipogeo.xsd` (il codice usa
+  lo schema se presente e lo salta se assente, la validazione oggi e in PHP)
 - Schemi XSD per le anagrafiche introdotte nella 0.2.0: la validazione oggi e
   fatta in PHP, il codice usa lo schema se presente e lo salta se assente
 
