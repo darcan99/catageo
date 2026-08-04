@@ -564,8 +564,16 @@ Due tabelle di dominio, editabili da ADM, che alimentano le tendine delle nuove 
     <cognome>Candela</cognome>
     <nome>Dario</nome>
     <soprannome/>
+    <!-- Appartenenza storicizzata. Lo STESSO gruppo puo comparire piu volte
+         con periodi distinti: chi lascia un gruppo e vi rientra dopo qualche
+         anno ha due periodi, e la storia va conservata per intero. Periodi di
+         gruppi DIVERSI possono sovrapporsi liberamente, perche l'iscrizione
+         simultanea a piu gruppi e la norma. L'unico caso rifiutato e
+         l'accavallamento di due periodi dello stesso gruppo. -->
     <gruppi>
-      <gruppo id="G001" dal="1998" al=""/>   <!-- appartenenza storicizzata -->
+      <gruppo id="G001" dal="2018" al="2020"/>
+      <gruppo id="G002" dal="2021" al="2025"/>
+      <gruppo id="G001" dal="2023" al=""/>   <!-- rientro, ancora in corso -->
     </gruppi>
     <email/> <telefono/>
     <qualifiche><qualifica>Istruttore SSI</qualifica></qualifiche>

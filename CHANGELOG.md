@@ -6,6 +6,22 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+### Corretto
+- **Appartenenze ai gruppi: lo stesso gruppo poteva comparire una volta sola.**
+  Le appartenenze venivano deduplicate per identificativo di gruppo, quindi il
+  caso reale di chi lascia un gruppo e vi rientra dopo qualche anni era
+  impossibile da registrare. Ora lo stesso gruppo puo ricorrere con periodi
+  distinti; si scartano soltanto i duplicati esatti (stesso gruppo, stessi due
+  anni), che sono un errore di inserimento. Le appartenenze vengono ordinate
+  cronologicamente e quelle in corso sono segnalate in elenco.
+- Aggiunto il controllo di **sovrapposizione fra periodi dello stesso gruppo**,
+  che sarebbe contraddittoria, ammettendo il confine condiviso: uscire ed essere
+  riammessi nello stesso anno e plausibile. I periodi di gruppi diversi possono
+  sovrapporsi liberamente, perche l'iscrizione simultanea a piu gruppi e la norma.
+- `Esploratori::gruppoAllaData()` restituiva un solo gruppo, quindi con due
+  iscrizioni contemporanee ne attribuiva arbitrariamente una. Sostituita da
+  `gruppiAllaData()`, che restituisce l'elenco, piu `gruppiAttuali()`.
+
 ### Da fare
 - Fase 3: scheda ipogeo, censimento, indice CSV, storico
 - Schemi XSD per le anagrafiche introdotte nella 0.2.0: la validazione oggi e

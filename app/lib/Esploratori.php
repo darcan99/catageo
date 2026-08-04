@@ -158,6 +158,72 @@ final class Esploratori extends Anagrafica
                 throw new AnagraficaEccezione('In un\'appartenenza l\'anno finale non puo precedere quello iniziale.');
             }
         }
+
+        self::validaSovrapposizioni(self::normalizzaAppartenenze($dati['gruppi'] ?? []));
+    }
+
+    /**
+     * Verifica che due periodi dello STESSO gruppo non si sovrappongano.
+     *
+     * Lo stesso gruppo puo ricorrere piu volte (si lascia e si rientra) e
+     * gruppi diversi possono essere contemporanei: l'iscrizione simultanea a
+     * piu gruppi e la norma. Due periodi dello stesso gruppo che si accavallano
+     * sono invece contraddittori, e quasi sempre un anno digitato male.
+     *
+     * Il confine condiviso e ammesso: uscire nel 2020 e rientrare nel 2020 e
+     * plausibile, quindi 2018-2020 e 2020-2022 non sono in conflitto.
+     *
+     * @param  array<int,array{id:string,dal:string,al:string}> $appartenenze
+     * @throws AnagraficaEccezione
+     */
+    private static function validaSovrapposizioni(array $appartenenze): void
+    {
+        $perGruppo = [];
+        foreach ($appartenenze as $appartenenza) {
+            $perGruppo[$appartenenza['id']][] = $appartenenza;
+        }
+
+        foreach ($perGruppo as $idGruppo => $periodi) {
+            $totale = count($periodi);
+            for ($i = 0; $i < $totale; $i++) {
+                for ($j = $i + 1; $j < $totale; $j++) {
+                    $inizioA = $periodi[$i]['dal'] !== '' ? (int) $periodi[$i]['dal'] : 0;
+                    $fineA   = $periodi[$i]['al'] !== '' ? (int) $periodi[$i]['al'] : PHP_INT_MAX;
+                    $inizioB = $periodi[$j]['dal'] !== '' ? (int) $periodi[$j]['dal'] : 0;
+                    $fineB   = $periodi[$j]['al'] !== '' ? (int) $periodi[$j]['al'] : PHP_INT_MAX;
+
+                    if ($inizioA < $fineB && $inizioB < $fineA) {
+                        $gruppo    = Gruppi::trova((string) $idGruppo);
+                        $etichetta = $gruppo !== null ? (string) $gruppo['sigla'] : (string) $idGruppo;
+
+                        throw new AnagraficaEccezione(
+                            "Due periodi di appartenenza al gruppo {$etichetta} si sovrappongono ("
+                            . self::periodoLeggibile($periodi[$i]) . ' e ' . self::periodoLeggibile($periodi[$j])
+                            . '). Lo stesso gruppo puo ricorrere piu volte, ma i periodi devono essere distinti.'
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Periodo di un'appartenenza in forma leggibile.
+     *
+     * @param array{id:string,dal:string,al:string} $appartenenza
+     */
+    public static function periodoLeggibile(array $appartenenza): string
+    {
+        $dal = $appartenenza['dal'] !== '' ? $appartenenza['dal'] : '?';
+        $al  = $appartenenza['al'] !== '' ? $appartenenza['al'] : 'oggi';
+
+        return $dal === '?' && $al === 'oggi' ? 'periodo non indicato' : 'dal ' . $dal . ' al ' . $al;
+    }
+
+    /** True se l'appartenenza e ancora in corso (anno finale non indicato). */
+    public static function appartenenzaInCorso(array $appartenenza): bool
+    {
+        return trim((string) ($appartenenza['al'] ?? '')) === '';
     }
 
     /**
@@ -208,37 +274,60 @@ final class Esploratori extends Anagrafica
     }
 
     /**
-     * Gruppo di appartenenza a una certa data, utile per attribuire
-     * correttamente un'esplorazione storica.
+     * Gruppi di appartenenza a una certa data, per attribuire correttamente
+     * un'esplorazione storica.
      *
-     * @return string|null id del gruppo, o null se non determinabile
+     * Restituisce un elenco e non un singolo gruppo: l'iscrizione simultanea a
+     * piu gruppi e la norma fra gli speleologi, e scegliere arbitrariamente il
+     * primo attribuirebbe l'esplorazione al gruppo sbagliato.
+     *
+     * @return string[] id dei gruppi attivi a quella data, in ordine cronologico
      */
-    public static function gruppoAllaData(string $idEsploratore, string $data): ?string
+    public static function gruppiAllaData(string $idEsploratore, string $data): array
     {
         $esploratore = static::trova($idEsploratore);
         if ($esploratore === null) {
-            return null;
+            return [];
         }
 
         $anno = (int) substr($data, 0, 4);
         if ($anno <= 0) {
-            return null;
+            return [];
         }
 
+        $gruppi = [];
         foreach ($esploratore['gruppi'] as $appartenenza) {
             $dal = $appartenenza['dal'] !== '' ? (int) $appartenenza['dal'] : null;
             $al  = $appartenenza['al'] !== '' ? (int) $appartenenza['al'] : null;
 
             if (($dal === null || $anno >= $dal) && ($al === null || $anno <= $al)) {
-                return $appartenenza['id'];
+                if (!in_array($appartenenza['id'], $gruppi, true)) {
+                    $gruppi[] = $appartenenza['id'];
+                }
             }
         }
 
-        return null;
+        return $gruppi;
+    }
+
+    /**
+     * Gruppi a cui l'esploratore risulta iscritto adesso.
+     *
+     * @return string[]
+     */
+    public static function gruppiAttuali(string $idEsploratore): array
+    {
+        return self::gruppiAllaData($idEsploratore, date('Y-m-d'));
     }
 
     /**
      * Normalizza l'elenco delle appartenenze proveniente dal form.
+     *
+     * Lo stesso gruppo puo comparire piu volte con periodi diversi: uno
+     * speleologo lascia un gruppo e dopo qualche anno vi rientra, e la storia
+     * va conservata per intero. Si scartano soltanto le righe vuote e i
+     * duplicati esatti, cioe stesso gruppo con gli stessi due anni, che sono
+     * un errore di inserimento e non un'informazione.
      *
      * @param  mixed $valore
      * @return array<int,array{id:string,dal:string,al:string}>
@@ -257,17 +346,55 @@ final class Esploratori extends Anagrafica
                 continue;
             }
             $id = trim((string) ($riga['id'] ?? ''));
-            if ($id === '' || isset($visti[$id])) {
-                continue; // riga vuota o gruppo ripetuto
+            if ($id === '') {
+                continue; // riga vuota del form
             }
-            $visti[$id]  = true;
-            $risultato[] = [
-                'id'  => $id,
-                'dal' => trim((string) ($riga['dal'] ?? '')),
-                'al'  => trim((string) ($riga['al'] ?? '')),
-            ];
+
+            $dal = trim((string) ($riga['dal'] ?? ''));
+            $al  = trim((string) ($riga['al'] ?? ''));
+
+            $chiave = $id . '|' . $dal . '|' . $al;
+            if (isset($visti[$chiave])) {
+                continue; // duplicato esatto
+            }
+            $visti[$chiave] = true;
+
+            $risultato[] = ['id' => $id, 'dal' => $dal, 'al' => $al];
         }
 
-        return $risultato;
+        return self::ordinaAppartenenze($risultato);
+    }
+
+    /**
+     * Ordina le appartenenze cronologicamente, dalla piu vecchia.
+     *
+     * Le appartenenze in corso (anno finale vuoto) restano in fondo entro il
+     * proprio anno di inizio: sono quelle che interessano di piu ed e comodo
+     * trovarle sempre nello stesso posto.
+     *
+     * @param  array<int,array{id:string,dal:string,al:string}> $appartenenze
+     * @return array<int,array{id:string,dal:string,al:string}>
+     */
+    private static function ordinaAppartenenze(array $appartenenze): array
+    {
+        usort($appartenenze, static function (array $a, array $b): int {
+            // Anno iniziale ignoto: si considera il piu antico possibile,
+            // altrimenti finirebbe in coda pur essendo probabilmente il primo.
+            $inizioA = $a['dal'] !== '' ? (int) $a['dal'] : 0;
+            $inizioB = $b['dal'] !== '' ? (int) $b['dal'] : 0;
+            if ($inizioA !== $inizioB) {
+                return $inizioA <=> $inizioB;
+            }
+
+            $fineA = $a['al'] !== '' ? (int) $a['al'] : PHP_INT_MAX;
+            $fineB = $b['al'] !== '' ? (int) $b['al'] : PHP_INT_MAX;
+            if ($fineA !== $fineB) {
+                return $fineA <=> $fineB;
+            }
+
+            return strcmp($a['id'], $b['id']);
+        });
+
+        return $appartenenze;
     }
 }

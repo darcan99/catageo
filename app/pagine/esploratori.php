@@ -26,8 +26,12 @@ defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
 
 Auth::esigi('anagrafiche');
 
-/** Righe di appartenenza vuote offerte in aggiunta a quelle esistenti. */
-const RIGHE_APPARTENENZA_LIBERE = 3;
+/**
+ * Righe di appartenenza vuote offerte in aggiunta a quelle esistenti.
+ * Quattro e non una: lo stesso gruppo puo ricorrere e le iscrizioni
+ * contemporanee sono la norma, quindi le righe servono davvero.
+ */
+const RIGHE_APPARTENENZA_LIBERE = 4;
 
 $azione      = isset($_GET['azione']) ? (string) $_GET['azione'] : 'elenco';
 $idRichiesto = isset($_GET['id']) ? (string) $_GET['id'] : '';
@@ -194,6 +198,15 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
               resta attribuito al gruppo di allora anche se la persona ne ha
               cambiato. Lasciare vuoto l'anno finale se l'appartenenza e in corso.
             </p>
+            <p class="catageo-nota mb-3">
+              <strong>Lo stesso gruppo puo comparire piu volte</strong>, con periodi
+              diversi: chi lascia un gruppo e vi rientra dopo qualche anno ha due
+              periodi distinti. Ed e normale essere iscritti a piu gruppi
+              contemporaneamente, quindi i periodi di gruppi diversi possono
+              sovrapporsi liberamente. L'unico caso rifiutato e l'accavallamento
+              di due periodi dello <em>stesso</em> gruppo, che sarebbe
+              contraddittorio.
+            </p>
 
             <?php if ($gruppi === []): ?>
               <div class="alert alert-warning">
@@ -306,13 +319,21 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
                 <?php else: ?>
                   <?php foreach ($esploratore['gruppi'] as $appartenenza): ?>
                     <?php
-                    $gruppo = Gruppi::trova((string) $appartenenza['id']);
-                    $periodo = trim(((string) $appartenenza['dal']) . '–' . ((string) $appartenenza['al']), '–');
+                    $gruppo   = Gruppi::trova((string) $appartenenza['id']);
+                    $inCorso  = Esploratori::appartenenzaInCorso($appartenenza);
+                    $dal      = (string) $appartenenza['dal'];
+                    $al       = (string) $appartenenza['al'];
+                    $periodo  = $dal === '' && $al === '' ? '' : ($dal !== '' ? $dal : '?') . '–' . ($al !== '' ? $al : '');
                     ?>
                     <div>
-                      <?= Testo::esc($gruppo !== null ? (string) $gruppo['sigla'] : (string) $appartenenza['id'] . ' (non trovato)') ?>
+                      <span class="<?= $inCorso ? 'fw-semibold' : '' ?>">
+                        <?= Testo::esc($gruppo !== null ? (string) $gruppo['sigla'] : (string) $appartenenza['id'] . ' (non trovato)') ?>
+                      </span>
                       <?php if ($periodo !== ''): ?>
-                        <span class="text-body-secondary">(<?= Testo::esc($periodo) ?>)</span>
+                        <span class="text-body-secondary catageo-valore"><?= Testo::esc($periodo) ?></span>
+                      <?php endif; ?>
+                      <?php if ($inCorso): ?>
+                        <span class="badge text-bg-success-subtle text-success-emphasis border border-success-subtle">in corso</span>
                       <?php endif; ?>
                     </div>
                   <?php endforeach; ?>
