@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 0.4.0
+ *  Versione .....: 0.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  Mappa nella scheda; regole di riservatezza
+ *                                delegate a Visibilita.
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
  * ============================================================================
  */
@@ -270,36 +272,20 @@ function segnalaAvvisiCoordinate(): void
  */
 function coordinateVisibili(array $scheda): array
 {
-    $lat = (string) $scheda['ubicazione']['coordinate']['latitudine'];
-    $lon = (string) $scheda['ubicazione']['coordinate']['longitudine'];
-
-    $riservatezza = (string) $scheda['ubicazione']['riservatezza'];
-    if ($riservatezza !== 'coordinate_offuscate' || Auth::puo('vedi_riservati')) {
-        return ['lat' => $lat, 'lon' => $lon, 'offuscate' => false];
-    }
-
-    // Arrotondamento deterministico: la stessa scheda mostra sempre la stessa
-    // posizione approssimata, cosi non si puo triangolare ricaricando la pagina.
-    $metri = max(100, Config::intero('sicurezza.offuscamentoCoordinate', 1000));
-    $passo = $metri / 111000.0;   // gradi di latitudine equivalenti
-
-    return [
-        'lat'       => number_format(round((float) $lat / $passo) * $passo, 4, '.', ''),
-        'lon'       => number_format(round((float) $lon / $passo) * $passo, 4, '.', ''),
-        'offuscate' => true,
-    ];
+    // Le regole stanno in Visibilita: elenco, scheda e mappa devono decidere
+    // allo stesso modo, e una regola di riservatezza applicata in due punti su
+    // tre e una fuga di dati.
+    return Visibilita::coordinate(
+        (string) $scheda['ubicazione']['coordinate']['latitudine'],
+        (string) $scheda['ubicazione']['coordinate']['longitudine'],
+        (string) $scheda['ubicazione']['riservatezza']
+    );
 }
 
 /** True se l'utente corrente puo vedere una scheda con la riservatezza data. */
 function schedaVisibile(string $riservatezza, string $statoScheda): bool
 {
-    if ($riservatezza === 'riservata' && !Auth::puo('vedi_riservati')) {
-        return false;
-    }
-    if ($statoScheda === 'bozza' && !Auth::puo('vedi_bozze')) {
-        return false;
-    }
-    return true;
+    return Visibilita::schedaVisibile($riservatezza, $statoScheda);
 }
 
 $cataloghi = Cataloghi::elenco();
@@ -329,6 +315,21 @@ if ($azione === 'scheda' && $codice !== '') {
     $storico = Ipogeo::storico($codiceCorrente);
     $riga    = IndiceIpogei::trova($codiceCorrente);
     $titolo  = $codiceCorrente . ' — ' . (string) $scheda['identificazione']['nome'];
+
+    // La cartografia si carica solo se c'e qualcosa da inquadrare: una scheda
+    // senza coordinate non deve scaricare Leaflet per non mostrare nulla.
+    $mappaScheda = $coord['lat'] !== '' && $coord['lon'] !== '';
+    if ($mappaScheda) {
+        $cssPagina = [
+            'assets/vendor/leaflet-1.9.4/leaflet.css',
+            'assets/css/catageo-mappa.css',
+        ];
+        $jsPagina = [
+            'assets/vendor/leaflet-1.9.4/leaflet.js',
+            'assets/vendor/proj4-2.21.0/proj4.min.js',
+            'assets/js/catageo-mappa.js',
+        ];
+    }
     ?>
 
     <?php if ($risoluzione['eraStorico']): ?>
@@ -599,6 +600,29 @@ if ($azione === 'scheda' && $codice !== '') {
             </div>
           </div>
 
+          <?php if ($mappaScheda): ?>
+            <div class="col-lg-6">
+              <div class="card h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                  <h2 class="h6 mb-0">Posizione</h2>
+                  <a class="btn btn-sm btn-outline-secondary catageo-non-stampare"
+                     href="index.php?p=mappa&amp;catalogo=<?= urlencode((string) $scheda['catasto']['catalogo']) ?>">
+                    <i class="bi bi-map"></i> Mappa del catalogo
+                  </a>
+                </div>
+                <div class="card-body">
+                  <div id="catageoMappaSchedaBox" class="catageo-mappa catageo-mappa-scheda"></div>
+                  <?php if ($coord['offuscate']): ?>
+                    <div class="catageo-nota mt-2">
+                      Il cerchio indica l'area entro cui si trova l'ingresso: le coordinate
+                      esatte sono riservate e non vengono inviate al browser.
+                    </div>
+                  <?php endif; ?>
+                </div>
+              </div>
+            </div>
+          <?php endif; ?>
+
           <div class="col-lg-6">
             <div class="card h-100">
               <div class="card-header bg-transparent"><h2 class="h6 mb-0">Caratteristiche</h2></div>
@@ -839,6 +863,25 @@ if ($azione === 'scheda' && $codice !== '') {
       </div>
 
     </div>
+
+    <?php if ($mappaScheda): ?>
+      <?php
+      // Il raggio del cerchio di offuscamento e lo stesso passo usato per
+      // arrotondare: dichiarare un'area piu piccola di quella reale sarebbe
+      // fuorviante, piu grande renderebbe il dato inutile.
+      $puntoMappa = [
+          'lat'       => $coord['lat'],
+          'lon'       => $coord['lon'],
+          'codice'    => $codiceCorrente,
+          'nome'      => (string) $scheda['identificazione']['nome'],
+          'natura'    => (string) $scheda['identificazione']['natura'],
+          'offuscate' => $coord['offuscate'],
+          'raggio'    => max(100, Config::intero('sicurezza.offuscamentoCoordinate', 1000)),
+      ];
+      ?>
+      <script type="application/json" id="catageoMappaConfig"><?= Testo::escJson(Mappa::perBrowser()) ?></script>
+      <script type="application/json" id="catageoMappaPunto"><?= Testo::escJson($puntoMappa) ?></script>
+    <?php endif; ?>
 
     <?php
     return; // scheda mostrata
@@ -1502,11 +1545,17 @@ $righe  = IndiceIpogei::elenco($filtro, IPOGEI_PER_PAGINA, ($pagina - 1) * IPOGE
       <?php endif; ?>
     </p>
   </div>
-  <?php if (Auth::puo('modifica_scheda')): ?>
-    <a class="btn btn-primary" href="index.php?p=ipogei&amp;azione=nuovo">
-      <i class="bi bi-plus-lg"></i> Nuovo ipogeo
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary"
+       href="index.php?p=mappa<?= $filtroCatalogo !== '' ? '&amp;catalogo=' . urlencode($filtroCatalogo) : '' ?>">
+      <i class="bi bi-map"></i> Vedi sulla mappa
     </a>
-  <?php endif; ?>
+    <?php if (Auth::puo('modifica_scheda')): ?>
+      <a class="btn btn-primary" href="index.php?p=ipogei&amp;azione=nuovo">
+        <i class="bi bi-plus-lg"></i> Nuovo ipogeo
+      </a>
+    <?php endif; ?>
+  </div>
 </div>
 
 <form method="get" action="index.php" class="row g-2 align-items-end mb-3">

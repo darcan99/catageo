@@ -1,0 +1,206 @@
+/* ============================================================================
+ *  CATAGEO — Catasto Ipogei
+ * ============================================================================
+ *  File .........: assets/css/catageo-mappa.css
+ *  Descrizione ..: Stili della cartografia: cluster, legenda, lettura delle
+ *                  coordinate sotto il puntatore, popup dei marker.
+ *
+ *                  Caricato solo dalle pagine che mostrano una mappa, insieme a
+ *                  leaflet.css. I colori usano le variabili di Bootstrap, cosi
+ *                  che i controlli restino leggibili anche in tema scuro.
+ *  Versione .....: 0.6.0
+ *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+ *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
+ *  Copyright ....: (c) 2026 Dario Candela
+ * ----------------------------------------------------------------------------
+ *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
+ * ============================================================================
+ */
+
+/* ------------------------------------------------------------------ cluster */
+
+/* Il numero dentro il cerchio e l'informazione principale: sfondo pieno e
+   bordo chiaro per staccare dal fondo cartografico, che puo essere di qualunque
+   colore. */
+.catageo-cluster {
+    background: none;
+    border: 0;
+}
+
+.catageo-cluster > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.78rem;
+    line-height: 1;
+    font-family: var(--bs-font-sans-serif);
+}
+
+/* Tre fasce dimensionali: la grandezza del cerchio anticipa l'ordine di
+   grandezza prima ancora di leggere il numero. */
+.catageo-cluster-p > div { background-color: rgba(13, 110, 253, 0.85); }
+.catageo-cluster-m > div { background-color: rgba(255, 133, 27, 0.9); }
+.catageo-cluster-g > div { background-color: rgba(220, 53, 69, 0.9); }
+
+/* --------------------------------------------------------------- popup */
+
+.catageo-popup-titolo {
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+}
+
+.catageo-popup-codice {
+    font-family: var(--bs-font-monospace);
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.catageo-popup dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.1rem 0.5rem;
+    margin: 0.4rem 0 0.5rem;
+    font-size: 0.82rem;
+}
+
+.catageo-popup dt {
+    color: #666;
+    font-weight: 400;
+}
+
+.catageo-popup dd {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Il popup di Leaflet ha fondo bianco fisso: il testo resta scuro anche in tema
+   scuro, altrimenti diventerebbe bianco su bianco. */
+.leaflet-popup-content .catageo-popup {
+    color: #212529;
+    min-width: 13rem;
+}
+
+.catageo-popup-avviso {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: #9a3412;
+}
+
+/* -------------------------------------------------------------- legenda */
+
+.catageo-legenda {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    max-width: 13rem;
+}
+
+.catageo-legenda h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+    margin: 0 0 0.35rem;
+}
+
+.catageo-legenda ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.catageo-legenda li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.catageo-legenda-segno {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+    flex: 0 0 auto;
+}
+
+/* Ingresso non praticabile: si distingue per il tratteggio, non per il colore,
+   che resta riservato alla natura della cavita. */
+.catageo-legenda-segno-chiuso {
+    border-style: dashed;
+    background-color: transparent !important;
+}
+
+/* ------------------------------------------------- lettura delle coordinate */
+
+/* Riquadro in basso: mostra la posizione del puntatore nel sistema preferito.
+   Serve a chi lavora su rilievi, che ragiona in coordinate e non in "circa la". */
+.catageo-coordinate-puntatore {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 0.2rem 0.5rem;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Su schermi stretti la barra delle coordinate coprirebbe la mappa. */
+@media (max-width: 575.98px) {
+    .catageo-coordinate-puntatore,
+    .catageo-legenda {
+        display: none;
+    }
+}
+
+/* --------------------------------------------------------- stato e conteggi */
+
+.catageo-mappa-stato {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Mappetta della scheda: piu bassa, perche accompagna i dati e non li sostituisce. */
+.catageo-mappa-scheda {
+    height: 20rem;
+    min-height: 0;
+}
+
+/* I controlli di Leaflet sono pensati per fondo chiaro: in tema scuro si
+   invertono i pulsanti di zoom e le attribuzioni, altrimenti spariscono. */
+[data-bs-theme="dark"] .leaflet-bar a,
+[data-bs-theme="dark"] .leaflet-control-layers,
+[data-bs-theme="dark"] .leaflet-control-attribution,
+[data-bs-theme="dark"] .leaflet-control-scale-line {
+    background-color: #2b3035;
+    color: #dee2e6;
+    border-color: #495057;
+}
+
+[data-bs-theme="dark"] .leaflet-bar a:hover {
+    background-color: #343a40;
+}
+
+[data-bs-theme="dark"] .leaflet-control-attribution a {
+    color: #6ea8fe;
+}

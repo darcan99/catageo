@@ -5,8 +5,8 @@
 | | |
 |---|---|
 | **Progetto** | CATAGEO (CATAsto ipoGEi) |
-| **Versione documento** | 1.1.0 |
-| **Data** | 2026-08-04 |
+| **Versione documento** | 1.2.0 |
+| **Data** | 2026-08-05 |
 | **Autore** | Dario Candela — darcan99@gmail.com |
 | **Repository** | github.com/darcan99/catageo |
 | **Stato** | Bozza per approvazione |
@@ -17,6 +17,7 @@
 |---|---|---|---|
 | 1.0.0 | 2026-08-03 | Dario Candela | Prima stesura |
 | 1.1.0 | 2026-08-04 | Dario Candela | Cataloghi multipli con serie di codifica a contatori indipendenti e strumento di migrazione tra cataloghi; padding del progressivo a soglia minima e senza tetto; testi senza limiti di lunghezza; nuove sezioni su file dedicati (bibliografia, dati scientifici, biospeleologia, archeologia, geologia); apertura al censimento di ipogei esteri |
+| 1.2.0 | 2026-08-05 | Dario Candela | Sistemi di riferimento e formati delle coordinate (D13) e conversione reale fra datum diversi (D14); stato di realizzazione della cartografia dopo la fase 4 (§7.2.1) e attributi dei layer (§7.2.2), con lo scostamento sull'astrazione del provider dichiarato in §7.1.1 |
 
 ---
 
@@ -1283,6 +1284,8 @@ onClickMappa(callback)                 onSpostaCerchio(callback)
 
 Il PHP produce sempre gli stessi dati (JSON dei punti, GeoJSON dei tracciati, elenco layer da `config.xml`): il provider cambia solo il rendering. Il clustering usa un'implementazione propria basata su griglia server-side per zoom bassi, così da non dipendere né da `Leaflet.markercluster` né da `MarkerClusterer` di Google e restare identica sui due provider. I layer **WMS** su Google sono realizzati con un `ImageMapType` che costruisce le `GetMap` per tile; su Leaflet con `L.tileLayer.wms` nativo.
 
+> **Scostamento in fase 4 — l'astrazione non è stata scritta.** `catageo-mappa.js` usa Leaflet direttamente. Un'interfaccia con una sola implementazione non ha modo di essere sbagliata nel punto giusto: si scopre quale sia il confine utile solo scrivendo la seconda implementazione, e fino a quel momento si paga un livello di indirezione per un beneficio ipotetico. Il contratto che conta è già indipendente dal provider e sta dove serve, cioè **fra PHP e browser**: `Mappa::perBrowser()` descrive layer, centro, zoom e colori senza nominare Leaflet, e `?p=geojson` è GeoJSON standard. Tutto il codice che conosce Leaflet sta in un unico file, quindi in fase 4b l'astrazione si estrae da un'implementazione funzionante invece di essere indovinata ora. **Decisione da confermare al committente.**
+
 ### 7.2 Funzionalità mappa
 
 - Mappa generale con marker di tutti gli ipogei visibili all'utente, **clustering** lato client per gestire migliaia di punti.
@@ -1296,6 +1299,48 @@ Il PHP produce sempre gli stessi dati (JSON dei punti, GeoJSON dei tracciati, el
 - Disegno del cerchio di ricerca per raggio, con trascinamento del centro.
 - Mappa nella scheda del singolo ipogeo, con ingressi multipli, tracciato KML dei rilievi e punti del diario di esplorazione.
 - Esportazione dei risultati in KML e GeoJSON.
+
+### 7.2.1 Stato di realizzazione (fase 4)
+
+| Funzione di §7.2 | Stato | Dove |
+|---|---|---|
+| Mappa generale, marker degli ipogei visibili | fatto | `app/pagine/mappa.php` |
+| Clustering a griglia in coordinate schermo | fatto | `catageo-mappa.js`, cella 64 px, singoli oltre lo zoom 17 |
+| Filtro per catalogo, natura, stato d'accesso, testo | fatto, **lato client** sui dati già scaricati | filtri immediati, nessun ricaricamento |
+| Marker per natura, legenda | fatto | colore = natura, tratteggio = ingresso non praticabile |
+| Popup con codice, nome, dati sintetici, link alla scheda | fatto | miniatura di copertina rinviata alla fase 5, quando esisteranno le foto |
+| Selettore base layer + pannello overlay WMS | fatto | da `config.xml`, opacità per layer rispettata |
+| Mappa nella scheda | fatto | punto singolo, o cerchio d'area se le coordinate sono offuscate |
+| Esportazione GeoJSON | fatto | `?p=geojson`, con gli stessi filtri dell'elenco |
+| Lettura delle coordinate sotto il puntatore | fatto, **non previsto in analisi** | gradi decimali e UTM, con fuso ricavato dalla longitudine |
+| Aggiunta layer WMS a runtime dall'interfaccia | **da fare** | oggi si dichiarano in `config.xml`; l'interfaccia di gestione va con la fase 9 (strumenti ADM) |
+| Cursore opacità per layer | **da fare** | l'attributo `opacita` è già letto e applicato, manca il comando |
+| Cerchio di ricerca per raggio, trascinabile | **da fare** | fase 8, insieme alla ricerca geografica |
+| Tracciato KML dei rilievi, punti dei diari | **da fare** | fasi 6 e 7. `window.CATAGEO.mappa` è il punto d'innesto già predisposto |
+| Layer tematici geologici preconfigurati | **da fare** | fase 6b: gli URL dei servizi vanno verificati uno per uno prima di scriverli in `config.xml.dist` (§6.16.1) |
+| Marker distinguibili per catalogo | **da fare** | oggi il catalogo si filtra ma non si distingue nel simbolo; il colore è impegnato dalla natura, servirà una seconda variabile visiva |
+
+#### 7.2.2 Configurazione dei layer
+
+Ogni layer è un elemento `<layer>` sotto `<baseLayers>` (sfondi, mutuamente esclusivi) oppure `<overlayLayers>` (sovrapposizioni). Attributi letti da `Mappa`:
+
+| Attributo | Vale per | Significato |
+|---|---|---|
+| `id` | tutti | identificativo; se assente viene generato |
+| `nome` | tutti | etichetta nel selettore |
+| `tipo` | tutti | `tms` (tile XYZ) o `wms`; qualunque altro valore ricade su `tms` |
+| `url` | tutti | **solo `http`/`https`**: uno schema diverso viene scartato, così un errore di configurazione non diventa un problema di sicurezza |
+| `attribuzione` | tutti | testo obbligatorio per rispettare la licenza della cartografia |
+| `minZoom`, `maxZoom` | tutti | limiti di scala |
+| `attivo` | tutti | `1` per accenderlo all'apertura |
+| `opacita` | tutti | `0`–`1`; fuori intervallo viene riportato dentro |
+| `sottodomini` | `tms` | lettere per il segnaposto `{s}`, default `abc` |
+| `layers` | `wms` | nomi dei layer richiesti al servizio: **obbligatorio**, senza di essi il layer viene scartato invece di mostrare riquadri vuoti |
+| `formato` | `wms` | default `image/png` |
+| `versione` | `wms` | default `1.3.0` |
+| `trasparente` | `wms` | `0` per un WMS opaco; altrimenti trasparente |
+
+Le origini dei layer alimentano la **Content-Security-Policy** emessa da `bootstrap.php`: aggiungere un servizio in `config.xml` è sufficiente, la policy si adegua da sé. Il segnaposto `{s}` diventa un carattere jolly di sottodominio. Se la lettura della configurazione cartografica fallisce, la policy resta quella restrittiva e il guasto viene registrato nel log: il sintomo altrimenti sarebbe soltanto una mappa senza sfondo.
 
 ### 7.3 KML sui rilievi
 

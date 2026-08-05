@@ -8,18 +8,23 @@ declare(strict_types=1);
  *  Descrizione ..: Struttura comune delle pagine: intestazione HTML, navbar,
  *                  messaggi, contenuto e footer. Riceve dalle pagine le
  *                  variabili $titolo e $contenuto.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  CSS e JS specifici della pagina, cosi le
+ *                                librerie cartografiche si caricano solo
+ *                                dove servono.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  *
  * @var string $titolo     titolo della pagina
  * @var string $contenuto  HTML gia prodotto dalla pagina
  * @var string $paginaAttiva  identificativo per evidenziare la voce di menu
+ * @var string[] $cssPagina  fogli di stile aggiuntivi richiesti dalla pagina
+ * @var string[] $jsPagina   script aggiuntivi richiesti dalla pagina
  */
 
 // Seconda barriera contro l'accesso diretto via HTTP: questo file ha senso
@@ -33,6 +38,12 @@ $contenuto   = $contenuto ?? '';
 $paginaAttiva = $paginaAttiva ?? '';
 $utente      = Auth::utente();
 $tema        = Config::caricata() ? Config::testo('sistema.tema', 'auto') : 'auto';
+
+// Risorse aggiuntive dichiarate dalla pagina. Le librerie pesanti (Leaflet,
+// proj4) si caricano solo dove servono: la pagina di accesso non deve scaricare
+// mezzo megabyte di cartografia.
+$cssPagina = $cssPagina ?? [];
+$jsPagina  = $jsPagina ?? [];
 
 /** Voci di menu: etichetta, pagina, icona, permesso richiesto. */
 $voci = [
@@ -55,6 +66,9 @@ $voci = [
 <link rel="stylesheet" href="assets/vendor/bootstrap-5.3.8/css/bootstrap.min.css">
 <link rel="stylesheet" href="assets/vendor/bootstrap-icons-1.13.1/bootstrap-icons.min.css">
 <link rel="stylesheet" href="assets/css/catageo.css">
+<?php foreach ($cssPagina as $foglio): ?>
+<link rel="stylesheet" href="<?= Testo::esc($foglio) ?>">
+<?php endforeach; ?>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -165,5 +179,8 @@ $voci = [
 
 <script src="assets/vendor/bootstrap-5.3.8/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/catageo.js"></script>
+<?php foreach ($jsPagina as $script): ?>
+<script src="<?= Testo::esc($script) ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>

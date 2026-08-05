@@ -9,12 +9,15 @@ declare(strict_types=1);
  *                  misure, log ed esportazioni. La lettura e in streaming
  *                  (una riga per volta) perche gli indici e le serie da
  *                  datalogger possono contare decine di migliaia di righe.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  BOM saltato prima di fgetcsv: un file salvato
+ *                                da Excel in "CSV UTF-8" ha BOM e intestazione
+ *                                fra apici, e la prima colonna non si leggeva.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -60,6 +63,8 @@ final class Csv
             // Lock condiviso: una scrittura concorrente non deve far leggere
             // una riga a meta.
             @flock($handle, LOCK_SH);
+
+            self::saltaBom($handle);
 
             $intestazione = fgetcsv($handle, 0, self::SEPARATORE, self::DELIMITATORE);
             if ($intestazione === false || $intestazione === [null]) {
@@ -110,6 +115,8 @@ final class Csv
             return [];
         }
         try {
+            self::saltaBom($handle);
+
             $riga = fgetcsv($handle, 0, self::SEPARATORE, self::DELIMITATORE);
             if ($riga === false || $riga === [null]) {
                 return [];
@@ -264,6 +271,25 @@ final class Csv
         $testo = (string) $valore;
         $testo = str_replace(["\r\n", "\r", "\n"], ' ', $testo);
         return trim($testo);
+    }
+
+    /**
+     * Posiziona il puntatore dopo il BOM, se il file ne ha uno.
+     *
+     * Va fatto PRIMA di fgetcsv, non dopo: se il BOM precede l'apice di
+     * apertura, fgetcsv non riconosce il primo campo come delimitato e
+     * l'intestazione diventa "catalogo" con gli apici dentro il nome. E
+     * precisamente cio che produce Excel salvando in "CSV UTF-8", cioe il modo
+     * piu probabile in cui un file dell'archivio verra riscritto a mano.
+     *
+     * @param resource $handle
+     */
+    private static function saltaBom($handle): void
+    {
+        $inizio = fread($handle, strlen(self::BOM));
+        if ($inizio !== self::BOM) {
+            rewind($handle);
+        }
     }
 
     /** Rimuove il BOM UTF-8 iniziale, se presente. */

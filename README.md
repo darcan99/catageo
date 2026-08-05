@@ -26,9 +26,24 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — attualmente in fase di analisi.
+🚧 **In sviluppo** — versione corrente **0.6.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
-Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi.
+| Fase | Contenuto | Stato |
+|---|---|---|
+| 0–1 | Struttura, core XML/CSV, autenticazione a tre livelli, installer | ✅ fatto |
+| 2 | Anagrafiche: gruppi speleologici, esploratori, tipologie, grandezze | ✅ fatto |
+| 2b | Cataloghi multipli con serie di codifica e contatori indipendenti | ✅ fatto |
+| 3 | Ipogei: scheda standard, censimento, indice, storico dei codici | ✅ fatto |
+| — | Coordinate: gradi, sessagesimali, UTM, Gauss-Boaga, ED50, con conversione verificata contro proj4js | ✅ fatto |
+| 4 | Mappa Leaflet/OSM, marker, raggruppamento, layer WMS, mappa di scheda | ✅ fatto |
+| 4b | Provider Google Maps alternativo | ⏳ da fare |
+| 5 | Allegati, foto con miniature, video | ⏳ da fare |
+| 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ⏳ da fare |
+| 7 | Esplorazioni, bibliografia, dati scientifici, biospeleologia, archeologia | ⏳ da fare |
+| 8 | Ricerca testuale, per attributi e geografica; migrazione fra cataloghi | ⏳ da fare |
+| 9–10 | Strumenti di manutenzione, rifinitura, manuale, `v1.0.0` | ⏳ da fare |
+
+Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.
 
 ## Requisiti
 

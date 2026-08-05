@@ -52,14 +52,36 @@
     <zoom>6</zoom>
     <zoomScheda>16</zoomScheda>
     <clusterMarker>1</clusterMarker>
+    <!-- Sfondi cartografici, mutuamente esclusivi. Il primo con attivo="1" e
+         quello mostrato all'apertura. L'elenco completo degli attributi
+         riconosciuti sta in ANALISI.md 7.2.2.
+         L'attribuzione non e decorativa: e la condizione di licenza con cui la
+         cartografia si puo usare. Non va rimossa. -->
     <baseLayers>
       <layer id="osm" nome="OpenStreetMap" tipo="tms"
              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
              attribuzione="&#169; OpenStreetMap contributors"
              maxZoom="19" attivo="1"/>
     </baseLayers>
-    <!-- Layer tematici: gli URL dei servizi vanno verificati e inseriti in
-         fase 4 (vedi ANALISI.md 6.16.1). Restano disattivati. -->
+
+    <!-- Layer tematici sovrapponibili (WMS del territorio, catasti, geologia).
+         Vuoto di proposito: gli endpoint dei servizi pubblici cambiano nel tempo
+         e ognuno ha le sue condizioni d'uso, quindi vanno verificati uno per uno
+         prima di scriverli qui (vedi ANALISI.md 6.16.1 e la fase 6b del piano).
+         Scriverne di inventati significherebbe consegnare un'installazione che
+         si collega a indirizzi che non esistono o che non e autorizzata a usare.
+
+         La forma di una voce WMS e questa:
+
+         <layer id="geologia" nome="Carta geologica" tipo="wms"
+                url="https://esempio.ente.it/geoserver/wms"
+                layers="nome_del_layer_sul_servizio"
+                formato="image/png" versione="1.3.0" trasparente="1"
+                attribuzione="Fonte: nome dell'ente"
+                opacita="0.6" attivo="0"/>
+
+         Gli host che compaiono qui vengono aggiunti automaticamente alla
+         Content-Security-Policy: non serve toccare altro. -->
     <overlayLayers/>
   </mappa>
 

@@ -6,6 +6,79 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.6.0] — 2026-08-05
+
+Fase 4: gli ipogei sul territorio.
+
+### Aggiunto
+- **Mappa generale** (`?p=mappa`) con Leaflet 1.9.4 e OpenStreetMap, entrambi
+  serviti dal server dell'installazione: nessuna CDN, nessuna chiave API.
+- **Raggruppamento dei marker** con una griglia in coordinate schermo, celle di
+  64 px, marker singoli oltre lo zoom 17. Scritto in casa invece di aggiungere
+  `Leaflet.markercluster`: sono un centinaio di righe contro una dipendenza in
+  piu da aggiornare, e il comportamento resta identico quando in fase 4b
+  arrivera il secondo provider.
+- **Filtri immediati** per testo, natura, catalogo e stato d'accesso, applicati
+  ai dati gia scaricati: nessun ricaricamento mentre si esplora la mappa.
+- **Legenda**: colore per natura della cavita, tratteggio per ingresso non
+  praticabile, cerchio numerato per i gruppi. Senza legenda i colori sono
+  decorazione.
+- **Lettura delle coordinate sotto il puntatore**, in gradi decimali e UTM. Il
+  fuso si ricava dalla longitudine e non dalla configurazione, cosi chi rileva a
+  cavallo di due fusi legge sempre quello giusto. Verificata al metro contro il
+  motore PHP su tre fusi e tre fasce.
+- **Mappa nella scheda dell'ipogeo**, con la rotella del mouse disattivata
+  perche altrimenti scorrere la pagina diventerebbe impossibile. Le schede senza
+  coordinate non scaricano Leaflet per non mostrare nulla.
+- **`?p=geojson`**: FeatureCollection standard degli ipogei visibili, con gli
+  stessi filtri dell'elenco. Serve la mappa e vale come esportazione.
+- `Mappa`: configurazione cartografica in un solo punto, con sfondi e layer WMS
+  dichiarati in `config.xml`. Gli URL ammessi sono solo `http`/`https` e un WMS
+  senza l'attributo `layers` viene scartato invece di disegnare riquadri vuoti.
+  Attributi documentati in `ANALISI.md` 7.2.2.
+- `Visibilita`: le regole di riservatezza in una classe sola, usata da elenco,
+  scheda e mappa. Una regola applicata in due punti su tre e una fuga di dati.
+- **Content-Security-Policy** attiva, con `script-src 'self'` e senza
+  `unsafe-inline`: i dati per il JavaScript passano da blocchi
+  `<script type="application/json">`, che non sono codice. Le origini dei tile
+  server si ricavano dai layer configurati, quindi aggiungere un servizio in
+  `config.xml` basta e la policy si adegua da se.
+- `window.CATAGEO.mappa`: punto d'innesto dichiarato per i rilievi KML della
+  fase 6 e i punti dei diari della fase 7, che aggiungeranno layer a questa
+  mappa invece di crearne una seconda.
+- `docs/prove/mappa/README.md`: verifiche fatte nel browser, con gli esiti e
+  l'elenco esplicito di cio che **non** coprono.
+
+### Riservatezza
+- Le coordinate offuscate escono dal server **gia arrotondate**: un filtro fatto
+  nel browser non e un filtro, perche i dati esatti sono comunque partiti.
+- Le schede riservate non entrano nella risposta GeoJSON di chi non puo vederle.
+- Sulla scheda, coordinate offuscate significano un **cerchio d'area** e non un
+  punto: un puntino sarebbe una bugia precisa. Lo zoom resta limitato a 12.
+- L'arrotondamento e deterministico: ricaricare la pagina mostra sempre la stessa
+  posizione approssimata. Con un disturbo casuale, piu letture permetterebbero di
+  ricavare il centro della distribuzione, cioe la posizione vera.
+
+### Corretto
+- **Un CSV salvato da Excel come «CSV UTF-8» rendeva illeggibile la prima
+  colonna dell'indice.** Excel scrive il BOM prima dell'apice di apertura, quindi
+  `fgetcsv` non riconosceva il primo campo come delimitato e la colonna si
+  chiamava `"catalogo"`, apici compresi: ogni lettura per nome falliva. Ora il
+  BOM viene saltato prima della lettura, non ripulito dopo. Conta perche
+  l'archivio e fatto per essere aperto e corretto a mano, ed Excel e il modo piu
+  probabile in cui accadra.
+- `CATAGEO_VERSIONE` era rimasta a 0.1.0 dalla prima fase: il footer dichiarava
+  una versione che non era quella installata.
+
+### Rinviato con motivazione
+- L'astrazione `CatageoMappa` prevista in analisi 7.1.1 **non e stata scritta**:
+  un'interfaccia con una sola implementazione si scopre sbagliata solo quando
+  arriva la seconda. Il contratto che conta e gia indipendente dal provider e sta
+  fra PHP e browser. Da confermare al committente.
+- Aggiunta di layer WMS dall'interfaccia, cursore di opacita, cerchio di ricerca
+  per raggio, marker distinguibili per catalogo: elencati in analisi 7.2.1 con la
+  fase in cui arrivano.
+
 ## [0.5.0] — 2026-08-05
 
 Coordinate: conversione reale fra sistemi di riferimento.

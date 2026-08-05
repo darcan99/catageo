@@ -12,12 +12,14 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  Rotte della mappa e del GeoJSON; risposte
+ *                                grezze emesse senza layout.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -47,6 +49,8 @@ if (!Config::caricata()) {
  * file        = file in app/pagine
  * permesso    = permesso richiesto, oppure null per le pagine pubbliche
  * titolo      = titolo mostrato nella pagina e nel tab del browser
+ * grezza      = true per le risposte che non sono pagine (JSON, KML, download):
+ *               vengono emesse cosi come sono, senza layout
  *
  * La whitelist e l'unico modo per raggiungere un file: il parametro ?p= non
  * viene mai usato per costruire un percorso, quindi non esiste superficie per
@@ -56,7 +60,8 @@ $pagine = [
     'login'        => ['file' => 'login.php',        'permesso' => null,                 'titolo' => 'Accesso'],
     'esci'         => ['file' => 'esci.php',         'permesso' => null,                 'titolo' => 'Uscita'],
     'home'         => ['file' => 'home.php',         'permesso' => 'consulta',           'titolo' => 'Pagina iniziale'],
-    'mappa'        => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Mappa'],
+    'mappa'        => ['file' => 'mappa.php',        'permesso' => 'consulta',           'titolo' => 'Mappa'],
+    'geojson'      => ['file' => 'geojson.php',      'permesso' => 'consulta',           'titolo' => 'GeoJSON', 'grezza' => true],
     'ipogei'       => ['file' => 'ipogei.php',       'permesso' => 'consulta',           'titolo' => 'Ipogei'],
     'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
     'esplorazioni' => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
@@ -72,7 +77,6 @@ $pagine = [
 
 /** Fase di sviluppo dichiarata nelle pagine non ancora realizzate. */
 $fasiPreviste = [
-    'mappa'        => 'Fase 4 — mappa Leaflet/OSM, marker, layer WMS',
     'ipogei'       => 'Fase 3 — scheda ipogeo, censimento, indice',
     'ricerca'      => 'Fase 8 — ricerca testuale, per attributi e geografica',
     'esplorazioni' => 'Fase 7 — diari esplorativi',
@@ -117,6 +121,25 @@ if ($richiesta === 'login' && Auth::autenticato()) {
 $titolo       = $pagina['titolo'];
 $paginaAttiva = $richiesta;
 $contenuto    = '';
+
+// Le risposte grezze non passano dal layout: emettono il proprio contenuto e
+// terminano. Gli errori li restituiscono nel loro stesso formato, altrimenti un
+// client che si aspetta JSON riceverebbe una pagina HTML e non capirebbe nulla.
+if (!empty($pagina['grezza'])) {
+    try {
+        require __DIR__ . '/app/pagine/' . $pagina['file'];
+    } catch (Throwable $e) {
+        Log::errore($e->getMessage(), 'errore', $e->getFile(), $e->getLine());
+        if (!headers_sent()) {
+            http_response_code($e instanceof AuthEccezione ? 403 : 500);
+            header('Content-Type: application/json; charset=UTF-8');
+        }
+        echo json_encode(['errore' => Config::booleano('sistema.debug', false)
+            ? $e->getMessage()
+            : 'Richiesta non completata. L\'errore e stato registrato nel log.']);
+    }
+    exit;
+}
 
 try {
     ob_start();

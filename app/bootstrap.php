@@ -9,12 +9,15 @@ declare(strict_types=1);
  *                  classi, gestione degli errori, caricamento della
  *                  configurazione, fuso orario e avvio della sessione.
  *                  Va incluso da index.php e da installa.php.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.0  2026-08-05  D.Candela  Content-Security-Policy con le origini dei
+ *                                tile server ricavate dai layer configurati.
+ *                                CATAGEO_VERSIONE allineata al rilascio.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -25,7 +28,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '0.1.0');
+define('CATAGEO_VERSIONE', '0.6.0');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');
@@ -111,16 +114,54 @@ date_default_timezone_set($catageoFuso);
 /**
  * Intestazioni di sicurezza applicate a ogni risposta.
  *
- * La Content-Security-Policy NON viene emessa in questa fase: andra definita
- * in fase 4, quando saranno noti gli host effettivi dei tile server e
- * l'eventuale script di Google Maps. Scriverla ora troppo permissiva sarebbe
- * inutile, troppo stretta romperebbe la mappa.
+ * La Content-Security-Policy elenca esplicitamente le origini dei tile server
+ * ricavandole dai layer configurati: e l'unico punto in cui l'applicativo si
+ * collega a host esterni, e resta visibile a chi amministra il sistema.
+ *
+ * script-src resta 'self' senza 'unsafe-inline': i dati che le pagine passano al
+ * JavaScript viaggiano in blocchi <script type="application/json">, che non sono
+ * codice eseguibile. style-src ammette 'unsafe-inline' perche Leaflet posiziona
+ * i tile scrivendo l'attributo style degli elementi, e non c'e modo di evitarlo
+ * senza rinunciare alla mappa.
  */
 if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('Referrer-Policy: same-origin');
     header('X-Robots-Tag: noindex, nofollow');
+
+    $catageoOrigini = '';
+    if ($catageoConfigurato) {
+        try {
+            $catageoElenco = Mappa::originiEsterne();
+            $catageoOrigini = $catageoElenco === [] ? '' : ' ' . implode(' ', $catageoElenco);
+        } catch (Throwable $e) {
+            // Una configurazione cartografica incompleta non deve impedire
+            // l'accesso: si resta sulla policy piu restrittiva. Il guasto va
+            // pero registrato, perche il sintomo visibile sarebbe soltanto una
+            // mappa senza sfondo, senza alcuna spiegazione.
+            $catageoOrigini = '';
+            try {
+                Log::errore('Origini cartografiche non determinate: ' . $e->getMessage(),
+                    'errore', $e->getFile(), $e->getLine());
+            } catch (Throwable $ignorato) {
+                // Archivio non ancora pronto: non c'e dove annotare.
+            }
+        }
+    }
+
+    header(
+        "Content-Security-Policy: default-src 'self'; "
+        . "base-uri 'self'; "
+        . "form-action 'self'; "
+        . "frame-ancestors 'self'; "
+        . "object-src 'none'; "
+        . "script-src 'self'; "
+        . "style-src 'self' 'unsafe-inline'; "
+        . "font-src 'self'; "
+        . "img-src 'self' data: blob:" . $catageoOrigini . '; '
+        . "connect-src 'self'" . $catageoOrigini
+    );
 }
 
 // --------------------------------------------------------------------- sessione
