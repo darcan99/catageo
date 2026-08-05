@@ -9,12 +9,13 @@ declare(strict_types=1);
  *                  classi, gestione degli errori, caricamento della
  *                  configurazione, fuso orario e avvio della sessione.
  *                  Va incluso da index.php e da installa.php.
- *  Versione .....: 0.6.4
+ *  Versione .....: 0.7.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.0  2026-08-05  D.Candela  Versione 0.7.0 (fase 5).
  *  0.6.4  2026-08-05  D.Candela  CATAGEO_VERSIONE segue i rilasci 0.6.1-0.6.4.
  *  0.6.0  2026-08-05  D.Candela  Content-Security-Policy con le origini dei
  *                                tile server ricavate dai layer configurati.
@@ -29,7 +30,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '0.6.4');
+define('CATAGEO_VERSIONE', '0.7.0');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');

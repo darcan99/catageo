@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.7.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.0  2026-08-05  D.Candela  Rotta della gestione risorse.
  *  0.6.0  2026-08-05  D.Candela  Rotte della mappa e del GeoJSON; risposte
  *                                grezze emesse senza layout.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
@@ -63,6 +64,7 @@ $pagine = [
     'mappa'        => ['file' => 'mappa.php',        'permesso' => 'consulta',           'titolo' => 'Mappa'],
     'geojson'      => ['file' => 'geojson.php',      'permesso' => 'consulta',           'titolo' => 'GeoJSON', 'grezza' => true],
     'ipogei'       => ['file' => 'ipogei.php',       'permesso' => 'consulta',           'titolo' => 'Ipogei'],
+    'risorse'      => ['file' => 'risorse.php',      'permesso' => 'consulta',           'titolo' => 'Risorse'],
     'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
     'esplorazioni' => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
     'anagrafiche'  => ['file' => 'anagrafiche.php',  'permesso' => 'anagrafiche',        'titolo' => 'Anagrafiche'],

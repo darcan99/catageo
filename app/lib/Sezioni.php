@@ -13,12 +13,14 @@ declare(strict_types=1);
  *                  averle definite in un unico punto e la garanzia che lo
  *                  standard di nomenclatura non divergga fra le parti che lo
  *                  applicano.
- *  Versione .....: 0.4.0
+ *  Versione .....: 0.7.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.0  2026-08-05  D.Candela  Estensioni ammesse, tipo di anteprima e
+ *                                sezioni caricabili (fase 5).
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
  * ============================================================================
  */
@@ -36,19 +38,37 @@ final class Sezioni
      * etichetta  = nome mostrato in interfaccia
      * conFile    = la sezione contiene file caricati dall'utente
      * indice     = la sezione ha un XML di indice "[codice] - [cartella].xml"
+     * estensioni = chiave di <upload><estensioni sezione="…"> in config.xml,
+     *              oppure '' se la sezione non riceve caricamenti
+     * anteprima  = come si mostra il contenuto: immagine, video, documento o ''
+     * caricabile = la sezione accetta caricamenti dall'interfaccia (fase 5:
+     *              allegati, foto e video; le altre arrivano dopo)
      */
     public const ELENCO = [
-        'AL' => ['cartella' => 'Allegati',       'etichetta' => 'Allegati',        'conFile' => true,  'indice' => true],
-        'FO' => ['cartella' => 'Foto',           'etichetta' => 'Foto',            'conFile' => true,  'indice' => true],
-        'VI' => ['cartella' => 'Video',          'etichetta' => 'Video',           'conFile' => true,  'indice' => true],
-        'RI' => ['cartella' => 'Rilievi',        'etichetta' => 'Rilievi',         'conFile' => true,  'indice' => true],
-        'ES' => ['cartella' => 'Esplorazioni',   'etichetta' => 'Esplorazioni',    'conFile' => true,  'indice' => true],
-        'BB' => ['cartella' => 'Bibliografia',   'etichetta' => 'Bibliografia',    'conFile' => false, 'indice' => true],
-        'SC' => ['cartella' => 'Scientifici',    'etichetta' => 'Dati scientifici', 'conFile' => true, 'indice' => true],
-        'BI' => ['cartella' => 'Biospeleologia', 'etichetta' => 'Biospeleologia',  'conFile' => true,  'indice' => true],
-        'AR' => ['cartella' => 'Archeologia',    'etichetta' => 'Archeologia',     'conFile' => false, 'indice' => true],
-        'GE' => ['cartella' => 'Geologia',       'etichetta' => 'Geologia',        'conFile' => false, 'indice' => true],
+        'AL' => ['cartella' => 'Allegati',       'etichetta' => 'Allegati',         'conFile' => true,  'indice' => true,
+                 'estensioni' => 'allegati',     'anteprima' => 'documento', 'caricabile' => true],
+        'FO' => ['cartella' => 'Foto',           'etichetta' => 'Foto',             'conFile' => true,  'indice' => true,
+                 'estensioni' => 'foto',         'anteprima' => 'immagine',  'caricabile' => true],
+        'VI' => ['cartella' => 'Video',          'etichetta' => 'Video',            'conFile' => true,  'indice' => true,
+                 'estensioni' => 'video',        'anteprima' => 'video',     'caricabile' => true],
+        'RI' => ['cartella' => 'Rilievi',        'etichetta' => 'Rilievi',          'conFile' => true,  'indice' => true,
+                 'estensioni' => 'rilievi',      'anteprima' => 'documento', 'caricabile' => false],
+        'ES' => ['cartella' => 'Esplorazioni',   'etichetta' => 'Esplorazioni',     'conFile' => true,  'indice' => true,
+                 'estensioni' => '',             'anteprima' => '',          'caricabile' => false],
+        'BB' => ['cartella' => 'Bibliografia',   'etichetta' => 'Bibliografia',     'conFile' => false, 'indice' => true,
+                 'estensioni' => '',             'anteprima' => '',          'caricabile' => false],
+        'SC' => ['cartella' => 'Scientifici',    'etichetta' => 'Dati scientifici', 'conFile' => true,  'indice' => true,
+                 'estensioni' => 'scientifici',  'anteprima' => 'documento', 'caricabile' => false],
+        'BI' => ['cartella' => 'Biospeleologia', 'etichetta' => 'Biospeleologia',   'conFile' => true,  'indice' => true,
+                 'estensioni' => 'scientifici',  'anteprima' => 'documento', 'caricabile' => false],
+        'AR' => ['cartella' => 'Archeologia',    'etichetta' => 'Archeologia',      'conFile' => false, 'indice' => true,
+                 'estensioni' => '',             'anteprima' => '',          'caricabile' => false],
+        'GE' => ['cartella' => 'Geologia',       'etichetta' => 'Geologia',         'conFile' => false, 'indice' => true,
+                 'estensioni' => '',             'anteprima' => '',          'caricabile' => false],
     ];
+
+    /** Nome della cartella delle miniature, dentro la cartella di sezione. */
+    public const MINIATURE = '_mini';
 
     /**
      * Sigle valide.
@@ -66,10 +86,37 @@ final class Sezioni
         return isset(self::ELENCO[strtoupper($sigla)]);
     }
 
+    /** Sigle delle sezioni che accettano caricamenti dall'interfaccia. */
+    public static function caricabili(): array
+    {
+        return array_keys(array_filter(
+            self::ELENCO,
+            static fn (array $s): bool => $s['caricabile']
+        ));
+    }
+
+    /** True se la sezione accetta caricamenti dall'interfaccia. */
+    public static function caricabile(string $sigla): bool
+    {
+        return self::valida($sigla) && self::dati($sigla)['caricabile'];
+    }
+
+    /** Chiave di configurazione delle estensioni ammesse per la sezione. */
+    public static function chiaveEstensioni(string $sigla): string
+    {
+        return self::dati($sigla)['estensioni'];
+    }
+
+    /** Come va mostrato il contenuto: immagine, video, documento o ''. */
+    public static function anteprima(string $sigla): string
+    {
+        return self::dati($sigla)['anteprima'];
+    }
+
     /**
      * Dati di una sezione.
      *
-     * @return array{cartella:string,etichetta:string,conFile:bool,indice:bool}
+     * @return array{cartella:string,etichetta:string,conFile:bool,indice:bool,estensioni:string,anteprima:string,caricabile:bool}
      * @throws InvalidArgumentException
      */
     public static function dati(string $sigla): array

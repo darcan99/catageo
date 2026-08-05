@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Progetto** | CATAGEO (CATAsto ipoGEi) |
-| **Versione documento** | 1.2.0 |
+| **Versione documento** | 1.3.0 |
 | **Data** | 2026-08-05 |
 | **Autore** | Dario Candela — darcan99@gmail.com |
 | **Repository** | github.com/darcan99/catageo |
@@ -18,6 +18,7 @@
 | 1.0.0 | 2026-08-03 | Dario Candela | Prima stesura |
 | 1.1.0 | 2026-08-04 | Dario Candela | Cataloghi multipli con serie di codifica a contatori indipendenti e strumento di migrazione tra cataloghi; padding del progressivo a soglia minima e senza tetto; testi senza limiti di lunghezza; nuove sezioni su file dedicati (bibliografia, dati scientifici, biospeleologia, archeologia, geologia); apertura al censimento di ipogei esteri |
 | 1.2.0 | 2026-08-05 | Dario Candela | Sistemi di riferimento e formati delle coordinate (D13) e conversione reale fra datum diversi (D14); stato di realizzazione della cartografia dopo la fase 4 (§7.2.1) e attributi dei layer (§7.2.2), con lo scostamento sull'astrazione del provider dichiarato in §7.1.1 |
+| 1.3.0 | 2026-08-05 | Dario Candela | Stato di realizzazione delle risorse dopo la fase 5 (§9.2–9.5); riservatezza per singola risorsa oltre che per scheda |
 
 ---
 
@@ -1395,6 +1396,26 @@ Upload multiplo con progressivo automatico, metadati compilabili, controllo MIME
 ### 9.3 Foto
 
 Galleria con miniature (`_mini/`), lightbox, riordino, scelta della copertina, geotag opzionale (letto da EXIF se presente, in fase 2), rotazione automatica da EXIF `Orientation`. Se `gd` non è disponibile si servono le immagini originali con dimensionamento CSS e avviso in diagnostica.
+
+#### 9.2–9.5 Stato di realizzazione (fase 5)
+
+| Funzione | Stato | Nota |
+|---|---|---|
+| Caricamento multiplo con progressivo automatico | fatto | allegati, foto, video |
+| Metadati compilabili, indice `[codice] - [Sezione].xml` | fatto | schema `schemi/risorse.xsd` |
+| Controllo estensione + MIME reale | fatto | tre barriere indipendenti, §12 |
+| `scarica.php` con permessi e `Content-Disposition` | fatto | più la riservatezza della singola risorsa |
+| Supporto `Range` per il seek dei video | fatto | 206, intervalli aperti, 416 |
+| Miniature con GD e rotazione da EXIF | fatto | con rinuncia motivata se la memoria non basta |
+| Copertina della scheda | fatto | usa l'originale, non la miniatura |
+| Rimozione conservativa | fatto | in `[codice] - _rimossi`, progressivo mai riusato |
+| Player HTML5 per i video | fatto | non esercitato con un MP4 reale, vedi `docs/prove/risorse` |
+| **Lightbox** della galleria | **da fare** | oggi l'immagine si apre in una scheda nuova |
+| **Riordino** delle foto | **da fare** | l'ordine è quello del progressivo |
+| **Geotag da EXIF** | **da fare** | il campo coordinate esiste nello schema, non viene ancora letto |
+| **Rilievi, dati scientifici, biospeleologia** | **da fare** | fasi 6 e 7: le sezioni elencano ma non accettano caricamenti |
+
+Una precisazione rispetto a quanto scritto sopra: la riservatezza è **per singola risorsa** e non solo per scheda. Una foto può essere marcata riservata dentro una scheda pubblica — è il caso della foto che mostra l'ingresso di una cavità protetta — e in quel caso `scarica.php` la nega a chi ha la sola consultazione.
 
 ### 9.4 Rilievi 2D / 3D
 

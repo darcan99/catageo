@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.7.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.0  2026-08-05  D.Candela  Contenuti delle sezioni nei rispettivi
+ *                                pannelli, copertina in testa alla scheda.
  *  0.6.0  2026-08-05  D.Candela  Mappa nella scheda; regole di riservatezza
  *                                delegate a Visibilita.
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
@@ -427,6 +429,36 @@ if ($azione === 'scheda' && $codice !== '') {
 
       <!-- ------------------------------------------------------------ Dati -->
       <div class="tab-pane fade show active" id="tabDati">
+        <?php
+        // Copertina: la prima cosa che si guarda aprendo una scheda, quando c'e.
+        // Sta fuori dalla griglia e a tutta larghezza perche una foto stretta in
+        // mezza colonna non fa vedere niente di una cavita.
+        $copertina = Risorse::copertina($codiceCorrente);
+        ?>
+        <?php if ($copertina !== null): ?>
+          <?php $pCop = (int) $copertina['progressivo']; ?>
+          <div class="card mb-4">
+            <?php
+            // La copertina usa l'ORIGINALE e non la miniatura: la miniatura e
+            // larga 400 px e qui verrebbe stirata su tutta la scheda, con un
+            // risultato visibilmente sgranato. E una sola immagine per scheda,
+            // quindi il peso in piu e accettabile; le gallerie, dove le immagini
+            // sono decine, continuano a usare le miniature.
+            ?>
+            <a href="<?= Testo::esc('scarica.php?codice=' . urlencode($codiceCorrente) . '&sez=FO&prog=' . $pCop . '&inline=1') ?>"
+               target="_blank" rel="noopener" title="Apri a dimensione piena">
+              <img class="catageo-copertina"
+                   src="<?= Testo::esc('scarica.php?codice=' . urlencode($codiceCorrente) . '&sez=FO&prog=' . $pCop . '&inline=1') ?>"
+                   alt="<?= Testo::esc((string) $copertina['titolo']) ?>">
+            </a>
+            <?php if ((string) $copertina['titolo'] !== ''): ?>
+              <div class="card-body py-2">
+                <span class="text-body-secondary"><?= Testo::esc((string) $copertina['titolo']) ?></span>
+              </div>
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
+
         <div class="row g-4">
           <div class="col-lg-6">
             <div class="card h-100">
@@ -746,29 +778,146 @@ if ($azione === 'scheda' && $codice !== '') {
         <?php endif; ?>
       </div>
 
-      <!-- --------------------------------------------- sezioni in arrivo -->
+      <!-- ------------------------------------------------------- sezioni -->
       <?php foreach (Sezioni::sigle() as $sigla): ?>
+        <?php
+        $contenuti  = Risorse::elenco($codiceCorrente, $sigla);
+        $caricabile = Sezioni::caricabile($sigla);
+        $vista      = Sezioni::anteprima($sigla);
+        $urlSezione = 'index.php?p=risorse&amp;codice=' . urlencode($codiceCorrente) . '&amp;sez=' . $sigla;
+
+        /** Indirizzo di consegna, uguale a quello della pagina di gestione. */
+        $urlFile = static function (int $prog, bool $mini = false, bool $inline = false) use ($codiceCorrente, $sigla): string {
+            return 'scarica.php?codice=' . urlencode($codiceCorrente) . '&sez=' . $sigla . '&prog=' . $prog
+                . ($mini ? '&mini=1' : '') . ($inline ? '&inline=1' : '');
+        };
+        ?>
         <div class="tab-pane fade" id="tabSezione<?= $sigla ?>">
-          <div class="card">
-            <div class="card-body d-flex gap-3">
-              <i class="bi bi-cone-striped fs-3 text-warning" aria-hidden="true"></i>
-              <div>
-                <h2 class="h6 mb-1"><?= Testo::esc(Sezioni::etichetta($sigla)) ?></h2>
-                <p class="text-body-secondary mb-2">
-                  La cartella
-                  <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codiceCorrente, $sigla)) ?></span>
-                  esiste gia nell'archivio ed e pronta: la gestione dei contenuti
-                  arriva nelle fasi successive del piano di sviluppo.
-                </p>
-                <p class="catageo-nota mb-0">
-                  Nel frattempo i file si possono depositare a mano nella cartella
-                  rispettando lo standard di nomenclatura
-                  <span class="catageo-valore"><?= Testo::esc($codiceCorrente) ?>-<?= $sigla ?>001-nome.est</span>:
-                  verranno riconosciuti e conteggiati dall'indice.
-                </p>
+
+          <div class="catageo-intestazione mb-3">
+            <div>
+              <h2 class="h5 mb-0"><?= Testo::esc(Sezioni::etichetta($sigla)) ?></h2>
+              <p class="text-body-secondary mb-0">
+                <?= count($contenuti) ?> element<?= count($contenuti) === 1 ? 'o' : 'i' ?>
+              </p>
+            </div>
+            <?php if ($caricabile && Auth::puo('carica_risorse')): ?>
+              <a class="btn btn-sm btn-primary catageo-non-stampare" href="<?= $urlSezione ?>">
+                <i class="bi bi-upload"></i> Gestisci e carica
+              </a>
+            <?php elseif ($contenuti !== []): ?>
+              <a class="btn btn-sm btn-outline-secondary catageo-non-stampare" href="<?= $urlSezione ?>">
+                <i class="bi bi-list-ul"></i> Vedi tutto
+              </a>
+            <?php endif; ?>
+          </div>
+
+          <?php if ($contenuti === []): ?>
+
+            <div class="card">
+              <div class="card-body d-flex gap-3">
+                <i class="bi <?= $caricabile ? 'bi-folder2-open text-body-secondary' : 'bi-cone-striped text-warning' ?> fs-3"
+                   aria-hidden="true"></i>
+                <div>
+                  <?php if ($caricabile): ?>
+                    <h3 class="h6 mb-1">Nessun contenuto</h3>
+                    <p class="text-body-secondary mb-0">
+                      La cartella
+                      <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codiceCorrente, $sigla)) ?></span>
+                      e pronta e attende il primo caricamento.
+                    </p>
+                  <?php else: ?>
+                    <h3 class="h6 mb-1">In arrivo</h3>
+                    <p class="text-body-secondary mb-2">
+                      La cartella
+                      <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codiceCorrente, $sigla)) ?></span>
+                      esiste gia nell'archivio: la gestione dei contenuti di questa
+                      sezione arriva in una fase successiva del piano.
+                    </p>
+                    <p class="catageo-nota mb-0">
+                      Nel frattempo i file si possono depositare a mano nella cartella
+                      rispettando lo standard di nomenclatura
+                      <span class="catageo-valore"><?= Testo::esc($codiceCorrente) ?>-<?= $sigla ?>001-nome.est</span>:
+                      verranno riconosciuti e conteggiati dall'indice.
+                    </p>
+                  <?php endif; ?>
+                </div>
               </div>
             </div>
-          </div>
+
+          <?php elseif ($vista === 'immagine'): ?>
+
+            <div class="row g-3">
+              <?php foreach ($contenuti as $foto): ?>
+                <?php $p = (int) $foto['progressivo']; ?>
+                <div class="col-6 col-md-4 col-xl-3">
+                  <div class="card h-100">
+                    <a href="<?= Testo::esc($urlFile($p, false, true)) ?>" target="_blank" rel="noopener">
+                      <img src="<?= Testo::esc($urlFile($p, true, true)) ?>"
+                           alt="<?= Testo::esc((string) $foto['titolo']) ?>"
+                           class="card-img-top catageo-miniatura" loading="lazy">
+                    </a>
+                    <div class="card-body py-2">
+                      <div class="text-truncate" title="<?= Testo::esc((string) $foto['titolo']) ?>">
+                        <?= Testo::esc((string) $foto['titolo']) ?>
+                      </div>
+                      <div class="catageo-nota">
+                        <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $p)) ?></span>
+                        <?php if (!empty($foto['copertina'])): ?>
+                          · <i class="bi bi-star-fill text-primary" title="copertina"></i>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+
+          <?php else: ?>
+
+            <div class="card">
+              <div class="table-responsive">
+                <table class="table catageo-tabella mb-0 align-middle">
+                  <thead>
+                    <tr>
+                      <th style="width:5rem">Rif.</th>
+                      <th>Titolo</th>
+                      <th>File</th>
+                      <th class="text-end">Dimensione</th>
+                      <th>Data</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($contenuti as $risorsa): ?>
+                      <?php $p = (int) $risorsa['progressivo']; ?>
+                      <tr>
+                        <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $p)) ?></span></td>
+                        <td>
+                          <?= Testo::esc((string) $risorsa['titolo']) ?>
+                          <?php if ((string) $risorsa['categoriaAllegato'] !== ''): ?>
+                            <span class="badge text-bg-light border"><?= Testo::esc((string) $risorsa['categoriaAllegato']) ?></span>
+                          <?php endif; ?>
+                        </td>
+                        <td>
+                          <?php if (Risorse::percorsoFile($codiceCorrente, $sigla, $p) !== null): ?>
+                            <a href="<?= Testo::esc($urlFile($p)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
+                          <?php else: ?>
+                            <span class="text-danger">
+                              <i class="bi bi-exclamation-triangle-fill"></i>
+                              <?= Testo::esc((string) $risorsa['file']) ?> — file mancante
+                            </span>
+                          <?php endif; ?>
+                        </td>
+                        <td class="text-end catageo-valore"><?= Testo::esc(Testo::dimensione((int) $risorsa['dimensione'])) ?></td>
+                        <td><?= Testo::esc((string) $risorsa['data']) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          <?php endif; ?>
         </div>
       <?php endforeach; ?>
 

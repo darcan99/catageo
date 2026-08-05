@@ -5,12 +5,13 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.6.4
+ *  Versione .....: 0.7.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.0  2026-08-05  D.Candela  Miniature, video e copertina (fase 5).
  *  0.6.4  2026-08-05  D.Candela  Sabbia predefinita; stile del menu Aspetto.
  *  0.6.3  2026-08-05  D.Candela  Tema chiaro invertito: pagina bianca e schede
  *                                piu scure, con quattro tavolozze; fondo di
@@ -315,6 +316,36 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
 
 #catageoAspetto + .dropdown-menu .catageo-nota {
     margin-top: 0;
+}
+
+/* ------------------------------------------------------------------ risorse */
+
+/* Miniature della galleria: proporzione fissa e ritaglio centrato, cosi la
+   griglia resta allineata anche con foto verticali e orizzontali mescolate.
+   Il fondo scuro non e decorativo: e quello che si vede mentre l'immagine si
+   sta ancora scaricando, e un grigio neutro e meno fastidioso del bianco. */
+.catageo-miniatura {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background-color: rgba(var(--bs-emphasis-color-rgb), 0.06);
+}
+
+/* Senza limite un video a piena risoluzione uscirebbe dalla riga di tabella. */
+.catageo-video {
+    width: 100%;
+    max-width: 40rem;
+    max-height: 22rem;
+    background-color: #000;
+    border-radius: var(--bs-border-radius);
+}
+
+/* Copertina nella scheda: si affianca ai dati senza dominarli. */
+.catageo-copertina {
+    width: 100%;
+    max-height: 16rem;
+    object-fit: cover;
+    border-radius: var(--bs-border-radius);
 }
 
 /* Pagina di accesso: form centrato verticalmente. */

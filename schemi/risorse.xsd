@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/risorse.xsd
+   Descrizione ..: Schema degli indici di sezione "[codice] - [Sezione].xml"
+                   (D1): allegati, foto, video, rilievi e le altre sezioni con
+                   file. Un solo schema per tutte, perche la struttura e la
+                   stessa e cambiano solo i campi facoltativi.
+
+                   Note sui tipi:
+                   - le date sono xs:string con pattern e non xs:date, perche
+                     l'applicativo scrive elementi vuoti quando il dato manca e
+                     xs:date non ammette la stringa vuota;
+                   - progressivo e ultimoProgressivo sono sequenze di cifre e
+                     non xs:integer: come i codici catastali non hanno tetto
+                     oltre l'intero della piattaforma (D7);
+                   - l'ordine degli elementi dentro <risorsa> non e imposto
+                     (xs:all): un indice corretto a mano resta valido anche se
+                     chi lo modifica sposta una riga.
+   Versione .....: 0.7.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tCifre">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tSiglaSezione">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodiceIpogeo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{1,60}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Data ISO oppure vuota: vedi nota in testa. -->
+  <xs:simpleType name="tData">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Data e ora ISO, oppure vuota. -->
+  <xs:simpleType name="tDataOra">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tRiservatezza">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pubblica"/>
+      <xs:enumeration value="coordinate_offuscate"/>
+      <xs:enumeration value="riservata"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0|1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. autore .............. -->
+
+  <xs:complexType name="tAutore">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <!-- Riferimento all'anagrafica; assente se l'autore e solo un nome. -->
+        <xs:attribute name="esploratoreId" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="tGruppo">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- ............................................. risorsa ............. -->
+
+  <xs:complexType name="tRisorsa">
+    <xs:all>
+      <xs:element name="file" type="xs:string"/>
+      <xs:element name="titolo" type="xs:string" minOccurs="0"/>
+      <xs:element name="descrizione" type="xs:string" minOccurs="0"/>
+      <xs:element name="data" type="tData" minOccurs="0"/>
+      <xs:element name="autore" type="tAutore" minOccurs="0"/>
+      <xs:element name="gruppo" type="tGruppo" minOccurs="0"/>
+      <xs:element name="licenza" type="xs:string" minOccurs="0"/>
+      <xs:element name="riservatezza" type="tRiservatezza" minOccurs="0"/>
+      <xs:element name="copertina" type="tBooleano" minOccurs="0"/>
+      <xs:element name="mime" type="xs:string" minOccurs="0"/>
+      <xs:element name="dimensione" type="tCifre" minOccurs="0"/>
+      <xs:element name="hash" type="xs:string" minOccurs="0"/>
+
+      <!-- Specifico degli allegati. -->
+      <xs:element name="categoriaAllegato" type="xs:string" minOccurs="0"/>
+
+      <!-- Specifico dei video ospitati altrove, per non consumare spazio. -->
+      <xs:element name="urlEsterno" type="xs:string" minOccurs="0"/>
+
+      <xs:element name="caricato" minOccurs="0">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="tDataOra">
+              <xs:attribute name="utente" type="xs:string" use="optional"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+
+    <xs:attribute name="progressivo" type="tCifre" use="required"/>
+    <xs:attribute name="sigla" type="tSiglaSezione" use="required"/>
+  </xs:complexType>
+
+  <!-- ............................................. radice .............. -->
+
+  <xs:element name="risorse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="risorsa" type="tRisorsa" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+      <xs:attribute name="sezione" type="xs:string" use="required"/>
+      <xs:attribute name="codiceIpogeo" type="tCodiceIpogeo" use="required"/>
+      <xs:attribute name="ultimoProgressivo" type="tCifre" use="required"/>
+    </xs:complexType>
+
+    <!-- Il progressivo identifica la risorsa dentro la sezione ed e citato
+         dalle altre sezioni: due righe con lo stesso numero renderebbero
+         ambiguo ogni riferimento. -->
+    <xs:unique name="unicitaProgressivo">
+      <xs:selector xpath="risorsa"/>
+      <xs:field xpath="@progressivo"/>
+    </xs:unique>
+
+    <!-- Due righe che puntano allo stesso file sono un errore di indice: la
+         rimozione dell'una porterebbe via il file dell'altra. -->
+    <xs:unique name="unicitaFile">
+      <xs:selector xpath="risorsa"/>
+      <xs:field xpath="file"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

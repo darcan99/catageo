@@ -6,6 +6,73 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.7.0] — 2026-08-05
+
+Fase 5: allegati, foto e video.
+
+### Aggiunto
+- **Caricamento di allegati, foto e video** dalla scheda dell'ipogeo, con
+  selezione multipla, metadati compilabili e progressivo automatico secondo lo
+  standard di nomenclatura (4.1): `LA297-FO001-Ingresso principale.jpg`.
+- **Indice di sezione** `[codice] - [Sezione].xml` (D1) come fonte di verita dei
+  metadati, con schema di validazione `schemi/risorse.xsd`. Lo schema impone
+  l'unicita del progressivo e del nome file: due righe con lo stesso numero
+  renderebbero ambiguo ogni riferimento fra sezioni.
+- **Miniature** delle foto con GD, rotazione automatica secondo l'orientamento
+  EXIF, e rigenerazione su richiesta. Se GD manca la galleria mostra gli
+  originali e l'interfaccia lo dichiara: meglio una galleria pesante che vuota.
+- **Galleria** nel pannello Foto della scheda e **copertina** in testa alla
+  scheda, scelta fra le foto caricate.
+- **`scarica.php`**: consegna mediata di ogni file dell'archivio, con verifica di
+  sessione, permessi e riservatezza della singola scheda. Supporta le **richieste
+  parziali** (`Range`), senza le quali un video non si puo scorrere.
+- Una risorsa puo essere **piu riservata della scheda** che la contiene: la foto
+  che mostra l'ingresso di una cavita protetta non viene consegnata a chi ha solo
+  la consultazione.
+- **Rimozione conservativa**: il file finisce in `[codice] - _rimossi` con una
+  marca temporale, non viene cancellato. Il progressivo **non** viene mai
+  riusato, perche e citato dalle altre sezioni.
+
+### Sicurezza
+- Tre barriere indipendenti su ogni file in arrivo: **lista nera** delle
+  estensioni eseguibili, **lista bianca** per sezione da `config.xml`, **tipo
+  reale** del contenuto letto con `finfo`. Servono tutte e tre: l'estensione la
+  sceglie chi carica, il tipo dichiarato dal browser pure, e solo il contenuto
+  non mente. Un `.jpg` che contiene codice PHP viene rifiutato.
+- Gli **SVG si consegnano sempre come allegato**, mai visualizzati in linea: un
+  SVG e un documento XML che puo contenere script, e mostrarlo in linea
+  significherebbe eseguirli nell'origine dell'applicativo.
+- Il `Content-Type` della consegna si **rilegge dal contenuto** e non dall'indice:
+  l'indice e un file dell'archivio, modificabile a mano, e un tipo dichiarato
+  male e il primo passo di un XSS.
+- Un file rifiutato non lascia tracce: verificato che non finisca ne nell'indice
+  ne sul disco.
+
+### Attenzioni per l'hosting economico
+- La memoria necessaria a una miniatura viene **stimata prima** di aprire il file:
+  una foto da 6000x4000 pesa 4 MB come JPEG ma quasi cento decompressa, e su un
+  `memory_limit` da 128 MB produrrebbe una pagina bianca senza spiegazioni. Se non
+  basta si rinuncia alla miniatura e il motivo finisce nel log.
+- I file si consegnano **a blocchi da 256 KB** e non con `readfile()`: un video da
+  centinaia di megabyte letto in un colpo solo supererebbe qualunque limite.
+
+### Verificato
+- Suite `prova-risorse.ps1`: 70 controlli con richieste multipart costruite a
+  mano, perche il punto delicato di questa fase e cio che accade fra il browser e
+  il disco e un test che salta il trasporto non lo esercita.
+- Nel browser: copertina e galleria effettivamente visualizzate, miniature
+  consegnate alla larghezza configurata, contrasti a norma sulle pagine nuove nei
+  due temi.
+- `docs/prove/risorse/README.md` elenca anche cio che **non** e coperto: video
+  reali, file molto grandi, assenza di GD, caricamenti simultanei.
+
+### Corretto in corsa
+- La copertina usava la miniatura da 400 px stirata su tutta la scheda, con un
+  risultato sgranato: ora usa l'originale. E una sola immagine per scheda.
+- La verifica «un utente USR non puo eliminare» passava per il motivo sbagliato:
+  la POST veniva respinta dal controllo CSRF perche priva di token, non dai
+  permessi. L'asserzione ora dice il vero e la proprieta e stabilita altrove.
+
 ## [0.6.4] — 2026-08-05
 
 L'aspetto lo sceglie chi consulta.
