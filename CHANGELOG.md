@@ -6,6 +6,54 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.7.1] — 2026-08-05
+
+Media: quello che il file sa gia dire, e come si guarda.
+
+### Aggiunto
+- **Data di scatto e coordinate lette dai metadati incorporati.** Chi fotografa
+  l'ingresso di una cavita con il telefono porta a casa data e posizione dentro
+  il file: chiedergliele di nuovo a mano significa farsi dare un dato peggiore di
+  quello che si ha gia in archivio. Si leggono l'EXIF delle foto e le scatole
+  `mvhd` e `©xyz` dei contenitori MP4/MOV, per cui l'EXIF non esiste.
+- I metadati riempiono **solo i campi lasciati vuoti**: un rilievo fatto con il
+  GPS professionale vale piu dell'EXIF di un telefono, e l'ordine di precedenza
+  deve dirlo. Nessuna sovrascrittura, mai.
+- **Coordinate per singola risorsa** nell'indice di sezione e nello schema: dove
+  e stata scattata la foto, che non e detto coincida con l'ingresso registrato
+  nella scheda. Correggibili a mano dal modulo, virgola decimale accettata.
+- **Finestra per guardare foto e video** senza lasciare la pagina, con schermo
+  intero e scaricamento. Aprire ogni immagine in una scheda nuova costringeva a
+  tornare indietro dopo ogni sguardo, e in una galleria di venti foto significa
+  venti andate e ritorni.
+- **Sotto ogni miniatura**: tipo, peso, data e — quando la risorsa ha coordinate —
+  un indicatore **GPS cliccabile** che apre il punto su Google Maps. Le
+  coordinate di uno scatto servono per andarci, non per leggerle.
+- **I video si guardano.** Prima nella scheda comparivano solo come nomi di file
+  da scaricare; ora si aprono nella finestra con i comandi di riproduzione.
+
+### Attenzioni
+- Alla chiusura della finestra il contenuto viene **rimosso**, non solo messo in
+  pausa: un `<video>` lasciato nel documento continua a scaricare e, se era in
+  riproduzione, continua a suonare a finestra chiusa.
+- Il collegamento resta valido su ogni innesco: senza JavaScript il file si apre
+  comunque, semplicemente in una scheda nuova.
+- Un GPS a 0,0 viene scartato: molti apparecchi scrivono zero quando il fix non
+  c'e stato, e l'Atlantico non e mai la posizione di un ipogeo.
+- Il lettore di scatole MP4 si ferma davanti a una lunghezza incoerente invece di
+  rincorrere posizioni a caso, e un errore di lettura non impedisce mai il
+  caricamento del file.
+
+### Verificato
+- 30 prove sui metadati con **file veri costruiti byte per byte**: un JPEG con
+  blocco EXIF scritto a mano e un MP4 con le scatole al posto giusto. Un parser
+  di formati binari collaudato su dati finti non e collaudato.
+- End-to-end via HTTP: foto con EXIF caricata, data e coordinate finite
+  nell'indice, e la data indicata a mano che vince sull'EXIF.
+- Nel browser: apertura della finestra, immagine decodificata, elemento video con
+  i controlli, pulsante mappa solo dove ci sono coordinate, e il video davvero
+  rimosso alla chiusura.
+
 ## [0.7.0] — 2026-08-05
 
 Fase 5: allegati, foto e video.

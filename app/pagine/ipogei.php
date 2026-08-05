@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.7.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.1  2026-08-05  D.Candela  Finestra dei media anche nella scheda; i
+ *                                video si guardano invece di scaricarsi.
  *  0.7.0  2026-08-05  D.Candela  Contenuti delle sezioni nei rispettivi
  *                                pannelli, copertina in testa alla scheda.
  *  0.6.0  2026-08-05  D.Candela  Mappa nella scheda; regole di riservatezza
@@ -318,6 +320,12 @@ if ($azione === 'scheda' && $codice !== '') {
     $riga    = IndiceIpogei::trova($codiceCorrente);
     $titolo  = $codiceCorrente . ' — ' . (string) $scheda['identificazione']['nome'];
 
+    require_once CATAGEO_ROOT . '/app/view/parti-media.php';
+
+    // La finestra dei media serve sempre nella scheda: foto e video si guardano
+    // anche in sola consultazione.
+    $jsPagina = ['assets/js/catageo-media.js'];
+
     // La cartografia si carica solo se c'e qualcosa da inquadrare: una scheda
     // senza coordinate non deve scaricare Leaflet per non mostrare nulla.
     $mappaScheda = $coord['lat'] !== '' && $coord['lon'] !== '';
@@ -326,11 +334,11 @@ if ($azione === 'scheda' && $codice !== '') {
             'assets/vendor/leaflet-1.9.4/leaflet.css',
             'assets/css/catageo-mappa.css',
         ];
-        $jsPagina = [
+        $jsPagina = array_merge([
             'assets/vendor/leaflet-1.9.4/leaflet.js',
             'assets/vendor/proj4-2.21.0/proj4.min.js',
             'assets/js/catageo-mappa.js',
-        ];
+        ], $jsPagina);
     }
     ?>
 
@@ -445,17 +453,17 @@ if ($azione === 'scheda' && $codice !== '') {
             // quindi il peso in piu e accettabile; le gallerie, dove le immagini
             // sono decine, continuano a usare le miniature.
             ?>
-            <a href="<?= Testo::esc('scarica.php?codice=' . urlencode($codiceCorrente) . '&sez=FO&prog=' . $pCop . '&inline=1') ?>"
-               target="_blank" rel="noopener" title="Apri a dimensione piena">
+            <a href="<?= Testo::esc(catageoUrlRisorsa($codiceCorrente, 'FO', $pCop, false, true)) ?>"
+               <?= catageoAttributiMedia($copertina, $codiceCorrente, 'FO') ?>
+               title="Guarda l'immagine">
               <img class="catageo-copertina"
-                   src="<?= Testo::esc('scarica.php?codice=' . urlencode($codiceCorrente) . '&sez=FO&prog=' . $pCop . '&inline=1') ?>"
+                   src="<?= Testo::esc(catageoUrlRisorsa($codiceCorrente, 'FO', $pCop, false, true)) ?>"
                    alt="<?= Testo::esc((string) $copertina['titolo']) ?>">
             </a>
-            <?php if ((string) $copertina['titolo'] !== ''): ?>
-              <div class="card-body py-2">
-                <span class="text-body-secondary"><?= Testo::esc((string) $copertina['titolo']) ?></span>
-              </div>
-            <?php endif; ?>
+            <div class="card-body py-2 d-flex flex-wrap justify-content-between gap-2">
+              <span class="text-body-secondary"><?= Testo::esc((string) $copertina['titolo']) ?></span>
+              <?= catageoDatiMedia($copertina, false) ?>
+            </div>
           </div>
         <?php endif; ?>
 
@@ -852,7 +860,9 @@ if ($azione === 'scheda' && $codice !== '') {
                 <?php $p = (int) $foto['progressivo']; ?>
                 <div class="col-6 col-md-4 col-xl-3">
                   <div class="card h-100">
-                    <a href="<?= Testo::esc($urlFile($p, false, true)) ?>" target="_blank" rel="noopener">
+                    <a href="<?= Testo::esc($urlFile($p, false, true)) ?>"
+                       <?= catageoAttributiMedia($foto, $codiceCorrente, $sigla) ?>
+                       title="Guarda l'immagine">
                       <img src="<?= Testo::esc($urlFile($p, true, true)) ?>"
                            alt="<?= Testo::esc((string) $foto['titolo']) ?>"
                            class="card-img-top catageo-miniatura" loading="lazy">
@@ -860,13 +870,11 @@ if ($azione === 'scheda' && $codice !== '') {
                     <div class="card-body py-2">
                       <div class="text-truncate" title="<?= Testo::esc((string) $foto['titolo']) ?>">
                         <?= Testo::esc((string) $foto['titolo']) ?>
-                      </div>
-                      <div class="catageo-nota">
-                        <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $p)) ?></span>
                         <?php if (!empty($foto['copertina'])): ?>
-                          · <i class="bi bi-star-fill text-primary" title="copertina"></i>
+                          <i class="bi bi-star-fill text-primary" title="copertina"></i>
                         <?php endif; ?>
                       </div>
+                      <?= catageoDatiMedia($foto, true, $sigla) ?>
                     </div>
                   </div>
                 </div>
@@ -900,7 +908,18 @@ if ($azione === 'scheda' && $codice !== '') {
                         </td>
                         <td>
                           <?php if (Risorse::percorsoFile($codiceCorrente, $sigla, $p) !== null): ?>
-                            <a href="<?= Testo::esc($urlFile($p)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
+                            <?php if ($vista === 'video'): ?>
+                              <?php // Il video si guarda nella finestra: prima
+                                    // c'era solo il nome del file da scaricare. ?>
+                              <a href="<?= Testo::esc($urlFile($p, false, true)) ?>"
+                                 <?= catageoAttributiMedia($risorsa, $codiceCorrente, $sigla) ?>>
+                                <i class="bi bi-play-circle"></i>
+                                <?= Testo::esc((string) $risorsa['file']) ?>
+                              </a>
+                            <?php else: ?>
+                              <a href="<?= Testo::esc($urlFile($p)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
+                            <?php endif; ?>
+                            <?= catageoDatiMedia($risorsa, false) ?>
                           <?php else: ?>
                             <span class="text-danger">
                               <i class="bi bi-exclamation-triangle-fill"></i>
@@ -1031,6 +1050,8 @@ if ($azione === 'scheda' && $codice !== '') {
       <script type="application/json" id="catageoMappaConfig"><?= Testo::escJson(Mappa::perBrowser()) ?></script>
       <script type="application/json" id="catageoMappaPunto"><?= Testo::escJson($puntoMappa) ?></script>
     <?php endif; ?>
+
+    <?php require CATAGEO_ROOT . '/app/view/modale-media.php'; ?>
 
     <?php
     return; // scheda mostrata

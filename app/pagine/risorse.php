@@ -13,12 +13,14 @@ declare(strict_types=1);
  *                  le due cose avrebbe aggiunto altre cinquecento righe a un
  *                  file che ne ha gia millesettecento, e chi consulta non ha
  *                  bisogno di vedere i moduli di caricamento.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.7.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.1  2026-08-05  D.Candela  Finestra dei media, dati sotto le miniature,
+ *                                coordinate correggibili a mano.
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
  * ============================================================================
  */
@@ -61,6 +63,29 @@ $anteprima  = Sezioni::anteprima($sigla);
 $puoGestire = Auth::puo('carica_risorse');
 $ritorno    = 'index.php?p=risorse&codice=' . urlencode($codice) . '&sez=' . $sigla;
 
+// La finestra dei media serve solo dove c'e qualcosa da guardare.
+if (in_array($anteprima, ['immagine', 'video'], true)) {
+    $jsPagina = ['assets/js/catageo-media.js'];
+}
+
+/**
+ * Coordinata scritta a mano, ricondotta a gradi decimali o alla stringa vuota.
+ *
+ * Si accetta anche la virgola come separatore, perche su tastiera italiana e
+ * quello che esce naturalmente. Un valore fuori intervallo si scarta invece di
+ * salvarlo: una latitudine di 412 gradi non e una posizione.
+ */
+function catageoGradi(string $valore, float $massimo): string
+{
+    $valore = trim(str_replace(',', '.', $valore));
+    if ($valore === '' || !is_numeric($valore)) {
+        return '';
+    }
+    $numero = (float) $valore;
+
+    return abs($numero) <= $massimo ? number_format($numero, 6, '.', '') : '';
+}
+
 // ============================================================================
 //  OPERAZIONI
 // ============================================================================
@@ -83,6 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'riservatezza'      => (string) ($_POST['riservatezza'] ?? 'pubblica'),
             'categoriaAllegato' => (string) ($_POST['categoriaAllegato'] ?? ''),
             'urlEsterno'        => (string) ($_POST['urlEsterno'] ?? ''),
+            'latitudine'        => catageoGradi((string) ($_POST['latitudine'] ?? ''), 90.0),
+            'longitudine'       => catageoGradi((string) ($_POST['longitudine'] ?? ''), 180.0),
         ];
     };
 
@@ -199,18 +226,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //  VISTA
 // ============================================================================
 
+require_once CATAGEO_ROOT . '/app/view/parti-media.php';
+
 $risorse   = Risorse::elenco($codice, $sigla);
 $titolo    = $etichetta . ' — ' . $codice;
 $ammesse   = Sezioni::chiaveEstensioni($sigla) !== ''
     ? Config::estensioniAmmesse(Sezioni::chiaveEstensioni($sigla))
     : [];
 $maxUpload = Config::dimensioneMaxUpload();
+$conFinestra = in_array($anteprima, ['immagine', 'video'], true);
 
 /** Indirizzo di consegna di una risorsa. */
-$url = static function (int $prog, bool $mini = false, bool $inline = false) use ($codice, $sigla): string {
-    return 'scarica.php?codice=' . urlencode($codice) . '&sez=' . $sigla . '&prog=' . $prog
-        . ($mini ? '&mini=1' : '') . ($inline ? '&inline=1' : '');
-};
+$url = static fn (int $prog, bool $mini = false, bool $inline = false): string
+    => catageoUrlRisorsa($codice, $sigla, $prog, $mini, $inline);
 ?>
 
 <div class="catageo-intestazione">
@@ -360,8 +388,10 @@ $url = static function (int $prog, bool $mini = false, bool $inline = false) use
       <?php $prog = (int) $foto['progressivo']; ?>
       <div class="col-6 col-md-4 col-xl-3">
         <div class="card h-100">
-          <a href="<?= Testo::esc($url($prog, false, true)) ?>" target="_blank" rel="noopener"
-             title="Apri l'immagine a dimensione piena">
+          <?php // href resta valido: senza JavaScript il file si apre comunque. ?>
+          <a href="<?= Testo::esc($url($prog, false, true)) ?>"
+             <?= catageoAttributiMedia($foto, $codice, $sigla) ?>
+             title="Guarda l'immagine">
             <img src="<?= Testo::esc($url($prog, true, true)) ?>"
                  alt="<?= Testo::esc((string) $foto['titolo']) ?>"
                  class="card-img-top catageo-miniatura" loading="lazy">
@@ -370,13 +400,7 @@ $url = static function (int $prog, bool $mini = false, bool $inline = false) use
             <div class="fw-semibold text-truncate" title="<?= Testo::esc((string) $foto['titolo']) ?>">
               <?= Testo::esc((string) $foto['titolo']) ?>
             </div>
-            <div class="catageo-nota">
-              <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $prog)) ?></span>
-              · <?= Testo::esc(Testo::dimensione((int) $foto['dimensione'])) ?>
-              <?php if ((string) $foto['data'] !== ''): ?>
-                · <?= Testo::esc((string) $foto['data']) ?>
-              <?php endif; ?>
-            </div>
+            <?= catageoDatiMedia($foto, true, $sigla) ?>
             <?php if (!empty($foto['copertina'])): ?>
               <span class="badge text-bg-primary mt-1"><i class="bi bi-star-fill"></i> copertina</span>
             <?php endif; ?>
@@ -455,7 +479,16 @@ $url = static function (int $prog, bool $mini = false, bool $inline = false) use
               </td>
               <td>
                 <?php if ($presente): ?>
-                  <a href="<?= Testo::esc($url($prog)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
+                  <?php if ($conFinestra): ?>
+                    <a href="<?= Testo::esc($url($prog, false, true)) ?>"
+                       <?= catageoAttributiMedia($risorsa, $codice, $sigla) ?>>
+                      <i class="bi bi-play-circle"></i>
+                      <?= Testo::esc((string) $risorsa['file']) ?>
+                    </a>
+                  <?php else: ?>
+                    <a href="<?= Testo::esc($url($prog)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
+                  <?php endif; ?>
+                  <?= catageoDatiMedia($risorsa, false) ?>
                 <?php else: ?>
                   <span class="text-danger" title="Registrato nell'indice ma assente dalla cartella">
                     <i class="bi bi-exclamation-triangle-fill"></i>
@@ -486,17 +519,6 @@ $url = static function (int $prog, bool $mini = false, bool $inline = false) use
               <?php endif; ?>
             </tr>
 
-            <?php if ($anteprima === 'video' && $presente): ?>
-              <tr>
-                <td></td>
-                <td colspan="<?= $puoGestire ? 5 : 4 ?>">
-                  <?php // controls e preload=metadata: si scarica solo quanto
-                        // serve a mostrare durata e primo fotogramma. ?>
-                  <video class="catageo-video" controls preload="metadata"
-                         src="<?= Testo::esc($url($prog, false, true)) ?>"></video>
-                </td>
-              </tr>
-            <?php endif; ?>
           <?php endforeach; ?>
         </tbody>
       </table>
@@ -602,6 +624,35 @@ $inModifica   = $daModificare > 0 && $puoGestire
           </div>
         <?php endif; ?>
 
+        <?php if (in_array($anteprima, ['immagine', 'video'], true)): ?>
+          <?php $mappaEsterna = catageoUrlMappaEsterna($inModifica); ?>
+          <div class="col-md-4">
+            <label for="mLat" class="form-label">Latitudine</label>
+            <input type="text" class="form-control catageo-valore" id="mLat" name="latitudine"
+                   value="<?= Testo::esc((string) $inModifica['latitudine']) ?>"
+                   placeholder="41.856231">
+          </div>
+          <div class="col-md-4">
+            <label for="mLon" class="form-label">Longitudine</label>
+            <input type="text" class="form-control catageo-valore" id="mLon" name="longitudine"
+                   value="<?= Testo::esc((string) $inModifica['longitudine']) ?>"
+                   placeholder="12.532104">
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="catageo-nota">
+              Gradi decimali WGS84, dove e stato ripreso il file. Vengono letti dai
+              metadati incorporati quando ci sono; se il dato manca o e sbagliato si
+              corregge qui.
+              <?php if ($mappaEsterna !== ''): ?>
+                <br>
+                <a href="<?= Testo::esc($mappaEsterna) ?>" target="_blank" rel="noopener">
+                  <i class="bi bi-geo-alt-fill"></i> Vedi il punto su Google Maps
+                </a>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
         <div class="col-12">
           <label for="mDescrizione" class="form-label">Descrizione</label>
           <textarea class="form-control" id="mDescrizione" name="descrizione" rows="4"><?= Testo::esc((string) $inModifica['descrizione']) ?></textarea>
@@ -614,4 +665,8 @@ $inModifica   = $daModificare > 0 && $puoGestire
       </form>
     </div>
   </div>
+<?php endif; ?>
+
+<?php if ($conFinestra): ?>
+  <?php require CATAGEO_ROOT . '/app/view/modale-media.php'; ?>
 <?php endif; ?>

@@ -19,12 +19,13 @@
                    - l'ordine degli elementi dentro <risorsa> non e imposto
                      (xs:all): un indice corretto a mano resta valido anche se
                      chi lo modifica sposta una riga.
-   Versione .....: 0.7.0
+   Versione .....: 0.7.1
    Sviluppatore .: Dario Candela <darcan99@gmail.com>
    Licenza ......: GNU GPL v3.0 - vedi LICENSE
    Copyright ....: (c) 2026 Dario Candela
   ............................................................................
    CRONOLOGIA
+   0.7.1  2026-08-05  D.Candela  Coordinate della singola risorsa.
    0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
   ============================================================================
 -->
@@ -93,6 +94,24 @@
     <xs:attribute name="id" type="xs:string" use="required"/>
   </xs:complexType>
 
+  <!-- ............................................. coordinate .......... -->
+
+  <!-- Posizione della singola risorsa: dove e stata scattata la foto o girato
+       il video, che non coincide necessariamente con l'ingresso registrato
+       nella scheda. Gradi decimali WGS84, la forma canonica dell'archivio. -->
+  <xs:simpleType name="tGradi">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[+\-]?[0-9]{1,3}(\.[0-9]{1,10})?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="tCoordinate">
+    <xs:all>
+      <xs:element name="latitudine" type="tGradi"/>
+      <xs:element name="longitudine" type="tGradi"/>
+    </xs:all>
+  </xs:complexType>
+
   <!-- ............................................. risorsa ............. -->
 
   <xs:complexType name="tRisorsa">
@@ -103,6 +122,7 @@
       <xs:element name="data" type="tData" minOccurs="0"/>
       <xs:element name="autore" type="tAutore" minOccurs="0"/>
       <xs:element name="gruppo" type="tGruppo" minOccurs="0"/>
+      <xs:element name="coordinate" type="tCoordinate" minOccurs="0"/>
       <xs:element name="licenza" type="xs:string" minOccurs="0"/>
       <xs:element name="riservatezza" type="tRiservatezza" minOccurs="0"/>
       <xs:element name="copertina" type="tBooleano" minOccurs="0"/>

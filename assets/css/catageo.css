@@ -5,12 +5,13 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.7.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.1  2026-08-05  D.Candela  Finestra dei media e dati sotto le miniature.
  *  0.7.0  2026-08-05  D.Candela  Miniature, video e copertina (fase 5).
  *  0.6.4  2026-08-05  D.Candela  Sabbia predefinita; stile del menu Aspetto.
  *  0.6.3  2026-08-05  D.Candela  Tema chiaro invertito: pagina bianca e schede
@@ -338,6 +339,67 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
     max-height: 22rem;
     background-color: #000;
     border-radius: var(--bs-border-radius);
+}
+
+/* Finestra dei media: fondo scuro sotto il contenuto, cosi una foto chiara e
+   una scura si guardano allo stesso modo, e l'altezza limitata all'altezza
+   della finestra perche una foto verticale non debba scorrere. */
+.catageo-media-corpo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #101215;
+    min-height: 12rem;
+}
+
+.catageo-media-contenuto {
+    display: block;
+    max-width: 100%;
+    max-height: 75vh;
+    margin: 0 auto;
+}
+
+/* A schermo intero il contenitore deve riempire davvero lo schermo: senza,
+   resta della dimensione che aveva nella finestra, centrato nel nero. */
+.catageo-media-corpo:fullscreen {
+    width: 100%;
+    height: 100%;
+}
+
+.catageo-media-corpo:fullscreen .catageo-media-contenuto {
+    max-height: 100vh;
+    max-width: 100vw;
+}
+
+/* Riga dei dati sotto una miniatura: deve stare su una riga sola e non far
+   crescere la card, quindi si spezza solo se proprio non ci sta. */
+.catageo-dati-media {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+}
+
+.catageo-dati-media .catageo-tipo-file {
+    font-family: var(--bs-font-monospace);
+    font-size: 0.68rem;
+    letter-spacing: 0.03em;
+    padding: 0 0.25rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.2rem;
+}
+
+/* L'indicatore di posizione e un collegamento a una mappa esterna: si distingue
+   dal resto dei dati, che sono solo testo. */
+a.catageo-geotag {
+    text-decoration: none;
+    color: var(--bs-link-color);
+}
+
+a.catageo-geotag:hover {
+    text-decoration: underline;
 }
 
 /* Copertina nella scheda: si affianca ai dati senza dominarli. */

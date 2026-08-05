@@ -20,12 +20,14 @@ declare(strict_types=1);
  *                  riferimento vecchio a un contenuto nuovo. Per questo l'ultimo
  *                  assegnato e memorizzato nell'indice e non ricalcolato dai
  *                  file presenti.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.7.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.7.1  2026-08-05  D.Candela  Coordinate della risorsa e acquisizione dei
+ *                                metadati incorporati al caricamento.
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
  * ============================================================================
  */
@@ -59,6 +61,8 @@ final class Risorse
         'riservatezza'    => 'pubblica',
         'categoriaAllegato' => '',
         'urlEsterno'      => '',
+        'latitudine'      => '',
+        'longitudine'     => '',
     ];
 
     // ========================================================================
@@ -230,6 +234,16 @@ final class Risorse
                 // il nome originale senza estensione, che e quello che chi
                 // carica ha in mente.
                 $risorsa['titolo'] = (string) pathinfo($file['nome'], PATHINFO_FILENAME);
+            }
+
+            // Data e posizione dai metadati del file, SOLO nei campi lasciati
+            // vuoti: quello che l'operatore ha scritto vale piu dell'EXIF di un
+            // telefono, e non va mai sovrascritto.
+            $incorporati = MetadatiMedia::leggi($destinazione, Sezioni::anteprima($sigla));
+            foreach (['data', 'latitudine', 'longitudine'] as $campo) {
+                if ((string) $risorsa[$campo] === '' && $incorporati[$campo] !== '') {
+                    $risorsa[$campo] = $incorporati[$campo];
+                }
             }
 
             $dati['risorse'][] = $risorsa;
@@ -524,6 +538,9 @@ final class Risorse
             $risorsa['gruppoId'] = $gruppo->getAttribute('id');
         }
 
+        $risorsa['latitudine']  = Xml::testo($nodo, 'coordinate/latitudine');
+        $risorsa['longitudine'] = Xml::testo($nodo, 'coordinate/longitudine');
+
         if ((string) $risorsa['riservatezza'] === '') {
             $risorsa['riservatezza'] = 'pubblica';
         }
@@ -563,6 +580,14 @@ final class Risorse
             if ((string) $risorsa[$campo] !== '') {
                 Xml::imposta($nodo, $campo, (string) $risorsa[$campo]);
             }
+        }
+
+        // Le coordinate della singola risorsa: dove e stata scattata la foto,
+        // che non e detto coincida con l'ingresso registrato nella scheda.
+        if ((string) $risorsa['latitudine'] !== '' && (string) $risorsa['longitudine'] !== '') {
+            $coord = Xml::imposta($nodo, 'coordinate', null);
+            Xml::imposta($coord, 'latitudine', (string) $risorsa['latitudine']);
+            Xml::imposta($coord, 'longitudine', (string) $risorsa['longitudine']);
         }
 
         Xml::imposta($nodo, 'riservatezza', (string) $risorsa['riservatezza']);

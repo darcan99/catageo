@@ -99,12 +99,65 @@ Le suite HTTP non vedono se un'immagine si vede davvero.
 > un riquadro rotto. La verifica corretta è togliere l'attributo a una di esse e
 > controllare che allora arrivi.
 
+## Metadati incorporati — 2026-08-05
+
+Data di scatto e coordinate vengono lette dal file quando ci sono. La verifica
+costruisce **file veri con i byte al posto giusto**, perché un parser di formati
+binari collaudato su dati finti non è collaudato: un JPEG con un blocco EXIF
+scritto a mano (IFD0, sotto-IFD EXIF e GPS, valori razionali) e un contenitore
+MP4 con le scatole `ftyp`, `moov`, `mvhd` e `©xyz`.
+
+| Controllo | Esito |
+|---|---|
+| Gradi, minuti e secondi come frazioni EXIF → gradi decimali | ✅ 41,856231 |
+| Emisfero sud e longitudine ovest negativi | ✅ |
+| Latitudine oltre 90°, terna incompleta, denominatore zero | ✅ rifiutati |
+| GPS a 0,0 (fix mai agganciato) | ✅ scartato: non è una posizione |
+| `DateTimeOriginal` preferito a `DateTime` | ✅ |
+| PNG senza EXIF | ✅ nessun dato, nessun errore |
+| Data da `mvhd` (epoca 1904) e posizione da `©xyz` ISO 6709 | ✅ |
+| File che non è ISO BMFF, o con lunghezza di scatola incoerente | ✅ si ferma senza rincorrere posizioni |
+| End-to-end: foto caricata via HTTP → data e coordinate nell'indice | ✅ |
+| **Il dato indicato a mano vince sull'EXIF** | ✅ verificato caricando con data esplicita |
+
+L'ordine di precedenza non è un dettaglio: un rilievo fatto col GPS
+professionale vale più dell'EXIF di un telefono, quindi i metadati riempiono
+**solo** i campi lasciati vuoti e non sovrascrivono mai.
+
+## Finestra dei media — 2026-08-05
+
+| Controllo | Esito |
+|---|---|
+| Clic su una miniatura apre la finestra, non una scheda nuova | ✅ |
+| Immagine decodificata dentro la finestra (1200 px) | ✅ |
+| Titolo, riferimento, data, tipo e peso nell'intestazione | ✅ |
+| Pulsante mappa presente **solo** se la risorsa ha coordinate | ✅ |
+| Video: viene creato un `<video>` con i controlli | ✅ |
+| **Alla chiusura il video viene rimosso**, non solo messo in pausa | ✅ corpo svuotato |
+| Collegamento di scaricamento all'originale | ✅ |
+
+L'ultimo punto è quello che rischiava di più: un `<video>` lasciato nel
+documento continua a scaricare e, se era in riproduzione, continua a suonare
+anche a finestra chiusa. Il corpo della finestra viene svuotato e la sorgente
+tolta.
+
+Il collegamento `href` resta valido su ogni innesco: senza JavaScript il file si
+apre comunque, semplicemente in una scheda nuova.
+
 ## Cosa questi controlli **non** coprono
 
-- **Video reali.** Il ramo del player HTML5 e il `preload="metadata"` non sono
-  stati esercitati con un vero MP4: generarne uno valido senza strumenti esterni
-  non era praticabile. Il supporto `Range`, che è la parte rischiosa del seek, è
-  invece verificato — su un'immagine, ma il codice non distingue per tipo.
+- **Video riproducibili.** L'MP4 usato nelle prove ha le scatole dei metadati ma
+  **non contiene tracce**: serve a verificare la lettura di data e posizione e
+  l'apertura del player, non la riproduzione. Che un filmato vero scorra davvero
+  nel `<video>` va provato con un file reale. Il supporto `Range`, che è la parte
+  rischiosa del seek, è invece verificato — su un'immagine, ma il codice non
+  distingue per tipo.
+- **Schermo intero.** Il pulsante chiama `requestFullscreen`, che in una finestra
+  non in primo piano il browser rifiuta: la logica è scritta ma non è stata vista
+  funzionare. Va provata a mano.
+- **Metadati di altri formati.** HEIC dei telefoni Apple e MOV con scatole in
+  ordine inusuale non sono stati provati. Se la lettura fallisce il file viene
+  comunque archiviato, con un avviso nel log.
 - **File grandi.** Il limite di dimensione è verificato solo nella logica, non
   caricando davvero un file da decine di megabyte, e nemmeno superando
   `post_max_size` (dove PHP svuota `$_FILES` e il messaggio d'errore arriva da
