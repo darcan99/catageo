@@ -25,46 +25,88 @@ Nel browser, su ogni pagina e per ciascun tema, si scorrono gli elementi che
 contengono testo, si ricostruisce il fondo effettivo risalendo l'albero e
 componendo le trasparenze, e si segnalano i casi sotto soglia.
 
-> **Trappola da conoscere: non cambiare tema con JavaScript per poi misurare.**
-> Scrivendo `data-bs-theme` e leggendo i colori subito dopo si ottengono i colori
-> del **tema precedente** per il testo e quelli **nuovi** per i fondi: risultano
-> contrasti di 1,03 che non esistono. Aspettare un giro di eventi non basta e non
-> è deterministico: nella stessa sessione la stessa tecnica ha dato risultati
-> corretti su una pagina e falsi positivi su un'altra.
+> **Trappola da conoscere: il tema deve arrivare dal server, non essere applicato
+> dopo il render.**
 >
-> **Il modo affidabile** è scrivere la preferenza in `localStorage`
-> (`catageo.tema`) e **ricaricare**, così i colori sono quelli del primo render.
-> Per misurare molte pagine conviene un `iframe` fuori schermo che le carica in
-> sequenza: stessa origine, quindi `contentDocument` è accessibile, e ogni pagina
-> è un render vero.
+> Quando `data-bs-theme` cambia *dopo* che la pagina è stata disegnata, leggendo i
+> colori si ottiene un misto: il **tema precedente** per il testo e quello
+> **nuovo** per i fondi. Risultano contrasti di 1,03 che non esistono. Aspettare
+> un giro di eventi non basta e non è deterministico: la stessa tecnica ha dato
+> risultati corretti su una pagina e falsi positivi su un'altra nella stessa
+> sessione.
 >
-> Questa trappola ha prodotto falsi positivi in **due** passate distinte di
-> questa verifica, e in entrambe stava per far "correggere" problemi inventati.
-> È il motivo per cui la procedura è scritta qui.
+> Non basta nemmeno scrivere la preferenza in `localStorage` e ricaricare: il
+> documento arriva dal server con il tema di `config.xml`, e poi `catageo.js`
+> applica la preferenza locale — cioè cambia il tema dopo il render, ricreando
+> esattamente la condizione del guasto. È così che una passata in tema scuro ha
+> segnalato *sette* problemi inesistenti su ogni pagina.
+>
+> **Il modo affidabile** è imporre il tema **in `config.xml`**
+> (`<sistema><tema>dark</tema>`) e **rimuovere** la preferenza locale
+> (`localStorage.removeItem('catageo.tema')`), così il documento nasce già col
+> tema giusto e nessuno lo cambia più. Per misurare molte pagine si usa un
+> `iframe` fuori schermo che le carica in sequenza: stessa origine, quindi
+> `contentDocument` è accessibile, e ogni pagina è un render vero.
+>
+> Questa trappola ha prodotto falsi positivi in **tre** passate distinte di
+> questa verifica. Ogni volta i valori assurdamente bassi (1,03 – 1,5 su elementi
+> che a occhio si leggono benissimo) sono stati il segnale che a sbagliare era lo
+> strumento. È il motivo per cui la procedura è scritta qui.
 
 ## Scala delle superfici — 2026-08-05
 
+I due temi hanno **logiche opposte**, ed è deliberato.
+
 | | tema chiaro | tema scuro |
 |---|---|---|
-| Fondo pagina | `#cfd7e0` | `#0c0f12` |
-| Fondo scheda | `#ffffff` | `#343b43` |
-| Fondo intestazione | blu scuro al 12% | blu chiaro al 21% |
-| **pagina / scheda** | **1,45** | **1,70** |
+| Fondo pagina | `#ffffff` — **bianco** | `#0c0f12` |
+| Fondo scheda | `#d1e0f1` — **più scura** | `#343b43` — più chiara |
+| Fondo barre (navbar, piede) | `#dce8f5` | `#2b3035` |
+| Fondo intestazione | blu scuro al 13% | blu chiaro al 21% |
+| **pagina / scheda** | **1,34** | **1,70** |
 | **scheda / intestazione** | **1,26** | **1,42** |
+| **pagina / navbar** | **1,24** | **1,44** |
 
-Progressione in due passi, su richiesta: prima si è staccata l'intestazione, poi
-il box intero.
+Nel tema scuro la scheda è **più chiara** della pagina, come vuole la convenzione
+delle superfici sollevate. Nel tema chiaro è **più scura**: il bianco fa da
+margine e la scheda da tavolo di lavoro. Sono due modi diversi di dire la stessa
+cosa, cioè «qui si lavora».
+
+L'inversione del tema chiaro ha un effetto collaterale utile: nei form i campi
+restano bianchi, quindi si staccano dal box che li contiene (1,34). Con la scheda
+bianca erano bianco su bianco e si distinguevano solo per il bordo.
+
+Progressione, su richiesta, in tre passi: prima si è staccata l'intestazione, poi
+il box, poi si è invertito il tema chiaro.
 
 | | chiaro | scuro |
 |---|---|---|
 | pagina / scheda, all'origine | 1,13 | 1,20 |
-| dopo il primo intervento | 1,24 | 1,43 |
-| **dopo il secondo** | **1,45** | **1,70** |
+| primo intervento | 1,24 | 1,43 |
+| secondo intervento | 1,45 | **1,70** |
+| **terzo, con l'inversione** | **1,34** | 1,70 (invariato) |
 
-Il rapporto **scheda / intestazione è stato tenuto fermo** a 1,26 e 1,42: era già
-stato approvato, e alzare tutto insieme avrebbe fatto perdere la gerarchia fra i
-due livelli. Alzando il fondo delle schede è stato necessario ricalibrare
-l'opacità della tinta dell'intestazione per mantenere lo stesso rapporto.
+Il rapporto **scheda / intestazione è tenuto fermo** a 1,26 e 1,42 in tutti i
+passaggi: era già stato approvato, e alzarlo insieme al resto avrebbe fatto
+perdere la gerarchia fra i due livelli. Ogni volta che il fondo delle schede si è
+spostato è stato necessario ricalibrare l'opacità della tinta dell'intestazione
+per mantenere lo stesso rapporto.
+
+### Tavolozze alternative del tema chiaro
+
+La temperatura del tema chiaro si cambia con l'attributo
+`data-catageo-tavolozza` e si confronta a vista in
+[tavolozze.html](tavolozze.html), che usa il CSS reale dell'applicativo.
+
+| Tavolozza | Scheda | bianco / scheda | Nota |
+|---|---|---|---|
+| azzurra *(predefinita)* | `#d1e0f1` | 1,34 | stessa famiglia dell'accento e del tema scuro |
+| neutra | `#d3dae2` | 1,41 | l'inversione senza tinte, la più sobria |
+| sabbia | `#e6ddc9` | 1,35 | il colore della roccia e delle carte topografiche |
+| verde | `#d5e2d8` | 1,34 | meno usuale in un gestionale |
+
+In tutte, il testo sulla scheda resta fra 10,9 e 11,5:1, cioè molto oltre la
+soglia: la scelta è di gusto, non di leggibilità.
 
 Oltre alla luminanza agiscono due leve che **non** toccano il contrasto del testo,
 e sono quelle che danno il colpo d'occhio a parità di leggibilità:
@@ -115,6 +157,8 @@ non adattato al tema; l'ultimo è stato **peggiorato** dalle intestazioni colora
 | `text-danger` (asterisco dei campi obbligatori) | 2,86 / 3,90 | dice che un campo non si può lasciare vuoto: va visto |
 | Riquadro dell'installer | **1,03** | il body aveva `bg-body-tertiary`, finito a un passo dal colore della scheda |
 | `btn-outline-danger` («Rimuovi dal catalogo») | 2,50 | emerso solo dopo aver schiarito le schede |
+| Collegamenti nelle tabelle dell'elenco | 3,35 | il blu `#0d6efd` su una scheda non più bianca. Bootstrap 5.3 compone il colore dei link da `--bs-link-color-**rgb**`: impostare `--bs-link-color` non ha alcun effetto, e la prima correzione era quindi inefficace |
+| Barra di navigazione e piede | 1,15 | con la pagina bianca il grigio `#f8f9fa` di `bg-body-tertiary` le rendeva quasi invisibili: il loro fondo ora viene dalla tavolozza |
 
 **Ogni volta che si sposta una superficie, i colori che vi stanno sopra vanno
 rimisurati.** Alzando il fondo delle schede al secondo giro sono ricaduti sotto
@@ -127,11 +171,11 @@ vanno più scuri di quanto sembri necessario.
 
 ## Esito finale
 
-Nessun elemento sotto soglia, in **entrambi i temi**, su nove pagine misurate con
-il metodo affidabile (iframe, primo render): scheda dell'ipogeo, elenco, form di
-censimento, mappa, cataloghi, vocabolari, diagnostica, pagina iniziale e
-installer. Verificate a parte anche la pagina di accesso e quella di errore
-permessi.
+Nessun elemento sotto soglia, in **entrambi i temi**, su **dieci pagine** misurate
+con il metodo definitivo (tema imposto da `config.xml`, preferenza locale rimossa,
+pagine caricate in iframe): scheda dell'ipogeo, elenco, form di censimento, mappa,
+cataloghi, vocabolari, diagnostica, pagina iniziale, pagina di accesso e
+installer. Verificata a parte anche la pagina di errore permessi.
 
 ## Cosa questa verifica **non** copre
 

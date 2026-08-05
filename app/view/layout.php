@@ -8,12 +8,14 @@ declare(strict_types=1);
  *  Descrizione ..: Struttura comune delle pagine: intestazione HTML, navbar,
  *                  messaggi, contenuto e footer. Riceve dalle pagine le
  *                  variabili $titolo e $contenuto.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.6.3
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.3  2026-08-05  D.Candela  Fondo di navbar e piede dalla tavolozza:
+ *                                bg-body-tertiary sparirebbe sul bianco.
  *  0.6.0  2026-08-05  D.Candela  CSS e JS specifici della pagina, cosi le
  *                                librerie cartografiche si caricano solo
  *                                dove servono.
@@ -72,7 +74,7 @@ $voci = [
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+<nav class="navbar navbar-expand-lg border-bottom">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
       <i class="bi bi-geo-alt-fill text-primary" aria-hidden="true"></i>
@@ -161,7 +163,7 @@ $voci = [
   <?= $contenuto ?>
 </main>
 
-<footer class="border-top py-3 mt-auto bg-body-tertiary">
+<footer class="border-top py-3 mt-auto">
   <div class="container-fluid d-flex flex-wrap justify-content-between gap-2 small text-body-secondary">
     <span>
       <?= Testo::esc($nomeCatasto) ?>

@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.6.2**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+🚧 **In sviluppo** — versione corrente **0.6.3**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
 | Fase | Contenuto | Stato |
 |---|---|---|

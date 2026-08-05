@@ -6,6 +6,58 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.6.3] — 2026-08-05
+
+Tema chiaro invertito: pagina bianca, schede piu scure.
+
+### Cambiato
+- **Il tema chiaro e ora l'inverso della convenzione**: pagina **bianca** e schede
+  **piu scure**. Il bianco fa da margine, la scheda da tavolo di lavoro. I due temi
+  hanno percio logiche opposte, e la cosa e deliberata: in tema scuro la superficie
+  di lavoro e piu chiara della pagina, in tema chiaro e piu scura. Entrambe dicono
+  «qui si lavora».
+- **Nei form i campi ora si staccano dal box**: restano bianchi su una scheda che
+  non lo e piu (1,34:1). Prima erano bianco su bianco e si distinguevano solo per
+  il bordo. E un guadagno che non era stato cercato.
+- Il tema **scuro non cambia**: i suoi valori restano quelli approvati.
+- **Barra di navigazione e piede** non usano piu l'utility `bg-body-tertiary`: con
+  la pagina bianca quel grigio (`#f8f9fa`) le rendeva quasi invisibili. Il loro
+  fondo segue la tavolozza e inquadra la pagina in entrambi i temi.
+
+### Aggiunto
+- **Quattro tavolozze per il tema chiaro**, selezionabili con l'attributo
+  `data-catageo-tavolozza`: azzurra (predefinita, stessa famiglia dell'accento e
+  del tema scuro), neutra, sabbia (il colore della roccia e delle carte
+  topografiche), verde. In tutte il testo resta fra 10,9 e 11,5:1, quindi la scelta
+  e di gusto e non di leggibilita.
+- `docs/prove/interfaccia/tavolozze.html`: le quattro tavolozze affiancate con il
+  **CSS reale** dell'applicativo, non una simulazione. Si apre direttamente dal
+  browser, senza PHP.
+
+### Corretto
+- **I collegamenti nelle tabelle dell'elenco erano a 3,35:1** sulla scheda non piu
+  bianca. La prima correzione non aveva funzionato perche Bootstrap 5.3 compone il
+  colore dei link da `--bs-link-color-rgb` e non da `--bs-link-color`: impostare
+  quest'ultima non produce alcun effetto.
+- Pulsanti in contorno ritarati di nuovo: stanno sia sulla pagina sia dentro le
+  schede, che ora hanno fondi diversi, e il valore deve bastare per il piu scuro
+  dei due.
+- Testo terziario alzato ancora: sulla scheda ora piu scura era ricaduto a 4,33:1.
+
+### Verificato
+- **Dieci pagine, entrambi i temi, nessun elemento sotto soglia WCAG AA.**
+- Trovata la causa vera dei falsi positivi che avevano inquinato le passate
+  precedenti: **non basta scrivere la preferenza in `localStorage` e ricaricare**,
+  perche il documento arriva dal server con il tema di `config.xml` e poi
+  `catageo.js` applica la preferenza locale, cioe cambia il tema **dopo** il
+  render. E cosi che una passata in tema scuro ha segnalato sette problemi
+  inesistenti per pagina. Il metodo definitivo impone il tema in `config.xml` e
+  rimuove la preferenza locale, cosi il documento nasce col tema giusto e nessuno
+  lo cambia piu. Terza volta che questa trappola produce falsi positivi: ogni volta
+  il segnale e stato un valore assurdamente basso su elementi che a occhio si
+  leggono benissimo.
+- `prova-web.ps1` verifica che navbar e piede non tornino a `bg-body-tertiary`.
+
 ## [0.6.2] — 2026-08-05
 
 Leggibilita, secondo passo: stacca anche il box, non solo il titolo.

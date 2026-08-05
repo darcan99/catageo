@@ -5,12 +5,15 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.6.2
+ *  Versione .....: 0.6.3
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.3  2026-08-05  D.Candela  Tema chiaro invertito: pagina bianca e schede
+ *                                piu scure, con quattro tavolozze; fondo di
+ *                                navbar e piede dalla tavolozza.
  *  0.6.2  2026-08-05  D.Candela  Anche il box si stacca dalla pagina, non solo
  *                                la sua intestazione; evidenza del box attivo
  *                                nei form; colori ritarati sul nuovo fondo.
@@ -41,14 +44,62 @@
    luminanza, e la distinzione resterebbe invisibile a chi non percepisce bene
    quella tinta. Con il tema scuro si schiarisce, per lo stesso motivo. */
 
+/* Tema chiaro: pagina BIANCA e schede piu scure, cioe l'inverso della
+   convenzione. Il ragionamento e che l'area di lavoro si riconosce perche non e
+   bianca: il bianco fa da margine, la scheda da tavolo. Ha anche un effetto
+   collaterale utile nei form, dove i campi restano bianchi e quindi si staccano
+   dal box che li contiene, cosa che con la scheda bianca non accadeva.
+
+   La tavolozza predefinita e azzurra: e la stessa famiglia dell'accento e del
+   tema scuro, quindi i due temi si somigliano. Le alternative sono selezionabili
+   con l'attributo data-catageo-tavolozza e si vedono affiancate in
+   docs/prove/interfaccia/tavolozze.html. */
 [data-bs-theme="light"] {
-    --catageo-fondo-pagina: #cfd7e0;
-    --catageo-fondo-scheda: #ffffff;
-    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.12);   /* pagina/scheda 1.45 */
-    --catageo-bordo-intestazione: rgba(5, 44, 101, 0.22);   /* scheda/intestazione 1.26 */
-    --catageo-bordo-scheda: #b3bfcc;
+    --catageo-fondo-pagina: #ffffff;
+    --catageo-fondo-scheda: #d1e0f1;
+    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.13);   /* pagina/scheda 1.34 */
+    --catageo-bordo-intestazione: rgba(5, 44, 101, 0.28);   /* scheda/intestazione 1.26 */
+    --catageo-bordo-scheda: #a9c1dd;
+    --catageo-fondo-barre: #dce8f5;
     --catageo-ombra-scheda: 0 2px 5px rgba(16, 24, 32, 0.10);
     --catageo-accento-attivo: 13, 110, 253;
+
+    /* Con la scheda non piu bianca il blu dei collegamenti cade a 3,35:1 dentro
+       le tabelle. Si scurisce una volta per tutte: cosi un link e leggibile sia
+       sul bianco della pagina sia sul fondo di una scheda.
+       Bootstrap 5.3 compone il colore dei link da --bs-link-color-RGB, non da
+       --bs-link-color: impostare quest'ultima non produce alcun effetto. */
+    --bs-link-color-rgb: 8, 66, 152;
+    --bs-link-hover-color-rgb: 6, 49, 111;
+}
+
+/* Grigio neutro: la lettura piu letterale dell'inversione, senza tinte. */
+[data-bs-theme="light"][data-catageo-tavolozza="neutra"],
+[data-bs-theme="light"] [data-catageo-tavolozza="neutra"] {
+    --catageo-fondo-scheda: #d3dae2;
+    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.13);
+    --catageo-bordo-scheda: #b0bccb;
+    --catageo-fondo-barre: #e0e5ea;
+}
+
+/* Sabbia: il colore della roccia e delle carte topografiche. */
+[data-bs-theme="light"][data-catageo-tavolozza="sabbia"],
+[data-bs-theme="light"] [data-catageo-tavolozza="sabbia"] {
+    --catageo-fondo-scheda: #e6ddc9;
+    --catageo-fondo-intestazione: rgba(80, 56, 20, 0.14);
+    --catageo-bordo-intestazione: rgba(80, 56, 20, 0.30);
+    --catageo-bordo-scheda: #cdbfa3;
+    --catageo-fondo-barre: #ebe3d3;
+}
+
+/* Verde: richiama la vegetazione delle carte, meno usuale in un gestionale. */
+[data-bs-theme="light"][data-catageo-tavolozza="verde"],
+[data-bs-theme="light"] [data-catageo-tavolozza="verde"] {
+    --catageo-fondo-scheda: #d5e2d8;
+    --catageo-fondo-intestazione: rgba(12, 60, 44, 0.13);
+    --catageo-bordo-intestazione: rgba(12, 60, 44, 0.28);
+    --catageo-bordo-scheda: #b2c7b9;
+    --catageo-fondo-barre: #dfeae2;
 }
 
 [data-bs-theme="dark"] {
@@ -60,12 +111,23 @@
     --catageo-fondo-intestazione: rgba(110, 168, 254, 0.21); /* pagina/scheda 1.70 */
     --catageo-bordo-intestazione: rgba(110, 168, 254, 0.36); /* scheda/intestazione 1.42 */
     --catageo-bordo-scheda: #4a535d;
+    --catageo-fondo-barre: #2b3035;
     --catageo-ombra-scheda: 0 2px 6px rgba(0, 0, 0, 0.55);
     --catageo-accento-attivo: 110, 168, 254;
 }
 
 body {
     background-color: var(--catageo-fondo-pagina);
+}
+
+/* Barra di navigazione e piede.
+ *
+ * Non usano piu l'utility bg-body-tertiary: con la pagina bianca quel grigio
+ * (#f8f9fa) le rendeva quasi invisibili. Il loro fondo segue la tavolozza, cosi
+ * inquadrano la pagina in entrambi i temi. */
+.navbar,
+body > footer {
+    background-color: var(--catageo-fondo-barre);
 }
 
 .card {
@@ -129,7 +191,9 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
 }
 
 [data-bs-theme="light"] {
-    --bs-tertiary-color: rgba(33, 37, 41, 0.66);
+    /* Alzato con l'inversione del tema: sulla scheda ora piu scura il valore
+       precedente era ricaduto a 4,33:1. */
+    --bs-tertiary-color: rgba(33, 37, 41, 0.74);
 }
 
 /* Il blu dei collegamenti di Bootstrap (#0d6efd) sul grigio chiaro della pagina
@@ -160,11 +224,11 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
 }
 
 [data-bs-theme="light"] .btn-outline-secondary {
-    /* Scurito insieme al fondo della pagina: sul grigio piu marcato il valore
-       precedente era ricaduto a 4,19:1. Questi pulsanti stanno spesso FUORI da
-       una scheda, quindi il loro fondo e la pagina, non il box. */
-    --bs-btn-color: #4f565c;
-    --bs-btn-border-color: #8e98a1;
+    /* Questi pulsanti stanno sia sulla pagina sia dentro le schede, che ora
+       hanno fondi diversi: il valore deve bastare per il piu scuro dei due,
+       altrimenti dentro una scheda ricade a 4,39:1. */
+    --bs-btn-color: #454b51;
+    --bs-btn-border-color: #848e97;
 }
 
 [data-bs-theme="dark"] .btn-outline-primary {
