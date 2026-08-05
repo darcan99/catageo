@@ -10,12 +10,13 @@
 
                   Si apre direttamente dal browser, anche senza PHP:
                   http://localhost/catageo/docs/prove/interfaccia/tavolozze.html
-  Versione .....: 0.6.3
+  Versione .....: 0.6.4
   Sviluppatore .: Dario Candela <darcan99@gmail.com>
   Licenza ......: GNU GPL v3.0 — vedi LICENSE
   Copyright ....: (c) 2026 Dario Candela
  ----------------------------------------------------------------------------
   CRONOLOGIA
+  0.6.4  2026-08-05  D.Candela  Sabbia predefinita; scelta dal menu Aspetto.
   0.6.3  2026-08-05  D.Candela  Prima stesura.
  ============================================================================
 -->
@@ -62,8 +63,11 @@ body { padding-bottom: 4rem; }
     simulazione.
   </p>
   <p class="text-body-secondary" style="max-width:48rem">
-    Il tema scuro non cambia. Per provare una tavolozza in tutto l'applicativo
-    basta cambiare il valore predefinito in <span class="catageo-valore">assets/css/catageo.css</span>.
+    Il tema scuro non cambia: le tavolozze agiscono solo sul chiaro. Nell'applicativo
+    si scelgono dal menu <strong>Aspetto</strong>, in alto a destra, e la scelta resta
+    nel browser di chi l'ha fatta. Il valore predefinito dell'installazione si imposta
+    con <span class="catageo-valore">&lt;tavolozza&gt;</span> in
+    <span class="catageo-valore">config.xml</span>.
   </p>
 
   <div class="row g-4">
@@ -71,86 +75,10 @@ body { padding-bottom: 4rem; }
     <!-- I quattro riquadri sono identici a meno dell'attributo della tavolozza:
          la ripetizione e voluta, cosi il confronto e a parita di contenuto. -->
 
-    <!-- ================= A: azzurra (predefinita) ================= -->
-    <div class="col-xl-6">
-      <div class="tav-riquadro">
-        <div class="tav-barra">Azzurra <span class="tav-nome">— predefinita</span></div>
-
-        <div class="card mb-3">
-          <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
-          <div class="card-body">
-            <dl class="row catageo-dl mb-0">
-              <dt class="col-sm-5 fw-normal text-body-secondary">Comune</dt>
-              <dd class="col-sm-7">Roma</dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate WGS84</dt>
-              <dd class="col-sm-7"><span class="catageo-valore">41.856231, 12.532104</span></dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">UTM WGS84</dt>
-              <dd class="col-sm-7"><span class="catageo-valore">33T 295964 4678705</span></dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">Precisione</dt>
-              <dd class="col-sm-7"><span class="text-body-tertiary">non dichiarata</span></dd>
-            </dl>
-          </div>
-        </div>
-
-        <form>
-          <div class="card">
-            <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
-            <div class="card-body">
-              <label class="form-label">Nome <span class="text-danger">*</span></label>
-              <input class="form-control mb-2" value="Grotta dei Ragni">
-              <label class="form-label">Natura</label>
-              <select class="form-select mb-3"><option>Cavità naturale</option></select>
-              <button type="button" class="btn btn-sm btn-primary">Salva</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary">Annulla</button>
-              <button type="button" class="btn btn-sm btn-outline-danger">Rimuovi</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ================= B: neutra ================= -->
-    <div class="col-xl-6">
-      <div class="tav-riquadro" data-catageo-tavolozza="neutra">
-        <div class="tav-barra">Neutra <span class="tav-nome">data-catageo-tavolozza="neutra"</span></div>
-
-        <div class="card mb-3">
-          <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
-          <div class="card-body">
-            <dl class="row catageo-dl mb-0">
-              <dt class="col-sm-5 fw-normal text-body-secondary">Comune</dt>
-              <dd class="col-sm-7">Roma</dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate WGS84</dt>
-              <dd class="col-sm-7"><span class="catageo-valore">41.856231, 12.532104</span></dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">UTM WGS84</dt>
-              <dd class="col-sm-7"><span class="catageo-valore">33T 295964 4678705</span></dd>
-              <dt class="col-sm-5 fw-normal text-body-secondary">Precisione</dt>
-              <dd class="col-sm-7"><span class="text-body-tertiary">non dichiarata</span></dd>
-            </dl>
-          </div>
-        </div>
-
-        <form>
-          <div class="card">
-            <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
-            <div class="card-body">
-              <label class="form-label">Nome <span class="text-danger">*</span></label>
-              <input class="form-control mb-2" value="Grotta dei Ragni">
-              <label class="form-label">Natura</label>
-              <select class="form-select mb-3"><option>Cavità naturale</option></select>
-              <button type="button" class="btn btn-sm btn-primary">Salva</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary">Annulla</button>
-              <button type="button" class="btn btn-sm btn-outline-danger">Rimuovi</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ================= C: sabbia ================= -->
+    <!-- ================= A: sabbia (predefinita) ================= -->
     <div class="col-xl-6">
       <div class="tav-riquadro" data-catageo-tavolozza="sabbia">
-        <div class="tav-barra">Sabbia <span class="tav-nome">data-catageo-tavolozza="sabbia"</span></div>
+        <div class="tav-barra">Sabbia <span class="tav-nome">— predefinita</span></div>
 
         <div class="card mb-3">
           <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
@@ -185,10 +113,86 @@ body { padding-bottom: 4rem; }
       </div>
     </div>
 
-    <!-- ================= D: verde ================= -->
+    <!-- ================= B: verde ================= -->
     <div class="col-xl-6">
       <div class="tav-riquadro" data-catageo-tavolozza="verde">
         <div class="tav-barra">Verde <span class="tav-nome">data-catageo-tavolozza="verde"</span></div>
+
+        <div class="card mb-3">
+          <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
+          <div class="card-body">
+            <dl class="row catageo-dl mb-0">
+              <dt class="col-sm-5 fw-normal text-body-secondary">Comune</dt>
+              <dd class="col-sm-7">Roma</dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate WGS84</dt>
+              <dd class="col-sm-7"><span class="catageo-valore">41.856231, 12.532104</span></dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">UTM WGS84</dt>
+              <dd class="col-sm-7"><span class="catageo-valore">33T 295964 4678705</span></dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">Precisione</dt>
+              <dd class="col-sm-7"><span class="text-body-tertiary">non dichiarata</span></dd>
+            </dl>
+          </div>
+        </div>
+
+        <form>
+          <div class="card">
+            <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
+            <div class="card-body">
+              <label class="form-label">Nome <span class="text-danger">*</span></label>
+              <input class="form-control mb-2" value="Grotta dei Ragni">
+              <label class="form-label">Natura</label>
+              <select class="form-select mb-3"><option>Cavità naturale</option></select>
+              <button type="button" class="btn btn-sm btn-primary">Salva</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary">Annulla</button>
+              <button type="button" class="btn btn-sm btn-outline-danger">Rimuovi</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= C: azzurra ================= -->
+    <div class="col-xl-6">
+      <div class="tav-riquadro" data-catageo-tavolozza="azzurra">
+        <div class="tav-barra">Azzurra <span class="tav-nome">data-catageo-tavolozza="azzurra"</span></div>
+
+        <div class="card mb-3">
+          <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
+          <div class="card-body">
+            <dl class="row catageo-dl mb-0">
+              <dt class="col-sm-5 fw-normal text-body-secondary">Comune</dt>
+              <dd class="col-sm-7">Roma</dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">Coordinate WGS84</dt>
+              <dd class="col-sm-7"><span class="catageo-valore">41.856231, 12.532104</span></dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">UTM WGS84</dt>
+              <dd class="col-sm-7"><span class="catageo-valore">33T 295964 4678705</span></dd>
+              <dt class="col-sm-5 fw-normal text-body-secondary">Precisione</dt>
+              <dd class="col-sm-7"><span class="text-body-tertiary">non dichiarata</span></dd>
+            </dl>
+          </div>
+        </div>
+
+        <form>
+          <div class="card">
+            <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
+            <div class="card-body">
+              <label class="form-label">Nome <span class="text-danger">*</span></label>
+              <input class="form-control mb-2" value="Grotta dei Ragni">
+              <label class="form-label">Natura</label>
+              <select class="form-select mb-3"><option>Cavità naturale</option></select>
+              <button type="button" class="btn btn-sm btn-primary">Salva</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary">Annulla</button>
+              <button type="button" class="btn btn-sm btn-outline-danger">Rimuovi</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================= D: neutra ================= -->
+    <div class="col-xl-6">
+      <div class="tav-riquadro" data-catageo-tavolozza="neutra">
+        <div class="tav-barra">Neutra <span class="tav-nome">data-catageo-tavolozza="neutra"</span></div>
 
         <div class="card mb-3">
           <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
@@ -237,10 +241,10 @@ body { padding-bottom: 4rem; }
         </tr>
       </thead>
       <tbody class="catageo-valore">
+        <tr><td>Sabbia <em>(predefinita)</em></td><td>#e6ddc9</td><td class="text-end">1,35</td><td class="text-end">1,25</td><td class="text-end">11,4</td></tr>
+        <tr><td>Verde</td><td>#d5e2d8</td><td class="text-end">1,34</td><td class="text-end">1,25</td><td class="text-end">11,5</td></tr>
         <tr><td>Azzurra</td><td>#d1e0f1</td><td class="text-end">1,34</td><td class="text-end">1,26</td><td class="text-end">11,5</td></tr>
         <tr><td>Neutra</td><td>#d3dae2</td><td class="text-end">1,41</td><td class="text-end">1,26</td><td class="text-end">10,9</td></tr>
-        <tr><td>Sabbia</td><td>#e6ddc9</td><td class="text-end">1,35</td><td class="text-end">1,25</td><td class="text-end">11,4</td></tr>
-        <tr><td>Verde</td><td>#d5e2d8</td><td class="text-end">1,34</td><td class="text-end">1,25</td><td class="text-end">11,5</td></tr>
       </tbody>
     </table>
   </div>

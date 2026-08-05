@@ -6,6 +6,40 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.6.4] — 2026-08-05
+
+L'aspetto lo sceglie chi consulta.
+
+### Aggiunto
+- **Menu Aspetto** nella barra in alto: tema (come il sistema / chiaro / scuro) e
+  tavolozza in un solo posto. Erano due decisioni della stessa natura — come si
+  vuole vedere lo schermo — e due controlli distinti che si somigliavano.
+- **La scelta resta nel browser di chi l'ha fatta** e vince sul predefinito
+  dell'installazione. Non e legata all'utenza registrata: non e un dato del
+  catasto, ed e ragionevole preferire qualcosa di diverso da un altro computer.
+- `<tavolozza>` in `config.xml` stabilisce il predefinito dell'installazione, per
+  chi non ha ancora scelto. Un valore non ammesso viene ricondotto al predefinito,
+  quindi un errore di battitura non lascia la pagina senza tavolozza.
+- `Aspetto`: elenchi ammessi, etichette e lettura validata in un punto solo.
+  Servono al layout, al menu che li mostra e al JavaScript che li applica, e un
+  valore noto a due su tre produce una voce di menu che non fa nulla.
+
+### Cambiato
+- **Sabbia e la tavolozza predefinita.** Era azzurra.
+- La voce attiva nel menu si segna con una **spunta** e non con il fondo pieno di
+  Bootstrap: in un menu dove ogni voce e un colore, una riga blu sopra i nomi
+  delle tavolozze direbbe la cosa sbagliata.
+
+### Verificato
+- **Tutte e quattro le tavolozze misurate separatamente** su otto pagine,
+  imponendo la tavolozza da `config.xml`: nessun elemento sotto soglia in nessuna.
+  Il testo sulla scheda resta fra 10,9 e 11,5:1.
+- Tema scuro rimisurato su dieci pagine dopo l'aggiunta del menu: pulito.
+- Misurato anche il menu **aperto**, che l'audit normalmente salta perche chiuso.
+- `prova-web.ps1` verifica che ogni tavolozza sia nota a **PHP, CSS e JavaScript**
+  insieme, che il menu esponga tutte le voci, che il predefinito arrivi dal server
+  e che un valore non ammesso venga ricondotto.
+
 ## [0.6.3] — 2026-08-05
 
 Tema chiaro invertito: pagina bianca, schede piu scure.

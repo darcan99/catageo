@@ -60,12 +60,15 @@ I due temi hanno **logiche opposte**, ed è deliberato.
 | | tema chiaro | tema scuro |
 |---|---|---|
 | Fondo pagina | `#ffffff` — **bianco** | `#0c0f12` |
-| Fondo scheda | `#d1e0f1` — **più scura** | `#343b43` — più chiara |
-| Fondo barre (navbar, piede) | `#dce8f5` | `#2b3035` |
-| Fondo intestazione | blu scuro al 13% | blu chiaro al 21% |
-| **pagina / scheda** | **1,34** | **1,70** |
-| **scheda / intestazione** | **1,26** | **1,42** |
+| Fondo scheda | `#e6ddc9` — **più scura** | `#343b43` — più chiara |
+| Fondo barre (navbar, piede) | `#ebe3d3` | `#2b3035` |
+| Fondo intestazione | tinta scura al 14% | blu chiaro al 21% |
+| **pagina / scheda** | **1,35** | **1,70** |
+| **scheda / intestazione** | **1,25** | **1,42** |
 | **pagina / navbar** | **1,24** | **1,44** |
+
+I valori del tema chiaro sono quelli della tavolozza **sabbia**, la predefinita;
+le altre tre stanno più sotto e sono equivalenti a meno di qualche centesimo.
 
 Nel tema scuro la scheda è **più chiara** della pagina, come vuole la convenzione
 delle superfici sollevate. Nel tema chiaro è **più scura**: il bianco fa da
@@ -92,21 +95,46 @@ perdere la gerarchia fra i due livelli. Ogni volta che il fondo delle schede si 
 spostato è stato necessario ricalibrare l'opacità della tinta dell'intestazione
 per mantenere lo stesso rapporto.
 
-### Tavolozze alternative del tema chiaro
+### Tavolozze del tema chiaro
 
-La temperatura del tema chiaro si cambia con l'attributo
-`data-catageo-tavolozza` e si confronta a vista in
+Si scelgono dal menu **Aspetto** e si confrontano a vista in
 [tavolozze.html](tavolozze.html), che usa il CSS reale dell'applicativo.
 
-| Tavolozza | Scheda | bianco / scheda | Nota |
-|---|---|---|---|
-| azzurra *(predefinita)* | `#d1e0f1` | 1,34 | stessa famiglia dell'accento e del tema scuro |
-| neutra | `#d3dae2` | 1,41 | l'inversione senza tinte, la più sobria |
-| sabbia | `#e6ddc9` | 1,35 | il colore della roccia e delle carte topografiche |
-| verde | `#d5e2d8` | 1,34 | meno usuale in un gestionale |
+| Tavolozza | Scheda | bianco / scheda | scheda / intest. | testo / scheda | Nota |
+|---|---|---|---|---|---|
+| **sabbia** *(predefinita)* | `#e6ddc9` | 1,35 | 1,25 | 11,4 | roccia e carte topografiche |
+| verde | `#d5e2d8` | 1,34 | 1,25 | 11,5 | vegetazione delle carte |
+| azzurra | `#d1e0f1` | 1,34 | 1,26 | 11,5 | in tinta con il tema scuro |
+| neutra | `#d3dae2` | 1,41 | 1,26 | 10,9 | grigio, senza tinte |
 
-In tutte, il testo sulla scheda resta fra 10,9 e 11,5:1, cioè molto oltre la
-soglia: la scelta è di gusto, non di leggibilità.
+Tutte e quattro sono state misurate **separatamente** su otto pagine, imponendo
+la tavolozza da `config.xml`: nessun elemento sotto soglia in nessuna. Il testo
+sulla scheda resta fra 10,9 e 11,5:1, cioè molto oltre la soglia, quindi la
+scelta è di gusto e non di leggibilità.
+
+La neutra è la più staccata dal bianco (1,41) perché è l'unica senza tinta: a
+parità di luminanza percepita, un grigio puro si allontana dal bianco più di un
+colore. Non è un motivo per preferirla, la differenza è sotto la soglia in cui
+conta.
+
+### Chi sceglie, e dove finisce la scelta
+
+| | Dove | Vale per |
+|---|---|---|
+| Predefinito dell'installazione | `config.xml`, `<sistema><tema>` e `<tavolozza>` | chi non ha ancora scelto |
+| Scelta personale | menu **Aspetto**, salvata in `localStorage` | quel browser, finché non si cancella |
+
+La preferenza **non** è legata all'utenza registrata: non è un dato del catasto,
+è come uno preferisce vedere lo schermo che ha davanti, e sullo stesso archivio
+da un altro computer può preferire altro. Un valore non ammesso in `config.xml`
+viene ricondotto al predefinito da `Aspetto`, quindi un errore di battitura non
+lascia la pagina senza tavolozza.
+
+Le tavolozze agiscono **solo sul tema chiaro**. Il tema scuro ha una sua scala,
+tarata a parte: moltiplicare le combinazioni significherebbe moltiplicare le
+misure da rifare a ogni modifica. Il menu lo dichiara, così chi sceglie mentre è
+in tema scuro sa perché non vede cambiare nulla — la spunta conferma comunque
+che la scelta è stata registrata.
 
 Oltre alla luminanza agiscono due leve che **non** toccano il contrasto del testo,
 e sono quelle che danno il colpo d'occhio a parità di leggibilità:

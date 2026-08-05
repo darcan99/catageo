@@ -5,12 +5,14 @@
  *  Descrizione ..: Comportamenti comuni dell'interfaccia: alternanza del tema
  *                  chiaro/scuro e conferme sulle azioni distruttive.
  *                  Nessuna dipendenza oltre a Bootstrap, gia caricato.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.4
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.4  2026-08-05  D.Candela  Tema e tavolozza dal menu Aspetto, con la
+ *                                scelta ricordata nel browser.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -18,6 +20,31 @@
     'use strict';
 
     var CHIAVE_TEMA = 'catageo.tema';
+    var CHIAVE_TAVOLOZZA = 'catageo.tavolozza';
+
+    var TEMI = ['auto', 'light', 'dark'];
+    var TAVOLOZZE = ['sabbia', 'verde', 'azzurra', 'neutra'];
+
+    /** Legge una preferenza dal browser, tollerando localStorage non disponibile. */
+    function preferenza(chiave, ammessi) {
+        var valore = null;
+        try {
+            valore = window.localStorage.getItem(chiave);
+        } catch (e) {
+            // Navigazione privata su alcuni browser: si resta sul valore che
+            // arriva dalla configurazione, senza errori.
+            valore = null;
+        }
+        return ammessi.indexOf(valore) !== -1 ? valore : null;
+    }
+
+    function salvaPreferenza(chiave, valore) {
+        try {
+            window.localStorage.setItem(chiave, valore);
+        } catch (e) {
+            // La scelta vale solo per la pagina corrente.
+        }
+    }
 
     /**
      * Applica un tema all'elemento radice.
@@ -31,42 +58,68 @@
         document.documentElement.setAttribute('data-bs-theme', effettivo);
     }
 
-    /** Tema scelto dall'utente, o quello previsto dalla configurazione. */
+    /** Applica una tavolozza. Ha effetto visibile solo sul tema chiaro. */
+    function applicaTavolozza(tavolozza) {
+        document.documentElement.setAttribute('data-catageo-tavolozza', tavolozza);
+    }
+
+    /** Tema scelto da chi guarda, o quello previsto dalla configurazione. */
     function temaCorrente() {
-        var salvato = null;
-        try {
-            salvato = window.localStorage.getItem(CHIAVE_TEMA);
-        } catch (e) {
-            // localStorage non disponibile (navigazione privata su alcuni
-            // browser): si resta sul tema di configurazione, senza errori.
-            salvato = null;
-        }
-        return salvato || document.documentElement.getAttribute('data-catageo-tema') || 'auto';
+        return preferenza(CHIAVE_TEMA, TEMI)
+            || document.documentElement.getAttribute('data-catageo-tema')
+            || 'auto';
     }
 
-    function salvaTema(tema) {
-        try {
-            window.localStorage.setItem(CHIAVE_TEMA, tema);
-        } catch (e) {
-            // La preferenza vale solo per la sessione corrente.
-        }
+    /** Tavolozza scelta da chi guarda, o quella prevista dalla configurazione. */
+    function tavolozzaCorrente() {
+        return preferenza(CHIAVE_TAVOLOZZA, TAVOLOZZE)
+            || document.documentElement.getAttribute('data-catageo-tavolozza-predefinita')
+            || 'sabbia';
     }
 
-    // Applicazione immediata, prima che l'utente veda la pagina renderizzata.
+    /** Segna con la spunta le voci di menu corrispondenti alle scelte attive. */
+    function aggiornaSpunte() {
+        var tema = temaCorrente();
+        var tavolozza = tavolozzaCorrente();
+
+        document.querySelectorAll('[data-catageo-scegli-tema]').forEach(function (voce) {
+            voce.classList.toggle('active', voce.getAttribute('data-catageo-scegli-tema') === tema);
+        });
+        document.querySelectorAll('[data-catageo-scegli-tavolozza]').forEach(function (voce) {
+            voce.classList.toggle('active', voce.getAttribute('data-catageo-scegli-tavolozza') === tavolozza);
+        });
+    }
+
+    // Applicazione immediata, prima che la pagina venga mostrata: se avvenisse
+    // dopo si vedrebbe un lampo del tema sbagliato.
     applicaTema(temaCorrente());
+    applicaTavolozza(tavolozzaCorrente());
 
     document.addEventListener('DOMContentLoaded', function () {
 
-        // ------------------------------------------------ alternanza del tema
-        var pulsante = document.getElementById('catageoTema');
-        if (pulsante) {
-            pulsante.addEventListener('click', function () {
-                var attuale = document.documentElement.getAttribute('data-bs-theme');
-                var nuovo = attuale === 'dark' ? 'light' : 'dark';
-                applicaTema(nuovo);
-                salvaTema(nuovo);
+        // ------------------------------------------------ menu Aspetto
+        document.querySelectorAll('[data-catageo-scegli-tema]').forEach(function (voce) {
+            voce.addEventListener('click', function () {
+                var scelto = voce.getAttribute('data-catageo-scegli-tema');
+                applicaTema(scelto);
+                salvaPreferenza(CHIAVE_TEMA, scelto);
+                aggiornaSpunte();
             });
-        }
+        });
+
+        document.querySelectorAll('[data-catageo-scegli-tavolozza]').forEach(function (voce) {
+            voce.addEventListener('click', function () {
+                var scelta = voce.getAttribute('data-catageo-scegli-tavolozza');
+                applicaTavolozza(scelta);
+                salvaPreferenza(CHIAVE_TAVOLOZZA, scelta);
+                aggiornaSpunte();
+
+                // In tema scuro la scelta e stata registrata ma non si vede: il
+                // menu lo dichiara gia, e la spunta conferma che e stata presa.
+            });
+        });
+
+        aggiornaSpunte();
 
         // Se l'utente non ha espresso una preferenza, si segue il sistema
         // anche quando cambia durante la navigazione.

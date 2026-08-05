@@ -8,12 +8,14 @@ declare(strict_types=1);
  *  Descrizione ..: Struttura comune delle pagine: intestazione HTML, navbar,
  *                  messaggi, contenuto e footer. Riceve dalle pagine le
  *                  variabili $titolo e $contenuto.
- *  Versione .....: 0.6.3
+ *  Versione .....: 0.6.4
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.4  2026-08-05  D.Candela  Menu Aspetto: tema e tavolozza scelti da
+ *                                chi consulta.
  *  0.6.3  2026-08-05  D.Candela  Fondo di navbar e piede dalla tavolozza:
  *                                bg-body-tertiary sparirebbe sul bianco.
  *  0.6.0  2026-08-05  D.Candela  CSS e JS specifici della pagina, cosi le
@@ -39,7 +41,11 @@ $titolo      = $titolo ?? $nomeCatasto;
 $contenuto   = $contenuto ?? '';
 $paginaAttiva = $paginaAttiva ?? '';
 $utente      = Auth::utente();
-$tema        = Config::caricata() ? Config::testo('sistema.tema', 'auto') : 'auto';
+
+// Aspetto: la configurazione stabilisce il valore predefinito, la preferenza di
+// chi guarda vive nel suo browser e vince su questa (vedi catageo.js).
+$tema      = Aspetto::tema();
+$tavolozza = Aspetto::tavolozza();
 
 // Risorse aggiuntive dichiarate dalla pagina. Le librerie pesanti (Leaflet,
 // proj4) si caricano solo dove servono: la pagina di accesso non deve scaricare
@@ -59,7 +65,11 @@ $voci = [
 ];
 ?>
 <!doctype html>
-<html lang="it" data-bs-theme="<?= Testo::esc($tema === 'auto' ? 'light' : $tema) ?>" data-catageo-tema="<?= Testo::esc($tema) ?>">
+<html lang="it"
+      data-bs-theme="<?= Testo::esc(Aspetto::temaIniziale()) ?>"
+      data-catageo-tema="<?= Testo::esc($tema) ?>"
+      data-catageo-tavolozza="<?= Testo::esc($tavolozza) ?>"
+      data-catageo-tavolozza-predefinita="<?= Testo::esc($tavolozza) ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -102,10 +112,51 @@ $voci = [
       </ul>
 
       <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-sm btn-outline-secondary" type="button"
-                id="catageoTema" title="Alterna tema chiaro e scuro">
-          <i class="bi bi-circle-half" aria-hidden="true"></i>
-        </button>
+        <?php
+        // Menu Aspetto: tema e tavolozza in un solo posto. Erano due controlli
+        // separati, ma sono la stessa decisione — come si vuole vedere lo
+        // schermo — e tenerli insieme evita due pulsanti che si somigliano.
+        ?>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                  id="catageoAspetto" data-bs-toggle="dropdown" aria-expanded="false"
+                  title="Tema e colori dell'interfaccia">
+            <i class="bi bi-circle-half" aria-hidden="true"></i>
+            <span class="visually-hidden">Aspetto</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" style="min-width:15rem">
+            <li class="dropdown-header">Tema</li>
+            <?php foreach (Aspetto::TEMI as $valore => $etichetta): ?>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" type="button"
+                        data-catageo-scegli-tema="<?= Testo::esc((string) $valore) ?>">
+                  <i class="bi bi-check2 catageo-spunta" aria-hidden="true"></i>
+                  <?= Testo::esc($etichetta) ?>
+                </button>
+              </li>
+            <?php endforeach; ?>
+
+            <li><hr class="dropdown-divider"></li>
+            <li class="dropdown-header">
+              Tavolozza
+              <div class="catageo-nota">Vale per il tema chiaro.</div>
+            </li>
+            <?php foreach (Aspetto::elencoTavolozze() as $voce): ?>
+              <li>
+                <button class="dropdown-item d-flex align-items-center gap-2" type="button"
+                        data-catageo-scegli-tavolozza="<?= Testo::esc($voce['valore']) ?>">
+                  <i class="bi bi-check2 catageo-spunta" aria-hidden="true"></i>
+                  <span>
+                    <?= Testo::esc($voce['nome']) ?>
+                    <?php if ($voce['nota'] !== ''): ?>
+                      <span class="catageo-nota d-block"><?= Testo::esc($voce['nota']) ?></span>
+                    <?php endif; ?>
+                  </span>
+                </button>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
 
         <?php if ($utente !== null): ?>
           <div class="dropdown">

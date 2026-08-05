@@ -111,7 +111,13 @@
     <fusoOrario>Europe/Rome</fusoOrario>
     <lingua>it</lingua>
     <versioniStorico>20</versioniStorico>
+    <!-- Aspetto predefinito dell'installazione. Chi consulta puo scegliere il
+         proprio dal menu Aspetto: la sua scelta resta nel suo browser e vince
+         su questa, che vale per chi non ha ancora scelto.
+         tema: auto (segue il sistema operativo), light, dark
+         tavolozza: sabbia, verde, azzurra, neutra — agisce sul tema chiaro -->
     <tema>auto</tema>
+    <tavolozza>sabbia</tavolozza>
     <debug>0</debug>
   </sistema>
 
