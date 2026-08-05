@@ -170,18 +170,16 @@ final class SistemiRiferimento
     public static function elenco(bool $soloAttivi = false): array
     {
         if (self::$cache === null) {
-            try {
-                self::assicuraFile();
-            } catch (Throwable $e) {
-                // Archivio non scrivibile: si prosegue con i predefiniti, cosi
-                // la consultazione resta possibile.
-                Log::errore('Vocabolario dei sistemi non inizializzabile: ' . $e->getMessage(), 'avviso');
-            }
-
             $sistemi = [];
 
-            if (is_file(self::percorso())) {
-                try {
+            // Tutto l'accesso all'archivio sta dentro un solo try: il
+            // vocabolario deve funzionare anche quando l'archivio non c'e
+            // ancora o non e scrivibile, perche serve gia alla diagnostica e
+            // all'installazione, prima che esista una configurazione.
+            try {
+                self::assicuraFile();
+
+                if (is_file(self::percorso())) {
                     $doc = Xml::carica(self::percorso());
                     foreach (Xml::elenco($doc, '/sistemiCoordinate/sistema') as $nodo) {
                         $codice = trim($nodo->getAttribute('codice'));
@@ -198,8 +196,11 @@ final class SistemiRiferimento
                             'attivo'      => Xml::booleano($nodo, 'attivo', true),
                         ];
                     }
-                } catch (Throwable $e) {
-                    Log::errore('Vocabolario dei sistemi non leggibile: ' . $e->getMessage(), 'avviso');
+                }
+            } catch (Throwable $e) {
+                $sistemi = [];
+                if (class_exists('Log', false) && Config::caricata()) {
+                    Log::errore('Vocabolario dei sistemi non disponibile: ' . $e->getMessage(), 'avviso');
                 }
             }
 

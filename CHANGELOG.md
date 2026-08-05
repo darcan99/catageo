@@ -7,6 +7,36 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 ## [Non rilasciato]
 
 ### Aggiunto
+- **Conversione fra sistemi di riferimento** (D14). `SistemiRiferimento` e un
+  vocabolario in cui ogni sistema e descritto da una stringa in stile proj4:
+  la stessa che riceve proj4js nel browser e che alimenta il motore in PHP.
+  Ampliabile incollando una definizione da epsg.io, senza toccare il codice.
+- `Proiezione`: trasversa di Mercatore su ellissoide qualsiasi e trasformazione
+  di datum a sette parametri di Helmert, nella convenzione di PROJ.
+- **Gauss-Boaga e ED50 ora si convertono davvero**, con l'incertezza dichiarata
+  accanto al nome del sistema e ripetuta come avviso al salvataggio. Prima
+  venivano solo conservati e i gradi WGS84 andavano inseriti a mano.
+- **Anteprima dal vivo** durante l'inserimento: mentre si digita, il punto
+  compare in gradi decimali, sessagesimali e UTM. E li che un fuso sbagliato o
+  un est e nord invertiti si vedono, invece di scoprirli dopo il salvataggio.
+- **Notazione preferita per catalogo**: il catalogo dichiara in che sistema e
+  abituato a scrivere le posizioni, e le sue schede la mostrano per prima.
+- Il campo del fuso e sparito dal form: e implicito nel sistema scelto, e
+  averlo separato rendeva possibile una contraddizione da intercettare.
+- Oltre quattro gradi dal meridiano centrale la conversione viene rifiutata con
+  un messaggio che suggerisce il fuso corretto: li la serie perde accuratezza, e
+  restituire un numero sbagliato sarebbe peggio.
+
+### Verificato
+- Verifica incrociata con proj4js su 52 punti e nove sistemi, in
+  `docs/prove/coordinate`: concordanza entro **2,56 mm**, Gauss-Boaga ed ED50
+  compresi, nessun caso fuori tolleranza. Serve perche un errore nel verso
+  delle rotazioni di Helmert lascia coerente il giro completo e intanto sposta
+  la posizione di decine di metri: solo un'implementazione indipendente lo vede.
+- 84 prove unitarie sul dominio delle coordinate e 38 dall'interfaccia; tutte le
+  suite precedenti rieseguite.
+
+### Aggiunto in precedenza
 - **Sistemi di riferimento e formati delle coordinate** (D13). L'archivio
   conserva sempre gradi decimali WGS84 come forma canonica, ma accanto registra
   il dato **come e stato rilevato**: sistema, formato e valore originali. Un

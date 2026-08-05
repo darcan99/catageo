@@ -150,6 +150,17 @@
           </xs:complexType>
         </xs:element>
 
+        <!-- Notazione con cui il catalogo e abituato a scrivere le posizioni.
+             Vuoto significa gradi decimali piu UTM WGS84 del fuso che contiene
+             il punto. -->
+        <xs:element name="visualizzazione" minOccurs="0">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="sistemaPreferito" type="xs:string" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
         <!-- Compilato quando il catalogo recepisce un archivio preesistente:
              serve a sapere da dove vengono i dati e con quale licenza. -->
         <xs:element name="origine" minOccurs="0">

@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'responsabile'          => (string) ($_POST['responsabile'] ?? ''),
                     'separatore'            => (string) ($_POST['separatore'] ?? ''),
                     'consentiCodiceManuale' => !empty($_POST['consentiCodiceManuale']),
+                    'sistemaPreferito'      => (string) ($_POST['sistemaPreferito'] ?? ''),
                     'prefisso'              => (string) ($_POST['prefisso'] ?? ''),
                     'cifre'                 => (int) ($_POST['cifre'] ?? 3),
                 ]);
@@ -68,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'responsabile'          => (string) ($_POST['responsabile'] ?? ''),
                     'separatore'            => (string) ($_POST['separatore'] ?? ''),
                     'consentiCodiceManuale' => !empty($_POST['consentiCodiceManuale']),
+                    'sistemaPreferito'      => (string) ($_POST['sistemaPreferito'] ?? ''),
                     'attivo'                => !empty($_POST['attivo']),
                 ]);
                 Log::modifica('modifica', $siglaPost, '', 'cataloghi', 'identita aggiornata');
@@ -584,6 +586,25 @@ $siglaAttiva = Cataloghi::siglaAttiva();
                 <input type="text" class="form-control catageo-valore" id="separatore" name="separatore" maxlength="3"
                        value="<?= $v('separatore') ?>">
                 <div class="catageo-nota">Fra prefisso e numero.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="sistemaPreferito" class="form-label">Notazione preferita per le posizioni</label>
+                <select class="form-select" id="sistemaPreferito" name="sistemaPreferito">
+                  <option value="">Gradi decimali e UTM del fuso del punto</option>
+                  <?php foreach (Coordinate::sistemi(true) as $codiceSis => $datiSis): ?>
+                    <?php if (Coordinate::inGradi($codiceSis)) { continue; } ?>
+                    <option value="<?= Testo::esc($codiceSis) ?>"
+                      <?= (string) ($m['sistemaPreferito'] ?? ($_POST['sistemaPreferito'] ?? '')) === $codiceSis ? 'selected' : '' ?>>
+                      <?= Testo::esc((string) $datiSis['nome']) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+                <div class="catageo-nota">
+                  La notazione con cui questo catasto e abituato a scrivere le
+                  posizioni: compare per prima nelle schede e nelle stampe. Il
+                  catasto del Lazio lavora in UTM WGS84 33N.
+                </div>
               </div>
 
               <div class="col-12">

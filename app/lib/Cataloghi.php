@@ -255,6 +255,9 @@ final class Cataloghi
             'prossimoProgressivo' => '1',
         ]);
 
+        $visualizzazione = Xml::aggiungi($radice, 'visualizzazione');
+        Xml::imposta($visualizzazione, 'sistemaPreferito', trim((string) ($dati['sistemaPreferito'] ?? '')));
+
         Xml::aggiungi($radice, 'origine');
 
         Xml::salva($doc, Percorsi::unisci($cartella, self::DESCRITTORE), self::xsd());
@@ -314,6 +317,16 @@ final class Cataloghi
                 Xml::imposta($codifica, 'separatore', (string) ($dati['separatore'] ?? ''));
                 Xml::imposta($codifica, 'consentiCodiceManuale', !empty($dati['consentiCodiceManuale']) ? '1' : '0');
             }
+
+            $visualizzazione = Xml::primo($doc, '/catalogo/visualizzazione');
+            if (!$visualizzazione instanceof DOMElement) {
+                $radiceDoc = $doc->documentElement;
+                if ($radiceDoc === null) {
+                    throw new CatalogoEccezione('Descrittore del catalogo malformato.');
+                }
+                $visualizzazione = Xml::aggiungi($radiceDoc, 'visualizzazione');
+            }
+            Xml::imposta($visualizzazione, 'sistemaPreferito', trim((string) ($dati['sistemaPreferito'] ?? '')));
 
             Xml::salva($doc, $descrittore, self::xsd());
         });
@@ -711,6 +724,11 @@ final class Cataloghi
             'separatore'            => Xml::testo($doc, '/catalogo/codifica/separatore'),
             'consentiCodiceManuale' => Xml::booleano($doc, '/catalogo/codifica/consentiCodiceManuale', false),
             'serie'                 => $serie,
+            // Notazione con cui il catalogo e abituato a scrivere le posizioni:
+            // il catasto del Lazio lavora in UTM WGS84 33N, e le sue schede
+            // devono mostrare quella per prima. Vuoto = solo gradi e UTM del
+            // fuso che contiene il punto.
+            'sistemaPreferito'      => Xml::testo($doc, '/catalogo/visualizzazione/sistemaPreferito'),
             'origine'               => [
                 'catastoOrigine'   => Xml::testo($doc, '/catalogo/origine/catastoOrigine'),
                 'riferimento'      => Xml::testo($doc, '/catalogo/origine/riferimento'),

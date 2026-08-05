@@ -68,43 +68,16 @@ final class Coordinate
      * riferimento e cosa diverso e si sceglie a parte.
      */
     public const FORMATI = [
-        'decimali' => 'Gradi decimali (41.856231)',
-        'gms'      => 'Gradi, minuti, secondi (41°51\'22.4"N)',
-        'gm'       => 'Gradi e minuti decimali (41°51.373\'N)',
-        'utm'      => 'UTM (fuso, est, nord)',
+        'decimali'   => 'Gradi decimali, o centesimali (41.856231)',
+        'gms'        => 'Gradi, minuti, secondi (41°51\'22.4"N)',
+        'gm'         => 'Gradi e minuti decimali (41°51.373\'N)',
+        'proiettate' => 'Coordinate proiettate in metri (est, nord)',
     ];
 
     /**
-     * Sistemi di riferimento selezionabili.
-     *
-     * convertibile = l'applicativo sa ricavarne i gradi decimali WGS84 senza
-     * approssimazioni; per gli altri il valore viene conservato come dichiarato
-     * e le coordinate canoniche vanno inserite a parte.
+     * Formati che esprimono gradi, e quindi richiedono un sistema geografico.
      */
-    public const SISTEMI = [
-        'EPSG:4326' => ['nome' => 'WGS84 geografiche', 'convertibile' => true,
-                        'nota' => 'Gradi di latitudine e longitudine sull\'ellissoide WGS84. E la forma canonica dell\'archivio.'],
-        'EPSG:32632' => ['nome' => 'UTM WGS84 fuso 32N', 'convertibile' => true,
-                         'nota' => 'Italia occidentale e centrale, fino a circa 12° est.'],
-        'EPSG:32633' => ['nome' => 'UTM WGS84 fuso 33N', 'convertibile' => true,
-                         'nota' => 'Italia centrale e meridionale, oltre i 12° est.'],
-        'EPSG:32634' => ['nome' => 'UTM WGS84 fuso 34N', 'convertibile' => true,
-                         'nota' => 'Estremo sud-est, Salento e Grecia occidentale.'],
-        'EPSG:25832' => ['nome' => 'UTM ETRS89 fuso 32N', 'convertibile' => true,
-                         'nota' => 'ETRS89 coincide con WGS84 entro pochi centimetri: convertito come tale.'],
-        'EPSG:25833' => ['nome' => 'UTM ETRS89 fuso 33N', 'convertibile' => true,
-                         'nota' => 'ETRS89 coincide con WGS84 entro pochi centimetri: convertito come tale.'],
-        'EPSG:3003'  => ['nome' => 'Gauss-Boaga fuso Ovest (Roma40)', 'convertibile' => false,
-                         'nota' => 'Datum Roma40, diverso da WGS84: la conversione richiede una trasformazione di datum e non viene fatta automaticamente.'],
-        'EPSG:3004'  => ['nome' => 'Gauss-Boaga fuso Est (Roma40)', 'convertibile' => false,
-                         'nota' => 'Datum Roma40, diverso da WGS84: la conversione richiede una trasformazione di datum e non viene fatta automaticamente.'],
-        'EPSG:23032' => ['nome' => 'UTM ED50 fuso 32N', 'convertibile' => false,
-                         'nota' => 'Datum ED50: scostamento di circa 50-100 m rispetto a WGS84, non convertibile senza parametri locali.'],
-        'EPSG:23033' => ['nome' => 'UTM ED50 fuso 33N', 'convertibile' => false,
-                         'nota' => 'Datum ED50: scostamento di circa 50-100 m rispetto a WGS84, non convertibile senza parametri locali.'],
-        'altro'      => ['nome' => 'Altro / non dichiarato', 'convertibile' => false,
-                         'nota' => 'Il valore viene conservato come annotazione.'],
-    ];
+    public const FORMATI_IN_GRADI = ['decimali', 'gms', 'gm'];
 
     /** Sistema canonico dell'archivio. */
     public const CANONICO = 'EPSG:4326';
@@ -124,44 +97,75 @@ final class Coordinate
 
     // --------------------------------------------------------------- informazioni
 
-    /** True se dal sistema indicato si sanno ricavare i gradi decimali WGS84. */
+    /**
+     * Sistemi selezionabili, dal vocabolario.
+     *
+     * Non sono piu una costante di questa classe: stanno in
+     * dati/sistemi_coordinate.xml e si possono ampliare incollando una
+     * definizione presa da epsg.io, senza toccare il codice.
+     *
+     * @return array<string,array<string,mixed>>
+     */
+    public static function sistemi(bool $soloAttivi = true): array
+    {
+        return SistemiRiferimento::elenco($soloAttivi);
+    }
+
+    /**
+     * True se dal sistema indicato si sanno ricavare i gradi decimali WGS84.
+     *
+     * Ora vale per ogni sistema del vocabolario: anche quelli con datum diverso
+     * si convertono, con l'incertezza dichiarata da accuratezza().
+     */
     public static function convertibile(string $sistema): bool
     {
-        return (bool) (self::SISTEMI[$sistema]['convertibile'] ?? false);
+        return SistemiRiferimento::trova($sistema) !== null;
     }
 
     /** Nome leggibile di un sistema. */
     public static function nomeSistema(string $sistema): string
     {
-        return (string) (self::SISTEMI[$sistema]['nome'] ?? $sistema);
+        return SistemiRiferimento::nome($sistema);
     }
 
     /** Nota esplicativa di un sistema. */
     public static function notaSistema(string $sistema): string
     {
-        return (string) (self::SISTEMI[$sistema]['nota'] ?? '');
+        return SistemiRiferimento::nota($sistema);
     }
 
     /**
-     * Fuso UTM dichiarato da un codice EPSG, oppure 0 se il codice non e UTM.
+     * Incertezza tipica della conversione verso WGS84, in metri.
+     * Zero per i sistemi che condividono il datum: li e solo un cambio di
+     * proiezione, esatto.
      */
-    public static function fusoDaSistema(string $sistema): int
+    public static function accuratezza(string $sistema): float
     {
-        foreach ([32600, 25800, 23000] as $base) {
-            if (preg_match('/^EPSG:(\d+)$/', $sistema, $p)) {
-                $numero = (int) $p[1];
-                if ($numero > $base && $numero < $base + 61) {
-                    return $numero - $base;
-                }
-            }
-        }
-        return 0;
+        return SistemiRiferimento::accuratezza($sistema);
     }
 
-    /** True se il sistema e una proiezione UTM. */
-    public static function eUtm(string $sistema): bool
+    /** True se la conversione comporta un cambio di datum, quindi un'incertezza. */
+    public static function cambiaDatum(string $sistema): bool
     {
-        return self::fusoDaSistema($sistema) > 0;
+        return SistemiRiferimento::cambiaDatum($sistema);
+    }
+
+    /** True se il sistema esprime coordinate in gradi anziche in metri. */
+    public static function inGradi(string $sistema): bool
+    {
+        return SistemiRiferimento::inGradi($sistema);
+    }
+
+    /** Fuso UTM dichiarato dalla definizione del sistema, oppure 0. */
+    public static function fusoDaSistema(string $sistema): int
+    {
+        return SistemiRiferimento::fuso($sistema);
+    }
+
+    /** True se il sistema e proiettato, cioe esprime metri e non gradi. */
+    public static function eProiettato(string $sistema): bool
+    {
+        return SistemiRiferimento::trova($sistema) !== null && !SistemiRiferimento::inGradi($sistema);
     }
 
     // ----------------------------------------------------------------- geografiche
@@ -473,80 +477,61 @@ final class Coordinate
         $sistema = (string) ($dati['sistema'] ?? self::CANONICO);
         $avvisi  = [];
 
+        // "utm" era il nome del formato prima che i sistemi proiettati
+        // diventassero piu d'uno: le schede gia scritte lo riportano ancora.
+        if ($formato === 'utm') {
+            $formato = 'proiettate';
+        }
+
         if (!isset(self::FORMATI[$formato])) {
             throw new CoordinateEccezione('Formato di inserimento non riconosciuto.');
         }
-        if (!isset(self::SISTEMI[$sistema])) {
-            throw new CoordinateEccezione('Sistema di riferimento non riconosciuto.');
+        if (SistemiRiferimento::trova($sistema) === null) {
+            throw new CoordinateEccezione('Sistema di riferimento non riconosciuto: ' . $sistema);
         }
 
-        // -------------------------------------------------------------- UTM
-        if ($formato === 'utm') {
-            $fusoDichiarato = (int) ($dati['fuso'] ?? 0);
-            $est            = self::numero($dati['est'] ?? '');
-            $nord           = self::numero($dati['nord'] ?? '');
-            $emisfero       = (string) ($dati['emisfero'] ?? 'N');
+        // -------------------------------------------------- coordinate proiettate
+        if ($formato === 'proiettate') {
+            $est  = self::numero($dati['est'] ?? '');
+            $nord = self::numero($dati['nord'] ?? '');
 
             if ($est === null || $nord === null) {
-                throw new CoordinateEccezione('Per il formato UTM servono est e nord in metri.');
+                throw new CoordinateEccezione('Per le coordinate proiettate servono est e nord in metri.');
             }
-
-            // Il fuso puo arrivare dal campo o dal codice EPSG del sistema.
-            $fuso = $fusoDichiarato > 0 ? $fusoDichiarato : self::fusoDaSistema($sistema);
-            if ($fuso <= 0) {
-                throw new CoordinateEccezione('Indicare il fuso UTM, oppure scegliere un sistema che lo dichiari.');
-            }
-
-            // Contraddizione fra il fuso scritto nel campo e quello dichiarato
-            // dal codice EPSG del sistema: uno dei due e sbagliato, e la
-            // differenza sul terreno sarebbe di centinaia di chilometri.
-            //
-            // NOTA: non ha senso ricalcolare il fuso dalle coordinate ottenute
-            // per confrontarlo con quello dichiarato. Una coppia est/nord e
-            // valida in OGNI fuso, e indica semplicemente un luogo diverso:
-            // il ricalcolo restituirebbe sempre il fuso dichiarato e il
-            // controllo non scatterebbe mai. L'unico confronto che porta
-            // informazione e questo, fra due dichiarazioni indipendenti.
-            $fusoDelSistema = self::fusoDaSistema($sistema);
-            if ($fusoDichiarato > 0 && $fusoDelSistema > 0 && $fusoDichiarato !== $fusoDelSistema) {
-                throw new CoordinateEccezione(sprintf(
-                    'Il fuso indicato (%d) contraddice il sistema scelto, che dichiara il fuso %d. '
-                    . 'Correggere uno dei due: la differenza sul terreno sarebbe di centinaia di chilometri.',
-                    $fusoDichiarato, $fusoDelSistema
-                ));
+            if (self::inGradi($sistema)) {
+                throw new CoordinateEccezione(
+                    'Il sistema "' . self::nomeSistema($sistema) . '" esprime gradi, non metri: '
+                    . 'scegliere un sistema proiettato oppure cambiare formato.'
+                );
             }
 
             // Est e nord scambiati e l'errore di digitazione piu frequente.
-            // Nell'emisfero nord, sopra i mille chilometri dall'equatore, il
-            // nord supera sempre il massimo ammesso per l'est: se il valore
-            // messo come est ha la magnitudine di un nord, i due sono invertiti.
-            if ($est > 1000000.0 || ($nord < 900000.0 && $est > $nord && $nord > 100000.0)) {
+            // In Italia il nord supera sempre i quattro milioni di metri,
+            // mentre l'est resta sotto il milione: se il valore messo come est
+            // ha la magnitudine di un nord, i due sono invertiti.
+            if ($nord < 900000.0 && $est > $nord && $nord > 100000.0) {
                 $avvisi[] = 'Est e nord sembrano invertiti: verificare quale dei due valori e la coordinata est.';
             }
 
-            $valoreOriginale = sprintf('%d %s %s %s', $fuso,
-                number_format($est, 2, '.', ''), number_format($nord, 2, '.', ''), strtoupper($emisfero));
+            $valoreOriginale = sprintf('%s %s %s',
+                $sistema, number_format($est, 2, '.', ''), number_format($nord, 2, '.', ''));
 
-            if (!self::convertibile($sistema)) {
-                // Datum diverso da WGS84: si conserva il dato ma non si finge
-                // di poterlo convertire. Le coordinate canoniche vanno inserite
-                // a parte, altrimenti si scriverebbe una posizione sbagliata di
-                // decine di metri spacciandola per esatta.
-                $lat = self::numero($dati['latitudine'] ?? '');
-                $lon = self::numero($dati['longitudine'] ?? '');
-                if ($lat === null || $lon === null) {
-                    throw new CoordinateEccezione(
-                        'Il sistema "' . self::nomeSistema($sistema) . '" ha un datum diverso da WGS84 e non viene '
-                        . 'convertito automaticamente: indicare anche latitudine e longitudine WGS84 in gradi decimali.'
-                    );
-                }
-                $avvisi[] = 'Il valore ' . self::nomeSistema($sistema) . ' e conservato come dichiarato; '
-                          . 'le coordinate WGS84 sono quelle inserite a mano.';
-
-                return self::esito($lat, $lon, $sistema, $formato, $valoreOriginale, $avvisi);
+            try {
+                $geo = SistemiRiferimento::versoWgs84($sistema, $est, $nord);
+            } catch (ProiezioneEccezione $e) {
+                throw new CoordinateEccezione($e->getMessage(), 0, $e);
             }
 
-            $geo = self::daUtm($fuso, $est, $nord, $emisfero);
+            // I sistemi con datum diverso si convertono, ma l'incertezza va
+            // dichiarata: una posizione derivata da Roma40 non e un rilievo.
+            $accuratezza = self::accuratezza($sistema);
+            if ($accuratezza >= 1.0) {
+                $avvisi[] = sprintf(
+                    'Conversione da %s con trasformazione di datum: incertezza dell\'ordine di %.0f m, '
+                    . 'da tenere presente accanto alla precisione del rilievo.',
+                    self::nomeSistema($sistema), $accuratezza
+                );
+            }
 
             return self::esito($geo['latitudine'], $geo['longitudine'], $sistema, $formato, $valoreOriginale, $avvisi);
         }
@@ -567,6 +552,11 @@ final class Coordinate
             // assume est, che copre l'Italia e la quasi totalita dei casi.
             $valoreOriginale = $latTesto . ' ' . $lonTesto;
 
+            if (self::eProiettato($sistema)) {
+                $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema e stato riportato a WGS84 geografiche.';
+                $sistema  = self::CANONICO;
+            }
+
             return self::esito($lat, $lon, $sistema, $formato, $valoreOriginale, $avvisi);
         }
 
@@ -578,10 +568,10 @@ final class Coordinate
             throw new CoordinateEccezione(self::MESSAGGIO_COORDINATE_MANCANTI);
         }
 
-        // In gradi decimali il sistema e per definizione quello canonico: un
-        // codice UTM con valori in gradi sarebbe una contraddizione.
-        if (self::eUtm($sistema)) {
-            $avvisi[] = 'Formato in gradi decimali con un sistema UTM: il sistema e stato riportato a WGS84 geografiche.';
+        // Gradi con un sistema proiettato e una contraddizione: si riporta al
+        // sistema canonico avvisando, invece di rifiutare un dato buono.
+        if (self::eProiettato($sistema)) {
+            $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema e stato riportato a WGS84 geografiche.';
             $sistema  = self::CANONICO;
         }
 
@@ -592,19 +582,43 @@ final class Coordinate
      * Rappresentazioni alternative di un punto, per la scheda: la stessa
      * posizione scritta nei modi in cui viene usata in campagna.
      *
+     * @param  string $sistemaPreferito codice EPSG proiettato da mostrare oltre
+     *                                  ai gradi; vuoto per l'UTM WGS84 del fuso
+     *                                  che contiene il punto
      * @return array<string,string>
      */
-    public static function rappresentazioni(float $latitudine, float $longitudine): array
+    public static function rappresentazioni(float $latitudine, float $longitudine, string $sistemaPreferito = ''): array
     {
-        $utm = self::aUtm($latitudine, $longitudine);
-
-        return [
+        $rappresentazioni = [
             'decimali' => number_format($latitudine, 6, '.', '') . ', ' . number_format($longitudine, 6, '.', ''),
             'gms'      => self::aSessagesimali($latitudine, 'lat') . ' ' . self::aSessagesimali($longitudine, 'lon'),
             'gm'       => self::aGradiMinuti($latitudine, 'lat') . ' ' . self::aGradiMinuti($longitudine, 'lon'),
-            'utm'      => self::utmLeggibile($utm),
-            'utmEpsg'  => (string) $utm['epsg'],
         ];
+
+        // UTM WGS84 del fuso che contiene il punto: e la notazione d'uso
+        // corrente in speleologia, e si calcola sempre.
+        $utm = self::aUtm($latitudine, $longitudine);
+        $rappresentazioni['utm']     = self::utmLeggibile($utm);
+        $rappresentazioni['utmEpsg'] = (string) $utm['epsg'];
+
+        // Sistema preferito del catalogo, se diverso e se il punto ci rientra.
+        $sistemaPreferito = trim($sistemaPreferito);
+        if ($sistemaPreferito !== '' && $sistemaPreferito !== $utm['epsg'] && self::eProiettato($sistemaPreferito)) {
+            try {
+                $proiettate = SistemiRiferimento::daWgs84($sistemaPreferito, $latitudine, $longitudine);
+                $rappresentazioni['preferito'] = sprintf('%s %s',
+                    number_format($proiettate['x'], 0, ',', '.'),
+                    number_format($proiettate['y'], 0, ',', '.'));
+                $rappresentazioni['preferitoEpsg'] = $sistemaPreferito;
+                $rappresentazioni['preferitoNome'] = self::nomeSistema($sistemaPreferito);
+            } catch (Throwable $e) {
+                // Punto fuori dal campo di validita del sistema preferito: si
+                // omette la rappresentazione invece di mostrarne una sbagliata.
+                $rappresentazioni['preferitoErrore'] = $e->getMessage();
+            }
+        }
+
+        return $rappresentazioni;
     }
 
     // -------------------------------------------------------------------- interni
