@@ -19,6 +19,9 @@ _log/
 # Marcatore di installazione completata
 /installato.txt
 
+# Dati generati dalle verifiche: si rigenerano in un secondo con lo script
+/docs/prove/coordinate/dati.json
+
 # Sistema operativo
 Thumbs.db
 Desktop.ini

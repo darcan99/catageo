@@ -1,0 +1,147 @@
+<!doctype html>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: docs/prove/coordinate/index.html
+   Descrizione ..: Verifica incrociata del motore di conversione PHP contro
+                   proj4js, sulle stesse definizioni e sugli stessi punti.
+                   I dati di confronto si generano con genera-dati.php.
+   Versione .....: 0.5.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.5.0  2026-08-05  D.Candela  Prima stesura.
+  ============================================================================
+-->
+<html lang="it" data-bs-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifica incrociata delle coordinate · CATAGEO</title>
+<link rel="stylesheet" href="../../../assets/vendor/bootstrap-5.3.8/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../../assets/css/catageo.css">
+<script src="../../../assets/vendor/proj4-2.21.0/proj4.min.js"></script>
+</head>
+<body class="p-4">
+<div class="container-fluid">
+
+  <h1 class="h4">Verifica incrociata delle conversioni</h1>
+  <p class="text-body-secondary">
+    Il motore di conversione in PHP e proj4js elaborano gli stessi punti con le
+    stesse definizioni. Uno scarto significativo indicherebbe un errore in una
+    delle due implementazioni: e il modo per accorgersi, per esempio, di una
+    convenzione sbagliata nelle rotazioni di Helmert, che produrrebbe errori di
+    decine di metri del tutto plausibili a occhio.
+  </p>
+
+  <div id="riepilogo" class="alert alert-secondary">Calcolo in corso…</div>
+  <div id="tabella"></div>
+  <div id="dettaglio"></div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var TOLLERANZA_METRI = 0.01;
+
+  fetch('dati.json').then(function (r) { return r.json(); }).then(function (dati) {
+
+    Object.keys(dati.sistemi).forEach(function (codice) {
+      proj4.defs(codice, dati.sistemi[codice].def);
+    });
+
+    var perSistema = {};
+    var fuori = [];
+
+    Object.keys(dati.sistemi).forEach(function (codice) {
+      if (codice === 'EPSG:4326') { return; }
+      perSistema[codice] = { nome: dati.sistemi[codice].nome, n: 0, maxAndata: 0, maxRitorno: 0 };
+    });
+
+    dati.punti.forEach(function (p) {
+      Object.keys(p.php).forEach(function (codice) {
+        var atteso = p.php[codice];
+        var s = perSistema[codice];
+
+        var js = proj4('EPSG:4326', codice, [p.lon, p.lat]);
+        var dx = js[0] - atteso.x;
+        var dy = js[1] - atteso.y;
+        var andata = Math.sqrt(dx * dx + dy * dy);
+
+        var jsInv = proj4(codice, 'EPSG:4326', [atteso.x, atteso.y]);
+        var dLat = (jsInv[1] - atteso.ritornoLat) * 111320;
+        var dLon = (jsInv[0] - atteso.ritornoLon) * 111320 * Math.cos(p.lat * Math.PI / 180);
+        var ritorno = Math.sqrt(dLat * dLat + dLon * dLon);
+
+        s.n++;
+        if (andata > s.maxAndata) { s.maxAndata = andata; }
+        if (ritorno > s.maxRitorno) { s.maxRitorno = ritorno; }
+
+        if (andata > TOLLERANZA_METRI || ritorno > TOLLERANZA_METRI) {
+          fuori.push({ sistema: codice, punto: p.nome, andata: andata, ritorno: ritorno });
+        }
+      });
+    });
+
+    var righe = Object.keys(perSistema).map(function (c) {
+      return {
+        sistema: c, nome: perSistema[c].nome, punti: perSistema[c].n,
+        andata_mm: +(perSistema[c].maxAndata * 1000).toFixed(3),
+        ritorno_mm: +(perSistema[c].maxRitorno * 1000).toFixed(3)
+      };
+    });
+
+    window.RISULTATO = {
+      tolleranzaMetri: TOLLERANZA_METRI,
+      sistemi: righe,
+      fuoriTolleranza: fuori.length,
+      conversioniEscluseDalPhp: (dati.rifiutati || []).length
+    };
+
+    var ok = fuori.length === 0;
+    var box = document.getElementById('riepilogo');
+    box.className = 'alert ' + (ok ? 'alert-success' : 'alert-danger');
+    box.textContent = ok
+      ? 'Tutte le conversioni concordano entro ' + (TOLLERANZA_METRI * 1000) + ' mm. '
+        + 'Conversioni rifiutate da PHP perche fuori dal campo di validita del fuso: '
+        + (dati.rifiutati || []).length + '.'
+      : fuori.length + ' conversioni oltre la tolleranza.';
+
+    var html = '<table class="table table-sm catageo-tabella"><thead><tr>'
+      + '<th>Sistema</th><th>Nome</th><th class="text-end">Punti</th>'
+      + '<th class="text-end">Scarto andata</th><th class="text-end">Scarto ritorno</th>'
+      + '</tr></thead><tbody>';
+    righe.forEach(function (r) {
+      html += '<tr><td class="catageo-codice">' + r.sistema + '</td><td>' + r.nome + '</td>'
+        + '<td class="text-end">' + r.punti + '</td>'
+        + '<td class="text-end catageo-valore">' + r.andata_mm + ' mm</td>'
+        + '<td class="text-end catageo-valore">' + r.ritorno_mm + ' mm</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('tabella').innerHTML = html;
+
+    if (!ok) {
+      var d = '<h2 class="h6">Fuori tolleranza</h2><ul>';
+      fuori.slice(0, 30).forEach(function (f) {
+        d += '<li>' + f.sistema + ' su ' + f.punto + ': andata '
+          + f.andata.toFixed(4) + ' m, ritorno ' + f.ritorno.toFixed(4) + ' m</li>';
+      });
+      d += '</ul>';
+      document.getElementById('dettaglio').innerHTML = d;
+    }
+
+  }).catch(function (e) {
+    window.RISULTATO = { errore: String(e) };
+    document.getElementById('riepilogo').className = 'alert alert-danger';
+    document.getElementById('riepilogo').textContent =
+      'Errore: ' + e + '. Generare prima dati.json con genera-dati.php.';
+  });
+})();
+</script>
+</body>
+</html>
