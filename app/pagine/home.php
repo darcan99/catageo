@@ -135,7 +135,7 @@ $fasi = [
 
   <div class="col-lg-7">
     <div class="card h-100">
-      <div class="card-header bg-transparent">
+      <div class="card-header">
         <h2 class="h6 mb-0"><i class="bi bi-list-check"></i> Avanzamento dello sviluppo</h2>
       </div>
       <div class="table-responsive">
@@ -169,7 +169,7 @@ $fasi = [
 
   <div class="col-lg-5">
     <div class="card h-100">
-      <div class="card-header bg-transparent">
+      <div class="card-header">
         <h2 class="h6 mb-0"><i class="bi bi-info-circle"></i> Stato dell'installazione</h2>
       </div>
       <div class="card-body">

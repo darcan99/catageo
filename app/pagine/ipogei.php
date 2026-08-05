@@ -430,7 +430,7 @@ if ($azione === 'scheda' && $codice !== '') {
         <div class="row g-4">
           <div class="col-lg-6">
             <div class="card h-100">
-              <div class="card-header bg-transparent"><h2 class="h6 mb-0">Identificazione</h2></div>
+              <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
               <div class="card-body">
                 <dl class="row catageo-dl">
                   <?php
@@ -469,7 +469,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
           <div class="col-lg-6">
             <div class="card h-100">
-              <div class="card-header bg-transparent"><h2 class="h6 mb-0">Ubicazione</h2></div>
+              <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
               <div class="card-body">
                 <dl class="row catageo-dl">
                   <?php
@@ -603,7 +603,7 @@ if ($azione === 'scheda' && $codice !== '') {
           <?php if ($mappaScheda): ?>
             <div class="col-lg-6">
               <div class="card h-100">
-                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center">
                   <h2 class="h6 mb-0">Posizione</h2>
                   <a class="btn btn-sm btn-outline-secondary catageo-non-stampare"
                      href="index.php?p=mappa&amp;catalogo=<?= urlencode((string) $scheda['catasto']['catalogo']) ?>">
@@ -625,7 +625,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
           <div class="col-lg-6">
             <div class="card h-100">
-              <div class="card-header bg-transparent"><h2 class="h6 mb-0">Caratteristiche</h2></div>
+              <div class="card-header"><h2 class="h6 mb-0">Caratteristiche</h2></div>
               <div class="card-body">
                 <dl class="row catageo-dl">
                   <?php
@@ -664,7 +664,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
           <div class="col-lg-6">
             <div class="card h-100">
-              <div class="card-header bg-transparent"><h2 class="h6 mb-0">Dati di catasto</h2></div>
+              <div class="card-header"><h2 class="h6 mb-0">Dati di catasto</h2></div>
               <div class="card-body">
                 <dl class="row catageo-dl">
                   <?php
@@ -692,7 +692,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
         <?php if ((array) $scheda['caratteristiche']['ingressi'] !== []): ?>
           <div class="card mt-4">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Ingressi</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Ingressi</h2></div>
             <div class="table-responsive">
               <table class="table table-sm catageo-tabella mb-0">
                 <thead><tr><th>#</th><th>Descrizione</th><th>Coordinate</th><th>Quota</th><th>Dimensioni</th><th>Stato</th></tr></thead>
@@ -734,7 +734,7 @@ if ($azione === 'scheda' && $codice !== '') {
             if (trim($valore) === '') { continue; }
             $qualcosa = true; ?>
           <div class="card mb-3">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0"><?= $etichetta ?></h2></div>
+            <div class="card-header"><h2 class="h6 mb-0"><?= $etichetta ?></h2></div>
             <div class="card-body">
               <?php // I testi non hanno limiti di lunghezza (D6): si mostrano integrali. ?>
               <div style="white-space:pre-wrap"><?= Testo::esc($valore) ?></div>
@@ -775,7 +775,7 @@ if ($azione === 'scheda' && $codice !== '') {
       <!-- --------------------------------------------------------- Storico -->
       <div class="tab-pane fade" id="tabStorico">
         <div class="card">
-          <div class="card-header bg-transparent">
+          <div class="card-header">
             <h2 class="h6 mb-0">Revisioni conservate</h2>
           </div>
           <?php if ($storico === []): ?>
@@ -805,7 +805,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
         <?php if (Auth::puo('modifica_codice') || Auth::puo('elimina_ipogeo')): ?>
           <div class="card mt-4 border-danger-subtle catageo-non-stampare">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Operazioni riservate</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Operazioni riservate</h2></div>
             <div class="card-body">
 
               <?php if (Auth::puo('modifica_codice')): ?>
@@ -936,7 +936,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------ identificazione -->
         <div class="col-lg-6">
           <div class="card h-100">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Identificazione</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Identificazione</h2></div>
             <div class="card-body">
               <div class="row g-3">
 
@@ -1039,7 +1039,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ----------------------------------------------------- ubicazione -->
         <div class="col-lg-6">
           <div class="card h-100">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Ubicazione</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Ubicazione</h2></div>
             <div class="card-body">
               <div class="row g-3">
 
@@ -1219,7 +1219,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------------- accesso -->
         <div class="col-lg-6">
           <div class="card h-100">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Accesso e percorribilita</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Accesso e percorribilita</h2></div>
             <div class="card-body">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -1282,7 +1282,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------------- misure -->
         <div class="col-lg-6">
           <div class="card h-100">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Misure e caratteristiche</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Misure e caratteristiche</h2></div>
             <div class="card-body">
               <div class="row g-3">
                 <?php
@@ -1332,7 +1332,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------------ ingressi -->
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Ingressi</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Ingressi</h2></div>
             <div class="card-body">
               <p class="catageo-nota">
                 Le coordinate del singolo ingresso servono quando sono piu di uno:
@@ -1386,7 +1386,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- --------------------------------------------------- descrizione -->
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Descrizione</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Descrizione</h2></div>
             <div class="card-body">
               <p class="catageo-nota">
                 Questi campi non hanno limiti di lunghezza: il testo viene
@@ -1418,7 +1418,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------------- catasto -->
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-transparent"><h2 class="h6 mb-0">Dati di catasto</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Dati di catasto</h2></div>
             <div class="card-body">
               <div class="row g-3">
                 <div class="col-md-3">

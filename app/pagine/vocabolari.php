@@ -203,7 +203,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
   <div class="row g-4">
     <div class="col-lg-7">
       <div class="card">
-        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h2 class="h6 mb-0">Tassonomia — <?= count($voci) ?> voci</h2>
         </div>
         <div class="table-responsive">
@@ -256,7 +256,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
     <div class="col-lg-5">
       <?php if ($inMod !== null): ?>
         <div class="card">
-          <div class="card-header bg-transparent">
+          <div class="card-header">
             <h2 class="h6 mb-0">Modifica <span class="catageo-valore"><?= Testo::esc($inMod['codice']) ?></span></h2>
           </div>
           <div class="card-body">
@@ -290,7 +290,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
         </div>
       <?php else: ?>
         <div class="card">
-          <div class="card-header bg-transparent">
+          <div class="card-header">
             <h2 class="h6 mb-0">Aggiungi una voce</h2>
           </div>
           <div class="card-body">
@@ -356,7 +356,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
     <div class="col-lg-8">
       <?php foreach ($categorie as $categoria): ?>
         <div class="card mb-3">
-          <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+          <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h6 mb-0">
               <span class="catageo-valore text-body-secondary"><?= Testo::esc($categoria['codice']) ?></span>
               <?= Testo::esc($categoria['nome']) ?>
@@ -419,7 +419,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
     <div class="col-lg-4">
       <?php if ($inMod !== null): ?>
         <div class="card mb-3">
-          <div class="card-header bg-transparent">
+          <div class="card-header">
             <h2 class="h6 mb-0">Modifica <span class="catageo-valore"><?= Testo::esc($inMod['codice']) ?></span></h2>
           </div>
           <div class="card-body">
@@ -468,7 +468,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
         </div>
       <?php else: ?>
         <div class="card mb-3">
-          <div class="card-header bg-transparent"><h2 class="h6 mb-0">Nuova grandezza</h2></div>
+          <div class="card-header"><h2 class="h6 mb-0">Nuova grandezza</h2></div>
           <div class="card-body">
             <form method="post" action="index.php?p=vocabolari" class="needs-validation" novalidate>
               <?= Auth::campoToken() ?>
@@ -516,7 +516,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
         </div>
 
         <div class="card">
-          <div class="card-header bg-transparent"><h2 class="h6 mb-0">Nuova categoria</h2></div>
+          <div class="card-header"><h2 class="h6 mb-0">Nuova categoria</h2></div>
           <div class="card-body">
             <form method="post" action="index.php?p=vocabolari" class="needs-validation" novalidate>
               <?= Auth::campoToken() ?>
@@ -552,7 +552,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
   <div class="row g-4">
     <div class="col-lg-8">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">Cronologia — <?= count($elenco) ?> periodi, in ordine cronologico</h2>
         </div>
         <div class="table-responsive">
@@ -600,7 +600,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
 
     <div class="col-lg-4">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0"><?= $inMod !== null ? 'Modifica periodo' : 'Nuovo periodo' ?></h2>
         </div>
         <div class="card-body">

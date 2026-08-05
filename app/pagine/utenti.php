@@ -135,7 +135,7 @@ $idCorrente = (string) (Auth::utente()['id'] ?? '');
   <div class="row">
     <div class="col-lg-7">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">
             <i class="bi <?= $modifica ? 'bi-pencil-square' : 'bi-person-plus' ?>"></i>
             <?= $modifica ? 'Modifica utente ' . Testo::esc((string) $inModifica['username']) : 'Nuovo utente' ?>

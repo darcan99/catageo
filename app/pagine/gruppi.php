@@ -116,7 +116,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
   <div class="row">
     <div class="col-lg-8">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">
             <?= $m !== null ? 'Modifica gruppo ' . Testo::esc((string) $m['sigla']) : 'Nuovo gruppo' ?>
           </h2>

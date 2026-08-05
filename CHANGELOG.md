@@ -6,6 +6,54 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.6.1] — 2026-08-05
+
+Leggibilita: i box delle schede si vedono.
+
+### Cambiato
+- **Superfici a contrasto su tre livelli**: fondo della pagina, box della scheda,
+  intestazione del box. Prima un box si riconosceva solo dall'intestazione e il
+  contenuto sembrava scritto sulla pagina: in una scheda divisa in dieci sezioni
+  non si capiva dove finiva una e iniziava l'altra. Separazione fra pagina e
+  scheda da 1,20 a **1,43** in tema scuro, da 1,13 a **1,24** in tema chiaro.
+- Nel tema chiaro l'intestazione si scurisce, nel tema scuro si schiarisce, in
+  entrambi i casi con una tinta blu. Tingere senza cambiare la luminanza — un blu
+  chiaro su bianco — darebbe una distinzione che sparisce per chi non percepisce
+  bene quella tinta e che in stampa non c'e affatto.
+- Il colore delle intestazioni sta in variabili CSS in un punto solo, non piu
+  disseminato come utility `bg-transparent` in 37 punti dei template. Le
+  intestazioni a cui una pagina da un colore proprio (un avviso, per esempio)
+  vengono **escluse** e non sovrascritte: quel colore sta dicendo qualcosa.
+
+### Corretto
+- **Un pulsante dentro l'intestazione di una scheda scendeva a 1,94:1**, cioe
+  illeggibile. E il caso peggiorato dalle intestazioni colorate, ed e stato il
+  motivo per cui la verifica ha smesso di fidarsi dell'occhio.
+- Componenti che usavano il grigio fisso `#6c757d` di Bootstrap, che non si
+  adatta al tema: pulsanti in contorno, `link-secondary` del footer e
+  intestazione del menu utente stavano fra 2,8 e 3,3:1 in tema scuro. Difetti
+  **preesistenti**, emersi dalla misura.
+- Il testo terziario dei «—» e dei «non dichiarata» era al 50% di opacita:
+  informazione, non decorazione, e non si leggeva.
+- L'asterisco dei campi obbligatori era rosso puro: 2,86:1 su fondo scuro.
+- Il riquadro dell'installer era diventato indistinguibile dal fondo (1,03:1),
+  perche il body aveva `bg-body-tertiary`, finito a un passo dal nuovo colore
+  delle schede.
+- In stampa le superfici tornano bianche: su carta un'intestazione colorata e
+  toner speso, e su una stampante in bianco e nero e testo su grigio.
+
+### Verificato
+- `docs/prove/interfaccia/README.md`: rapporti di contrasto misurati sui colori
+  calcolati dal browser, trasparenze sovrapposte comprese, su dieci pagine e in
+  entrambi i temi. **Nessun elemento sotto soglia WCAG AA.**
+- La prima passata della verifica ha prodotto falsi positivi da 1,03:1 perche
+  cambiava tema e misurava nello stesso istante, leggendo i colori del tema
+  precedente contro i fondi nuovi. La trappola e annotata: stava per far
+  correggere problemi inventati.
+- `prova-web.ps1` verifica ora la premessa strutturale, che invece e controllabile
+  senza browser: nessun `card-header` reso trasparente, variabili definite nei due
+  temi, superfici neutralizzate in stampa.
+
 ## [0.6.0] — 2026-08-05
 
 Fase 4: gli ipogei sul territorio.

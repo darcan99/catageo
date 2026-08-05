@@ -137,7 +137,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
   <div class="row">
     <div class="col-lg-9">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">
             <?= $m !== null ? 'Modifica ' . Testo::esc(Esploratori::etichetta($m)) : 'Nuovo esploratore' ?>
           </h2>

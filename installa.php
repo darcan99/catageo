@@ -238,7 +238,13 @@ function classeEsito(string $esito): string
 <link rel="stylesheet" href="assets/vendor/bootstrap-icons-1.13.1/bootstrap-icons.min.css">
 <link rel="stylesheet" href="assets/css/catageo.css">
 </head>
-<body class="bg-body-tertiary">
+<?php
+// Nessuna classe di sfondo sul body: il fondo lo decide catageo.css, che tiene
+// la scala delle superfici (pagina piu scura, scheda sopra). Con
+// bg-body-tertiary il fondo dell'installer finiva a un passo dal colore della
+// scheda e il riquadro spariva.
+?>
+<body>
 
 <div class="container py-5" style="max-width:56rem">
 
@@ -307,7 +313,7 @@ function classeEsito(string $esito): string
     <?php endif; ?>
 
     <div class="card mb-4">
-      <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="h6 mb-0"><i class="bi bi-1-circle"></i> Verifica dell'ambiente</h2>
         <div class="d-flex gap-2">
           <span class="badge text-bg-success"><?= (int) $riepilogo['ok'] ?></span>
@@ -341,7 +347,7 @@ function classeEsito(string $esito): string
     <?php endif; ?>
 
     <div class="card">
-      <div class="card-header bg-transparent">
+      <div class="card-header">
         <h2 class="h6 mb-0"><i class="bi bi-2-circle"></i> Catasto e primo amministratore</h2>
       </div>
       <div class="card-body">

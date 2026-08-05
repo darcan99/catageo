@@ -59,7 +59,7 @@ foreach ($verifiche as $voce) {
 
 <?php foreach ($gruppi as $nomeGruppo => $voci): ?>
   <div class="card mb-3">
-    <div class="card-header bg-transparent">
+    <div class="card-header">
       <h2 class="h6 mb-0"><?= Testo::esc($nomeGruppo) ?></h2>
     </div>
     <div class="table-responsive">
@@ -103,7 +103,7 @@ foreach ($verifiche as $voce) {
     <?php $righe = Log::ultime($file, 10); ?>
     <div class="col-lg-4">
       <div class="card h-100">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0"><i class="bi <?= $icona ?>"></i> <?= Testo::esc($etichetta) ?></h2>
         </div>
         <div class="card-body p-0">

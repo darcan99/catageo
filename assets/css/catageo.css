@@ -5,15 +5,167 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.6.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.1  2026-08-05  D.Candela  Superfici a contrasto: le schede si staccano
+ *                                dal fondo della pagina e le intestazioni dei
+ *                                box hanno una tinta propria.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
+
+/* ============================================================================
+ *  SUPERFICI
+ *  Tre livelli distinti: fondo della pagina, box della scheda, intestazione del
+ *  box. Senza questa distinzione i box si vedevano solo per l'intestazione e il
+ *  contenuto sembrava scritto direttamente sulla pagina, il che in una scheda
+ *  divisa in dieci sezioni rende difficile capire dove finisce una e inizia
+ *  l'altra.
+ *
+ *  I colori stanno in variabili nostre e non sparsi nelle regole: il tema si
+ *  cambia in un punto solo. Il selettore e data-bs-theme, che catageo.js
+ *  imposta sempre a light o dark (mai "auto"), quindi i due casi coprono tutto.
+ * ========================================================================= */
+
+/* I valori non sono scelti a occhio: sono stati misurati come rapporto di
+   contrasto fra superfici adiacenti, cercando la separazione piu netta che
+   restasse sobria. Con il tema chiaro l'intestazione si SCURISCE con il blu di
+   enfasi, perche un blu chiaro su bianco cambia la tinta ma quasi non cambia la
+   luminanza, e la distinzione resterebbe invisibile a chi non percepisce bene
+   quella tinta. Con il tema scuro si schiarisce, per lo stesso motivo. */
+
+[data-bs-theme="light"] {
+    --catageo-fondo-pagina: #e2e7ec;
+    --catageo-fondo-scheda: #ffffff;
+    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.12);   /* pagina/scheda 1.24 */
+    --catageo-bordo-intestazione: rgba(5, 44, 101, 0.22);   /* scheda/intestazione 1.26 */
+    --catageo-bordo-scheda: #c3ccd6;
+    --catageo-ombra-scheda: 0 1px 2px rgba(16, 24, 32, 0.07);
+}
+
+[data-bs-theme="dark"] {
+    /* La pagina scende sotto il fondo predefinito di Bootstrap (#212529) e le
+       schede restano piu chiare: in tema scuro una superficie sollevata si
+       riconosce perche e piu chiara, non piu scura. */
+    --catageo-fondo-pagina: #101418;
+    --catageo-fondo-scheda: #2c3238;
+    --catageo-fondo-intestazione: rgba(110, 168, 254, 0.20); /* pagina/scheda 1.43 */
+    --catageo-bordo-intestazione: rgba(110, 168, 254, 0.34); /* scheda/intestazione 1.43 */
+    --catageo-bordo-scheda: #3f464d;
+    --catageo-ombra-scheda: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+body {
+    background-color: var(--catageo-fondo-pagina);
+}
+
+.card {
+    --bs-card-bg: var(--catageo-fondo-scheda);
+    --bs-card-border-color: var(--catageo-bordo-scheda);
+    box-shadow: var(--catageo-ombra-scheda);
+}
+
+/* Intestazione del box: tinta propria e bordo inferiore marcato. Il titolo usa
+   il colore enfatizzato, perche e l'elemento con cui si scorre la scheda.
+   L'esclusione conta: un'intestazione a cui una pagina ha dato un colore
+   proprio (text-bg-danger su un avviso, per esempio) sta dicendo qualcosa, e
+   sovrascriverla con la tinta neutra cancellerebbe l'informazione. Si esclude
+   invece di annullare dopo, cosi il colore voluto non viene mai calpestato. */
+.card > .card-header:not([class*="bg-"]) {
+    background-color: var(--catageo-fondo-intestazione);
+    border-bottom-color: var(--catageo-bordo-intestazione);
+}
+
+.card > .card-header h2,
+.card > .card-header h3 {
+    color: var(--bs-emphasis-color);
+}
+
+/* ----------------------------------------------------------------------------
+ *  LEGGIBILITA DEI COMPONENTI GRIGI
+ *
+ *  Alcuni componenti di Bootstrap usano il grigio fisso #6c757d, che non si
+ *  adatta al tema: su fondo scuro resta un grigio medio su grigio scuro. Il
+ *  problema c'era gia, ma le intestazioni colorate lo hanno reso evidente: il
+ *  pulsante dentro l'intestazione di una scheda scendeva a un rapporto di 1.94,
+ *  cioe praticamente illeggibile. Si correggono i punti misurati, non tutto il
+ *  tema, e i valori sono scelti per superare 4.5:1 sul fondo su cui si trovano.
+ * ------------------------------------------------------------------------- */
+
+[data-bs-theme="dark"] {
+    /* Testo terziario: e quello dei "—" e dei "non dichiarata", che sono
+       informazione e non decorazione. Al 50% di opacita non si leggeva. */
+    --bs-tertiary-color: rgba(222, 226, 230, 0.68);
+}
+
+[data-bs-theme="light"] {
+    --bs-tertiary-color: rgba(33, 37, 41, 0.66);
+}
+
+/* Il blu dei collegamenti di Bootstrap (#0d6efd) sul grigio chiaro della pagina
+   si ferma a 4.27:1, appena sotto la soglia. Si usa la variante scura, che e lo
+   stesso blu percepito ma leggibile. */
+[data-bs-theme="light"] .btn-outline-primary {
+    --bs-btn-color: #0a58ca;
+    --bs-btn-border-color: #0a58ca;
+}
+
+[data-bs-theme="light"] .nav-tabs {
+    --bs-nav-link-color: #0a58ca;
+    --bs-nav-link-hover-color: #084298;
+}
+
+[data-bs-theme="light"] .link-secondary {
+    color: #5c636a !important;
+}
+
+[data-bs-theme="dark"] .btn-outline-secondary {
+    --bs-btn-color: #ced4da;
+    --bs-btn-border-color: #868e96;
+    --bs-btn-hover-color: #ffffff;
+    --bs-btn-hover-bg: #6c757d;
+    --bs-btn-hover-border-color: #6c757d;
+}
+
+[data-bs-theme="light"] .btn-outline-secondary {
+    --bs-btn-color: #5c636a;
+    --bs-btn-border-color: #98a1a9;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    --bs-btn-color: #6ea8fe;
+    --bs-btn-border-color: #6ea8fe;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    --bs-dropdown-header-color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .link-secondary {
+    color: #adb5bd !important;
+}
+
+/* L'asterisco dei campi obbligatori e il rosso puro #dc3545: su fondo scuro si
+   ferma a 2.86:1 e su bianco a 3.9:1. Dice all'operatore che un campo non si
+   puo lasciare vuoto, quindi deve essere visto. Si usano le varianti che
+   restano rosse ma leggibili su ciascun fondo. */
+[data-bs-theme="dark"] .text-danger {
+    color: #ea868f !important;
+}
+
+[data-bs-theme="light"] .text-danger {
+    color: #b02a37 !important;
+}
+
+/* Tabelle dentro una scheda: le righe alternate devono restare visibili sul
+   fondo del box, non su quello della pagina. */
+.card .table {
+    --bs-table-bg: transparent;
+}
 
 /* Pagina di accesso: form centrato verticalmente. */
 .catageo-accesso {
@@ -177,6 +329,24 @@ tr.catageo-riga-attenzione { background-color: rgba(var(--bs-warning-rgb), 0.10)
 
     main.container-fluid {
         padding: 0 !important;
+    }
+
+    /* Le superfici a contrasto servono sullo schermo. Su carta diventano toner
+       speso per niente e, su una stampante in bianco e nero, testo su grigio.
+       I box restano riconoscibili dal bordo. */
+    body,
+    .card,
+    .card > .card-header {
+        background-color: #fff !important;
+        box-shadow: none !important;
+    }
+
+    .card {
+        border-color: #999 !important;
+    }
+
+    .card > .card-header {
+        border-bottom: 1px solid #999 !important;
     }
 
     a[href]::after {

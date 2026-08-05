@@ -209,7 +209,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
   <div class="row g-4">
     <div class="col-xl-7">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">Serie del catalogo — <?= count($catalogo['serie']) ?></h2>
         </div>
         <div class="table-responsive">
@@ -299,7 +299,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
       </div>
 
       <div class="card mt-4">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">
             <i class="bi bi-magic"></i> Anteprima del codice
           </h2>
@@ -404,7 +404,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
 
     <div class="col-xl-5">
       <div class="card">
-        <div class="card-header bg-transparent">
+        <div class="card-header">
           <h2 class="h6 mb-0">
             <?= $serieMod !== null ? 'Modifica serie ' . Testo::esc((string) $serieMod['prefisso']) : 'Nuova serie' ?>
           </h2>
