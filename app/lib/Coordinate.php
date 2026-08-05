@@ -68,7 +68,7 @@ final class Coordinate
      * riferimento e cosa diverso e si sceglie a parte.
      */
     public const FORMATI = [
-        'decimali'   => 'Gradi decimali, o centesimali (41.856231)',
+        'decimali'   => 'Gradi decimali (41.856231)',
         'gms'        => 'Gradi, minuti, secondi (41°51\'22.4"N)',
         'gm'         => 'Gradi e minuti decimali (41°51.373\'N)',
         'proiettate' => 'Coordinate proiettate in metri (est, nord)',
@@ -445,14 +445,19 @@ final class Coordinate
         return sprintf('%d°%0' . ($decimaliMinuti + 3) . '.' . $decimaliMinuti . 'f\'%s', $gradi, $minuti, $cardinale);
     }
 
-    /** Notazione UTM compatta, quella che si scrive su un rilievo. */
+    /**
+     * Notazione UTM compatta, quella che si scrive su un rilievo.
+     *
+     * Niente separatore delle migliaia: una coordinata si legge, si trascrive e
+     * si ridigita su un GPS, e i punti fra le cifre sono solo un ostacolo.
+     */
     public static function utmLeggibile(array $utm): string
     {
-        return sprintf('%d%s %s %s',
+        return sprintf('%d%s %d %d',
             (int) $utm['fuso'],
             (string) $utm['fascia'],
-            number_format((float) $utm['est'], 0, ',', '.'),
-            number_format((float) $utm['nord'], 0, ',', '.')
+            (int) round((float) $utm['est']),
+            (int) round((float) $utm['nord'])
         );
     }
 
@@ -606,9 +611,8 @@ final class Coordinate
         if ($sistemaPreferito !== '' && $sistemaPreferito !== $utm['epsg'] && self::eProiettato($sistemaPreferito)) {
             try {
                 $proiettate = SistemiRiferimento::daWgs84($sistemaPreferito, $latitudine, $longitudine);
-                $rappresentazioni['preferito'] = sprintf('%s %s',
-                    number_format($proiettate['x'], 0, ',', '.'),
-                    number_format($proiettate['y'], 0, ',', '.'));
+                $rappresentazioni['preferito'] = sprintf('%d %d',
+                    (int) round($proiettate['x']), (int) round($proiettate['y']));
                 $rappresentazioni['preferitoEpsg'] = $sistemaPreferito;
                 $rappresentazioni['preferitoNome'] = self::nomeSistema($sistemaPreferito);
             } catch (Throwable $e) {

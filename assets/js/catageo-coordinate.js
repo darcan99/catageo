@@ -149,9 +149,10 @@
         var utmTesto = '—';
         if (definizioni[codiceUtm]) {
             var p = proj4('EPSG:4326', codiceUtm, [lon, lat]);
+            // Senza separatore delle migliaia: una coordinata si ridigita su un
+            // GPS, e i punti fra le cifre sono solo un ostacolo.
             utmTesto = fuso + fasciaPerLatitudine(lat) + ' '
-                + Math.round(p[0]).toLocaleString('it-IT') + ' '
-                + Math.round(p[1]).toLocaleString('it-IT');
+                + Math.round(p[0]) + ' ' + Math.round(p[1]);
         }
 
         var html = '';

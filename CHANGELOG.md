@@ -6,6 +6,10 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.5.0] — 2026-08-05
+
+Coordinate: conversione reale fra sistemi di riferimento.
+
 ### Aggiunto
 - **Conversione fra sistemi di riferimento** (D14). `SistemiRiferimento` e un
   vocabolario in cui ogni sistema e descritto da una stringa in stile proj4:
@@ -73,8 +77,15 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
   iscrizioni contemporanee ne attribuiva arbitrariamente una. Sostituita da
   `gruppiAllaData()`, che restituisce l'elenco, piu `gruppiAttuali()`.
 
+### Rifinito dopo la prova sul campo
+- L'etichetta del formato diceva «Gradi decimali, o centesimali»: i gradi
+  centesimali sono i gon, cioe un'altra cosa. Ora dice «Gradi decimali» con un
+  esempio numerico accanto.
+- Le coordinate UTM non hanno piu il separatore delle migliaia
+  (`33T 295964 4678705`, non `33T 295.964 4.678.705`): una coordinata si legge,
+  si trascrive e si ridigita su un GPS, e i punti fra le cifre sono un ostacolo.
+
 ### Da fare
-- Fase 4: mappa Leaflet/OSM, marker, layer WMS
 - Schemi XSD per le anagrafiche introdotte nella 0.2.0
 
 ## [0.4.0] — 2026-08-04
