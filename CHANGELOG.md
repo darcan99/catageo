@@ -6,6 +6,52 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.6.2] — 2026-08-05
+
+Leggibilita, secondo passo: stacca anche il box, non solo il titolo.
+
+### Cambiato
+- **Separazione fra pagina e scheda quasi raddoppiata** rispetto all'origine:
+  da 1,20 a **1,70** in tema scuro e da 1,13 a **1,45** in tema chiaro. Il box
+  ora si vede come oggetto, non solo per la sua intestazione.
+- Il rapporto fra scheda e intestazione e stato **tenuto fermo** a 1,42 e 1,26:
+  era gia approvato, e alzare tutto insieme avrebbe fatto perdere la gerarchia
+  fra i due livelli. Alzando il fondo delle schede e stato necessario ricalibrare
+  l'opacita della tinta dell'intestazione per mantenere lo stesso rapporto.
+- **Bordo e ombra piu marcati**: sono le due leve che aumentano il colpo d'occhio
+  senza toccare il contrasto del testo, quindi si e agito prima su quelle e solo
+  dopo sulla luminanza.
+
+### Aggiunto
+- **Il box su cui si sta lavorando si accende**: nel form di censimento le sezioni
+  sono nove, e sapere in quale ci si trova senza dedurlo dalla posizione del
+  cursore risparmia un salto di attenzione a ogni campo. Bordo nel colore
+  d'accento e alone, solo dentro un form: in consultazione ogni clic su un
+  collegamento farebbe lampeggiare un box senza significare nulla. L'evidenza non
+  e sul fondo, perche cambiare il fondo sotto le dita mentre si scrive sposta
+  l'attenzione invece di orientarla.
+
+### Corretto
+- Ritarati i colori che il fondo piu chiaro delle schede aveva riportato sotto
+  soglia: asterisco dei campi obbligatori (4,48), pulsanti in contorno (4,19 e
+  4,43), linguette delle sezioni (4,43). Piu il pulsante rosso delle operazioni
+  distruttive, a **2,50**, che al primo giro non era mai stato misurato su un
+  fondo cosi chiaro.
+- I pulsanti che stanno **fuori** da una scheda hanno come riferimento il grigio
+  della pagina e non il bianco del box: vanno piu scuri di quanto sembri.
+
+### Verificato
+- Nove pagine, entrambi i temi, **nessun elemento sotto soglia WCAG AA**.
+- Il metodo di misura e stato cambiato perche quello precedente non era
+  affidabile: scrivere `data-bs-theme` e misurare subito dopo restituisce i colori
+  del tema precedente per il testo e quelli nuovi per i fondi, e aspettare un giro
+  di eventi non basta. Nella stessa sessione la stessa tecnica ha dato risultati
+  corretti su una pagina e falsi positivi da 1,03:1 su un'altra. Ora la preferenza
+  si scrive in `localStorage` e le pagine si caricano in un iframe: ogni misura e
+  su un primo render vero. La trappola e documentata: ha prodotto falsi positivi
+  in due passate distinte e in entrambe stava per far correggere problemi
+  inesistenti.
+
 ## [0.6.1] — 2026-08-05
 
 Leggibilita: i box delle schede si vedono.

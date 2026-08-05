@@ -25,21 +25,63 @@ Nel browser, su ogni pagina e per ciascun tema, si scorrono gli elementi che
 contengono testo, si ricostruisce il fondo effettivo risalendo l'albero e
 componendo le trasparenze, e si segnalano i casi sotto soglia.
 
-> **Trappola da conoscere.** Cambiando `data-bs-theme` e misurando nello stesso
-> tick si leggono i colori del **tema precedente** per il testo e quelli **nuovi**
-> per i fondi: risultano contrasti di 1,03 che non esistono. Il tema va cambiato
-> in una chiamata e misurato nella successiva. La prima passata di questa verifica
-> è caduta esattamente lì e stava per far "correggere" problemi inventati.
+> **Trappola da conoscere: non cambiare tema con JavaScript per poi misurare.**
+> Scrivendo `data-bs-theme` e leggendo i colori subito dopo si ottengono i colori
+> del **tema precedente** per il testo e quelli **nuovi** per i fondi: risultano
+> contrasti di 1,03 che non esistono. Aspettare un giro di eventi non basta e non
+> è deterministico: nella stessa sessione la stessa tecnica ha dato risultati
+> corretti su una pagina e falsi positivi su un'altra.
+>
+> **Il modo affidabile** è scrivere la preferenza in `localStorage`
+> (`catageo.tema`) e **ricaricare**, così i colori sono quelli del primo render.
+> Per misurare molte pagine conviene un `iframe` fuori schermo che le carica in
+> sequenza: stessa origine, quindi `contentDocument` è accessibile, e ogni pagina
+> è un render vero.
+>
+> Questa trappola ha prodotto falsi positivi in **due** passate distinte di
+> questa verifica, e in entrambe stava per far "correggere" problemi inventati.
+> È il motivo per cui la procedura è scritta qui.
 
 ## Scala delle superfici — 2026-08-05
 
 | | tema chiaro | tema scuro |
 |---|---|---|
-| Fondo pagina | `#e2e7ec` | `#101418` |
-| Fondo scheda | `#ffffff` | `#2c3238` |
-| Fondo intestazione | blu scuro al 12% | blu chiaro al 20% |
-| **pagina / scheda** | **1,24** (era 1,13) | **1,43** (era 1,20) |
-| **scheda / intestazione** | **1,26** (era 1,10) | **1,43** (era 1,16) |
+| Fondo pagina | `#cfd7e0` | `#0c0f12` |
+| Fondo scheda | `#ffffff` | `#343b43` |
+| Fondo intestazione | blu scuro al 12% | blu chiaro al 21% |
+| **pagina / scheda** | **1,45** | **1,70** |
+| **scheda / intestazione** | **1,26** | **1,42** |
+
+Progressione in due passi, su richiesta: prima si è staccata l'intestazione, poi
+il box intero.
+
+| | chiaro | scuro |
+|---|---|---|
+| pagina / scheda, all'origine | 1,13 | 1,20 |
+| dopo il primo intervento | 1,24 | 1,43 |
+| **dopo il secondo** | **1,45** | **1,70** |
+
+Il rapporto **scheda / intestazione è stato tenuto fermo** a 1,26 e 1,42: era già
+stato approvato, e alzare tutto insieme avrebbe fatto perdere la gerarchia fra i
+due livelli. Alzando il fondo delle schede è stato necessario ricalibrare
+l'opacità della tinta dell'intestazione per mantenere lo stesso rapporto.
+
+Oltre alla luminanza agiscono due leve che **non** toccano il contrasto del testo,
+e sono quelle che danno il colpo d'occhio a parità di leggibilità:
+
+- **bordo** più marcato (`#b3bfcc` chiaro, `#4a535d` scuro);
+- **ombra** più evidente (`0 2px 5px` chiaro, `0 2px 6px` scuro).
+
+## Il box su cui si sta lavorando
+
+Nel form di censimento le sezioni sono nove. Il box che contiene il campo attivo
+si accende: bordo nel colore d'accento e alone di 0,18 rem. Si accende **solo
+dentro un form** (`form .card:focus-within`), perché in consultazione ogni clic su
+un collegamento farebbe lampeggiare un box senza che questo significhi nulla.
+
+L'evidenza è su bordo e alone, **non sul fondo**: cambiare il fondo sotto le dita
+mentre si scrive sposta l'attenzione invece di orientarla, e cambierebbe il
+contrasto del testo proprio nel punto in cui si sta leggendo.
 
 Nel tema chiaro l'intestazione si **scurisce**, nel tema scuro si **schiarisce**:
 in entrambi i casi con una tinta blu. Tingere senza cambiare la luminanza — un
@@ -63,21 +105,33 @@ Tutti emersi dalla misura, non dall'occhio. I primi quattro erano **preesistenti
 e riguardavano componenti grigi di Bootstrap che usano il colore fisso `#6c757d`,
 non adattato al tema; l'ultimo è stato **peggiorato** dalle intestazioni colorate.
 
-| Elemento | Prima | Dopo | Nota |
-|---|---|---|---|
-| `btn-outline-secondary` nell'intestazione di una scheda | **1,94** | 6,0 | praticamente illeggibile: è il caso peggiorato dalle intestazioni |
-| `btn-outline-primary` (menu utente) | 2,96 | 5,8 | |
-| `link-secondary` (footer) | 2,84 | 6,3 | |
-| `dropdown-header` (menu utente) | 3,29 | 6,4 | |
-| `text-body-tertiary` («—», «non dichiarata») | 3,72 / 3,12 | oltre 4,5 | è informazione, non decorazione |
-| `text-danger` (asterisco dei campi obbligatori) | 2,86 / 3,90 | 5,6 | dice che un campo non si può lasciare vuoto: va visto |
-| Riquadro dell'installer | **1,03** | 1,43 | il body aveva `bg-body-tertiary`, finito a un passo dal colore della scheda |
+| Elemento | Prima | Nota |
+|---|---|---|
+| `btn-outline-secondary` nell'intestazione di una scheda | **1,94** | praticamente illeggibile: è il caso peggiorato dalle intestazioni |
+| `btn-outline-primary` (menu utente) | 2,96 | |
+| `link-secondary` (footer) | 2,84 | |
+| `dropdown-header` (menu utente) | 3,29 | |
+| `text-body-tertiary` («—», «non dichiarata») | 3,72 / 3,12 | è informazione, non decorazione |
+| `text-danger` (asterisco dei campi obbligatori) | 2,86 / 3,90 | dice che un campo non si può lasciare vuoto: va visto |
+| Riquadro dell'installer | **1,03** | il body aveva `bg-body-tertiary`, finito a un passo dal colore della scheda |
+| `btn-outline-danger` («Rimuovi dal catalogo») | 2,50 | emerso solo dopo aver schiarito le schede |
+
+**Ogni volta che si sposta una superficie, i colori che vi stanno sopra vanno
+rimisurati.** Alzando il fondo delle schede al secondo giro sono ricaduti sotto
+soglia quattro elementi che erano stati appena corretti — l'asterisco a 4,48, i
+pulsanti in contorno a 4,19 e 4,43, le linguette a 4,43 — più il pulsante rosso
+delle operazioni distruttive, che al primo giro non era mai stato sopra un fondo
+così chiaro. Sono stati tutti ritarati: i pulsanti che stanno **fuori** da una
+scheda hanno come riferimento il grigio della pagina, non il bianco del box, e
+vanno più scuri di quanto sembri necessario.
 
 ## Esito finale
 
-Nessun elemento sotto soglia, in **entrambi i temi**, su: scheda dell'ipogeo,
-elenco, form di censimento, mappa, cataloghi, diagnostica, pagina iniziale,
-pagina di accesso, pagina di errore permessi e installer.
+Nessun elemento sotto soglia, in **entrambi i temi**, su nove pagine misurate con
+il metodo affidabile (iframe, primo render): scheda dell'ipogeo, elenco, form di
+censimento, mappa, cataloghi, vocabolari, diagnostica, pagina iniziale e
+installer. Verificate a parte anche la pagina di accesso e quella di errore
+permessi.
 
 ## Cosa questa verifica **non** copre
 
@@ -88,6 +142,7 @@ pagina di accesso, pagina di errore permessi e installer.
   attenuazione è che gli ingressi non praticabili si distinguono per il
   **tratteggio** e non per la tinta.
 - Gli stati transitori (`:hover`, `:focus`, `:disabled`), misurati solo per i
-  pulsanti a cui sono state cambiate le variabili.
+  pulsanti a cui sono state cambiate le variabili. Del box attivo è stato
+  verificato che bordo e alone cambino davvero al fuoco, non il loro contrasto.
 - La resa su stampante reale: le regole `@media print` sono verificate nel CSSOM,
   non su carta.

@@ -5,12 +5,15 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.6.1
+ *  Versione .....: 0.6.2
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.6.2  2026-08-05  D.Candela  Anche il box si stacca dalla pagina, non solo
+ *                                la sua intestazione; evidenza del box attivo
+ *                                nei form; colori ritarati sul nuovo fondo.
  *  0.6.1  2026-08-05  D.Candela  Superfici a contrasto: le schede si staccano
  *                                dal fondo della pagina e le intestazioni dei
  *                                box hanno una tinta propria.
@@ -39,24 +42,26 @@
    quella tinta. Con il tema scuro si schiarisce, per lo stesso motivo. */
 
 [data-bs-theme="light"] {
-    --catageo-fondo-pagina: #e2e7ec;
+    --catageo-fondo-pagina: #cfd7e0;
     --catageo-fondo-scheda: #ffffff;
-    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.12);   /* pagina/scheda 1.24 */
+    --catageo-fondo-intestazione: rgba(5, 44, 101, 0.12);   /* pagina/scheda 1.45 */
     --catageo-bordo-intestazione: rgba(5, 44, 101, 0.22);   /* scheda/intestazione 1.26 */
-    --catageo-bordo-scheda: #c3ccd6;
-    --catageo-ombra-scheda: 0 1px 2px rgba(16, 24, 32, 0.07);
+    --catageo-bordo-scheda: #b3bfcc;
+    --catageo-ombra-scheda: 0 2px 5px rgba(16, 24, 32, 0.10);
+    --catageo-accento-attivo: 13, 110, 253;
 }
 
 [data-bs-theme="dark"] {
     /* La pagina scende sotto il fondo predefinito di Bootstrap (#212529) e le
        schede restano piu chiare: in tema scuro una superficie sollevata si
        riconosce perche e piu chiara, non piu scura. */
-    --catageo-fondo-pagina: #101418;
-    --catageo-fondo-scheda: #2c3238;
-    --catageo-fondo-intestazione: rgba(110, 168, 254, 0.20); /* pagina/scheda 1.43 */
-    --catageo-bordo-intestazione: rgba(110, 168, 254, 0.34); /* scheda/intestazione 1.43 */
-    --catageo-bordo-scheda: #3f464d;
-    --catageo-ombra-scheda: 0 1px 3px rgba(0, 0, 0, 0.45);
+    --catageo-fondo-pagina: #0c0f12;
+    --catageo-fondo-scheda: #343b43;
+    --catageo-fondo-intestazione: rgba(110, 168, 254, 0.21); /* pagina/scheda 1.70 */
+    --catageo-bordo-intestazione: rgba(110, 168, 254, 0.36); /* scheda/intestazione 1.42 */
+    --catageo-bordo-scheda: #4a535d;
+    --catageo-ombra-scheda: 0 2px 6px rgba(0, 0, 0, 0.55);
+    --catageo-accento-attivo: 110, 168, 254;
 }
 
 body {
@@ -67,6 +72,27 @@ body {
     --bs-card-bg: var(--catageo-fondo-scheda);
     --bs-card-border-color: var(--catageo-bordo-scheda);
     box-shadow: var(--catageo-ombra-scheda);
+}
+
+/* Il box su cui si sta lavorando.
+ *
+ * Nel form di censimento le sezioni sono nove: sapere in quale ci si trova senza
+ * doverlo dedurre dalla posizione del cursore fa risparmiare un salto di
+ * attenzione a ogni campo. Si accende solo dentro un form, perche in
+ * consultazione ogni clic su un collegamento farebbe lampeggiare un box senza
+ * che questo significhi nulla.
+ *
+ * L'evidenza e su bordo e alone, non sul fondo: cambiare il fondo sotto le dita
+ * mentre si scrive sposta l'attenzione invece di orientarla, e cambierebbe il
+ * contrasto del testo proprio nel punto in cui si sta leggendo. */
+form .card:focus-within {
+    border-color: rgba(var(--catageo-accento-attivo), 0.6);
+    box-shadow: var(--catageo-ombra-scheda),
+                0 0 0 0.18rem rgba(var(--catageo-accento-attivo), 0.14);
+}
+
+form .card:focus-within > .card-header:not([class*="bg-"]) {
+    border-bottom-color: rgba(var(--catageo-accento-attivo), 0.55);
 }
 
 /* Intestazione del box: tinta propria e bordo inferiore marcato. Il titolo usa
@@ -110,17 +136,19 @@ body {
    si ferma a 4.27:1, appena sotto la soglia. Si usa la variante scura, che e lo
    stesso blu percepito ma leggibile. */
 [data-bs-theme="light"] .btn-outline-primary {
-    --bs-btn-color: #0a58ca;
+    --bs-btn-color: #084298;
     --bs-btn-border-color: #0a58ca;
 }
 
+/* Le linguette delle sezioni stanno sul fondo della pagina, non su una scheda:
+   il loro riferimento e il grigio, non il bianco, e serve un blu piu scuro. */
 [data-bs-theme="light"] .nav-tabs {
-    --bs-nav-link-color: #0a58ca;
-    --bs-nav-link-hover-color: #084298;
+    --bs-nav-link-color: #084298;
+    --bs-nav-link-hover-color: #06316f;
 }
 
 [data-bs-theme="light"] .link-secondary {
-    color: #5c636a !important;
+    color: #4f565c !important;
 }
 
 [data-bs-theme="dark"] .btn-outline-secondary {
@@ -132,13 +160,29 @@ body {
 }
 
 [data-bs-theme="light"] .btn-outline-secondary {
-    --bs-btn-color: #5c636a;
-    --bs-btn-border-color: #98a1a9;
+    /* Scurito insieme al fondo della pagina: sul grigio piu marcato il valore
+       precedente era ricaduto a 4,19:1. Questi pulsanti stanno spesso FUORI da
+       una scheda, quindi il loro fondo e la pagina, non il box. */
+    --bs-btn-color: #4f565c;
+    --bs-btn-border-color: #8e98a1;
 }
 
 [data-bs-theme="dark"] .btn-outline-primary {
     --bs-btn-color: #6ea8fe;
     --bs-btn-border-color: #6ea8fe;
+}
+
+/* I pulsanti delle operazioni distruttive devono essere leggibili quanto gli
+   altri: il rosso puro su fondo scuro stava a 2,50:1. Il fondo al passaggio del
+   mouse resta rosso pieno, perche il segnale di pericolo e quello. */
+[data-bs-theme="dark"] .btn-outline-danger {
+    --bs-btn-color: #f1959b;
+    --bs-btn-border-color: #e35d6a;
+}
+
+[data-bs-theme="light"] .btn-outline-danger {
+    --bs-btn-color: #b02a37;
+    --bs-btn-border-color: #c9505c;
 }
 
 [data-bs-theme="dark"] .dropdown-menu {
@@ -154,7 +198,9 @@ body {
    puo lasciare vuoto, quindi deve essere visto. Si usano le varianti che
    restano rosse ma leggibili su ciascun fondo. */
 [data-bs-theme="dark"] .text-danger {
-    color: #ea868f !important;
+    /* Schiarito insieme al fondo delle schede: con il box piu chiaro il rosa
+       precedente era ricaduto a 4,48:1, appena sotto soglia. */
+    color: #f1959b !important;
 }
 
 [data-bs-theme="light"] .text-danger {
