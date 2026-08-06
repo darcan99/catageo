@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.12.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+🚧 **In sviluppo** — versione corrente **0.13.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -43,7 +43,8 @@
 | 7b | Bibliografia: catalogo generale delle opere, tre forme di voce, citazioni per sigla, export BibTeX | ✅ fatto |
 | 7c | Dati scientifici: punti di misura, serie CSV, import da datalogger, statistiche, grafici SVG lato server | ✅ fatto |
 | 7d | Biospeleologia con colonie di chirotteri e avviso di periodo critico; archeologia con evidenze, tutela e indagini | ✅ fatto |
-| 8 | Ricerca testuale, per attributi e geografica; migrazione fra cataloghi | ⏳ da fare |
+| 8 | Ricerca testuale (inclusi codici storici), per attributi, specialistica e geografica per raggio; tre viste; export CSV/GeoJSON/KML | ✅ fatto |
+| 8b | Migrazione fra cataloghi | ⏳ da fare |
 | 9–10 | Strumenti di manutenzione, rifinitura, manuale, `v1.0.0` | ⏳ da fare |
 
 Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.

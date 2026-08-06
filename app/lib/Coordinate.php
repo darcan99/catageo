@@ -25,17 +25,17 @@ declare(strict_types=1);
  *                  datum diverso (Gauss-Boaga/Roma40, UTM ED50) vedi la nota
  *                  in fondo: sono ammessi come dato originale ma NON convertiti
  *                  automaticamente.
- *  Versione .....: 0.5.0
+ *  Versione .....: 0.12.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.0 2026-08-06  D.Candela  CoordinateEccezione spostata in app/lib/CoordinateEccezione.php:
+ *                                l'autoload risolve una classe per file.
  *  0.5.0  2026-08-04  D.Candela  Prima stesura (sistemi di riferimento).
  * ============================================================================
  */
-
-class CoordinateEccezione extends RuntimeException {}
 
 final class Coordinate
 {

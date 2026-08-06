@@ -20,12 +20,14 @@ declare(strict_types=1);
  *                  riferimento vecchio a un contenuto nuovo. Per questo l'ultimo
  *                  assegnato e memorizzato nell'indice e non ricalcolato dai
  *                  file presenti.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.12.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.0 2026-08-06  D.Candela  RisorsaEccezione spostata in app/lib/RisorsaEccezione.php:
+ *                                l'autoload risolve una classe per file.
  *  0.8.0  2026-08-05  D.Candela  Campi del rilievo e riconoscimento dei
  *                                formati mappabili e tridimensionali.
  *  0.7.1  2026-08-05  D.Candela  Coordinate della risorsa e acquisizione dei
@@ -33,10 +35,6 @@ declare(strict_types=1);
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
  * ============================================================================
  */
-
-class RisorsaEccezione extends RuntimeException
-{
-}
 
 final class Risorse
 {

@@ -19,19 +19,17 @@ declare(strict_types=1);
  *                  config.xml, tipo reale letto dal contenuto con finfo. Servono
  *                  tutte e tre: l'estensione la sceglie chi carica, il tipo
  *                  dichiarato dal browser pure, e solo il contenuto non mente.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.12.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.0 2026-08-06  D.Candela  UploadEccezione spostata in app/lib/UploadEccezione.php:
+ *                                l'autoload risolve una classe per file.
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
  * ============================================================================
  */
-
-class UploadEccezione extends RuntimeException
-{
-}
 
 final class Upload
 {

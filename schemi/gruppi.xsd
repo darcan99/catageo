@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/gruppi.xsd
+   Descrizione ..: Schema di validazione di dati/gruppi_speleologici.xml,
+                   l'anagrafica dei gruppi speleologici (6.4).
+
+                   Note sui tipi:
+                   - i campi facoltativi sono xs:string senza restrizioni e non
+                     tipi specifici (email, URL): l'applicativo scrive elementi
+                     vuoti quando il dato manca, e xs:string e l'unico tipo che
+                     ammette la stringa vuota. Il formato di email e sito web e
+                     comunque controllato da Gruppi::valida(), che usa i filtri
+                     di PHP, piu affidabili di un pattern scritto a mano;
+                   - anno di fondazione e sigla di provincia sono xs:string con
+                     pattern che ammette la stringa vuota, per lo stesso motivo;
+                   - "attivo" e 0/1 e non xs:boolean perche l'applicativo scrive
+                     sempre queste due cifre e xs:boolean accetterebbe anche
+                     "true" e "false", producendo archivi disomogenei.
+   Versione .....: 0.12.1
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.12.1  2026-08-06  D.Candela  Prima stesura: lo schema era dichiarato da
+                                  Gruppi.php fin dalla fase 2 ma non esisteva,
+                                  e la scrittura avveniva senza validazione.
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tIdGruppo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="G[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Sigla del gruppo: e il riferimento breve che compare negli elenchi,
+       scritto sempre in maiuscolo da Gruppi::scriviNodo(). -->
+  <xs:simpleType name="tSigla">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z0-9.\-]{1,20}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Testo che non puo restare vuoto (il nome del gruppo). -->
+  <xs:simpleType name="tTestoObbligatorio">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Sigla di provincia a due lettere oppure vuota. -->
+  <xs:simpleType name="tProvinciaOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Z]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Anno a quattro cifre oppure vuoto. L'intervallo plausibile (dal 1800 a
+       oggi) e verificato da Gruppi::valida(): dipende dall'anno corrente e uno
+       schema non puo esprimerlo. -->
+  <xs:simpleType name="tAnnoOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="gruppi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="gruppo" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <!-- xs:all invece di xs:sequence: l'archivio deve restare
+                 modificabile a mano, e un ordine diverso degli elementi non
+                 e un errore di contenuto. -->
+            <xs:all>
+              <xs:element name="sigla"          type="tSigla"/>
+              <xs:element name="nome"           type="tTestoObbligatorio"/>
+              <xs:element name="sedeComune"     type="xs:string"        minOccurs="0"/>
+              <xs:element name="sedeProvincia"  type="tProvinciaOVuota" minOccurs="0"/>
+              <xs:element name="indirizzo"      type="xs:string"        minOccurs="0"/>
+              <xs:element name="email"          type="xs:string"        minOccurs="0"/>
+              <xs:element name="telefono"       type="xs:string"        minOccurs="0"/>
+              <xs:element name="sitoWeb"        type="xs:string"        minOccurs="0"/>
+              <xs:element name="annoFondazione" type="tAnnoOVuoto"      minOccurs="0"/>
+
+              <!-- Le affiliazioni sono un elenco libero: SSI, CNSAS, FSL, UIS e
+                   CAI sono solo i valori proposti dall'interfaccia, non un
+                   vocabolario chiuso, perche esistono federazioni locali e
+                   affiliazioni estere che non si possono elencare in anticipo. -->
+              <xs:element name="affiliazioni" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="affiliazione" type="tTestoObbligatorio"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="note"   type="xs:string"   minOccurs="0"/>
+              <xs:element name="attivo" type="tBooleano01" minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="id" type="tIdGruppo" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- Unicita degli identificativi e delle sigle. Il confronto dello schema e
+         sensibile alle maiuscole, ma la sigla viene sempre scritta maiuscola:
+         il controllo senza distinzione di maiuscole resta in Gruppi::valida(),
+         che serve a intercettare l'archivio corretto a mano. -->
+    <xs:key name="chiaveIdGruppo">
+      <xs:selector xpath="gruppo"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:unique name="unicitaSiglaGruppo">
+      <xs:selector xpath="gruppo"/>
+      <xs:field xpath="sigla"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

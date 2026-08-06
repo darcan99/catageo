@@ -14,17 +14,17 @@ declare(strict_types=1);
  *                  sono suggerimenti: sono la struttura su cui si regge la
  *                  leggibilita dell'archivio senza l'applicativo, e vengono
  *                  applicate in un unico punto per non divergere.
- *  Versione .....: 0.4.0
+ *  Versione .....: 0.12.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.0 2026-08-06  D.Candela  IpogeoEccezione spostata in app/lib/IpogeoEccezione.php:
+ *                                l'autoload risolve una classe per file.
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
  * ============================================================================
  */
-
-class IpogeoEccezione extends RuntimeException {}
 
 final class Ipogeo
 {

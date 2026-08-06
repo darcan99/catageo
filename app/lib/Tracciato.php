@@ -22,19 +22,17 @@ declare(strict_types=1);
  *                  essere enormi o malformati: si legge con un limite di
  *                  dimensione, senza risolvere entita esterne, e un file
  *                  illeggibile produce un elenco vuoto e non un errore fatale.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.12.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.0 2026-08-06  D.Candela  TracciatoEccezione spostata in app/lib/TracciatoEccezione.php:
+ *                                l'autoload risolve una classe per file.
  *  0.8.0  2026-08-05  D.Candela  Prima stesura (fase 6).
  * ============================================================================
  */
-
-class TracciatoEccezione extends RuntimeException
-{
-}
 
 final class Tracciato
 {

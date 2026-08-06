@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/periodi.xsd
+   Descrizione ..: Schema di validazione di dati/periodi_storici.xml, il
+                   vocabolario dei periodi storici usato dalla datazione della
+                   sezione archeologica (6.4).
+
+                   Note sui tipi:
+                   - a differenza delle altre anagrafiche i dati stanno negli
+                     ATTRIBUTI e non negli elementi: un periodo e una riga di
+                     cronologia, e su una riga sola resta leggibile a colpo
+                     d'occhio anche aprendo il file con un editor;
+                   - l'identificativo e l'attributo "codice", un codice parlante
+                     (ROM-IMP) e non un progressivo: e cio che compare nei
+                     riferimenti delle schede, dove un P004 non direbbe nulla;
+                   - gli anni sono xs:string con pattern e non xs:integer per due
+                     ragioni: ammettono la stringa vuota (il periodo "non
+                     determinato" non ha estremi) e sono anni relativi, negativi
+                     per le date a.C., non date del calendario;
+                   - "attivo" e 0/1 e non xs:boolean, per non ammettere anche
+                     "true" e "false" e ritrovarsi archivi disomogenei.
+
+                   Che l'anno finale non preceda quello iniziale e un confronto
+                   fra valori che XSD 1.0 non sa esprimere: resta in
+                   Periodi::valida().
+   Versione .....: 0.12.1
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.12.1  2026-08-06  D.Candela  Prima stesura: lo schema era dichiarato da
+                                  Periodi.php fin dalla fase 2 ma non esisteva,
+                                  e la scrittura avveniva senza validazione.
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <!-- Codice parlante: maiuscole, cifre e trattino, da 2 a 20 caratteri. -->
+  <xs:simpleType name="tCodicePeriodo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z0-9\-]{2,20}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Testo che non puo restare vuoto (il nome del periodo). -->
+  <xs:simpleType name="tTestoObbligatorio">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Anno relativo oppure vuoto: intero fino a sette cifre, negativo per le
+       date a.C. Sette cifre bastano al Paleolitico inferiore (il vocabolario
+       predefinito parte da -1000000) e fermano gli errori di battitura. -->
+  <xs:simpleType name="tAnnoRelativoOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|-?[0-9]{1,7}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="periodi">
+    <xs:complexType>
+      <xs:sequence>
+        <!-- L'ordine dei periodi nel file non conta: l'elenco viene riordinato
+             cronologicamente in lettura, perche l'ordine alfabetico metterebbe
+             il Novecento prima della preistoria. -->
+        <xs:element name="periodo" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <!-- Unico elemento figlio: le note sono testo libero senza
+                   limiti di lunghezza e non starebbero bene in un attributo.
+                   Manca del tutto nei periodi del vocabolario predefinito. -->
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="codice" type="tCodicePeriodo"      use="required"/>
+            <xs:attribute name="nome"   type="tTestoObbligatorio"  use="required"/>
+            <xs:attribute name="da"     type="tAnnoRelativoOVuoto"/>
+            <xs:attribute name="a"      type="tAnnoRelativoOVuoto"/>
+            <xs:attribute name="attivo" type="tBooleano01"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <!-- Il codice e la chiave dei riferimenti nelle schede: non puo ripetersi.
+         Per questo Periodi::valida() ne vieta anche la modifica. -->
+    <xs:key name="chiaveCodicePeriodo">
+      <xs:selector xpath="periodo"/>
+      <xs:field xpath="@codice"/>
+    </xs:key>
+  </xs:element>
+
+</xs:schema>

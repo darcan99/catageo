@@ -18,12 +18,15 @@ declare(strict_types=1);
  *                  questa base: la loro struttura ad albero richiede una
  *                  gestione diversa, e forzarla qui avrebbe reso questa classe
  *                  piu complicata di entrambe le implementazioni separate.
- *  Versione .....: 0.2.0
+ *  Versione .....: 0.12.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.12.1 2026-08-06  D.Candela  Avviso nel log quando lo schema dichiarato
+ *                                manca: prima si scriveva senza validazione
+ *                                e senza dirlo.
  *  0.2.0  2026-08-04  D.Candela  Prima stesura (fase 2).
  * ============================================================================
  */
@@ -323,15 +326,43 @@ abstract class Anagrafica
         });
     }
 
-    /** Percorso dello schema XSD, se presente sul disco. */
+    /** Schemi gia segnalati come mancanti, per non ripetere l'avviso. */
+    private static array $schemiMancantiSegnalati = [];
+
+    /**
+     * Percorso dello schema XSD, se presente sul disco.
+     *
+     * Uno schema dichiarato ma assente non blocca la scrittura: i dati valgono
+     * piu della validazione, e un'installazione a cui manca un file di schema
+     * deve restare utilizzabile. Il caso viene pero annotato nel log, perche
+     * altrimenti l'applicativo sembrerebbe validare senza farlo, ed e la
+     * situazione peggiore: si scrive con la fiducia di un controllo che non c'e.
+     *
+     * L'avviso e registrato una volta sola per schema e per richiesta: xsd() e
+     * chiamata a ogni salvataggio e il log si riempirebbe di righe identiche.
+     */
     protected static function xsd(): ?string
     {
         $nome = static::nomeXsd();
         if ($nome === null) {
-            return null;
+            return null; // anagrafica dichiaratamente non validata
         }
+
         $percorso = Percorsi::schema($nome);
-        return is_file($percorso) ? $percorso : null;
+        if (is_file($percorso)) {
+            return $percorso;
+        }
+
+        if (!isset(self::$schemiMancantiSegnalati[$nome])) {
+            self::$schemiMancantiSegnalati[$nome] = true;
+            Log::errore(
+                'Schema XSD dichiarato ma assente: ' . $nome . ' (' . static::nomeFile() . '). '
+                . 'I dati vengono scritti senza validazione.',
+                'avviso'
+            );
+        }
+
+        return null;
     }
 
     /** Carica il documento, creandolo se assente. */

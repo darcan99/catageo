@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/esploratori.xsd
+   Descrizione ..: Schema di validazione di dati/esploratori.xml, l'anagrafica
+                   degli esploratori con appartenenza storicizzata ai gruppi
+                   speleologici (6.4).
+
+                   Note sui tipi:
+                   - gli anni di appartenenza sono xs:string con pattern e non
+                     xs:gYear, perche l'anno finale resta vuoto finche
+                     l'appartenenza e in corso e xs:gYear non ammette la
+                     stringa vuota. Stessa ragione per email e telefono, lasciati
+                     xs:string: sono scritti come elementi vuoti quando mancano;
+                   - "attivo" e 0/1 e non xs:boolean, per non ammettere anche
+                     "true" e "false" e ritrovarsi archivi disomogenei.
+
+                   Cosa NON controlla lo schema, e perche: lo stesso gruppo puo
+                   comparire piu volte (si lascia un gruppo e vi si rientra),
+                   quindi l'id di gruppo non e una chiave; che due periodi dello
+                   stesso gruppo non si accavallino, e che l'anno finale non
+                   preceda quello iniziale, sono confronti fra valori che XSD 1.0
+                   non sa esprimere e restano in Esploratori::valida().
+   Versione .....: 0.12.1
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.12.1  2026-08-06  D.Candela  Prima stesura: lo schema era dichiarato da
+                                  Esploratori.php fin dalla fase 2 ma non
+                                  esisteva, e la scrittura avveniva senza
+                                  validazione.
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tIdEsploratore">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="E[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Riferimento a un gruppo dell'anagrafica gruppi_speleologici.xml. -->
+  <xs:simpleType name="tRiferimentoGruppo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="G[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Testo che non puo restare vuoto (cognome e nome). -->
+  <xs:simpleType name="tTestoObbligatorio">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Anno a quattro cifre oppure vuoto: vuoto in "dal" significa inizio
+       ignoto, in "al" significa appartenenza ancora in corso. -->
+  <xs:simpleType name="tAnnoOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="esploratori">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="esploratore" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <!-- xs:all invece di xs:sequence: l'archivio deve restare
+                 modificabile a mano, e un ordine diverso degli elementi non
+                 e un errore di contenuto. -->
+            <xs:all>
+              <xs:element name="cognome"    type="tTestoObbligatorio"/>
+              <xs:element name="nome"       type="tTestoObbligatorio"/>
+              <!-- Il soprannome e facoltativo, ma diventa di fatto obbligatorio
+                   in caso di omonimia: e li che Esploratori::valida() lo
+                   pretende, perche e il modo con cui i gruppi distinguono le
+                   persone. Una regola che dipende dalle altre voci non e
+                   esprimibile in uno schema. -->
+              <xs:element name="soprannome" type="xs:string" minOccurs="0"/>
+
+              <!-- Appartenenze storicizzate. L'ordine e cronologico ma non
+                   significativo (viene ricalcolato a ogni scrittura), quindi
+                   xs:sequence serve solo a permettere la ripetizione. -->
+              <xs:element name="gruppi" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="gruppo" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:attribute name="id"  type="tRiferimentoGruppo" use="required"/>
+                        <!-- Facoltativi: l'attributo assente e la stringa vuota
+                             sono letti allo stesso modo da daNodo(). -->
+                        <xs:attribute name="dal" type="tAnnoOVuoto"/>
+                        <xs:attribute name="al"  type="tAnnoOVuoto"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="email"    type="xs:string" minOccurs="0"/>
+              <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+
+              <!-- Le qualifiche sono testo libero: rilevatore, armatore,
+                   speleosub, istruttore e le altre non formano un elenco
+                   chiuso, e ogni gruppo usa la propria terminologia. -->
+              <xs:element name="qualifiche" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="qualifica" type="tTestoObbligatorio"
+                                minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="note"   type="xs:string"   minOccurs="0"/>
+              <xs:element name="attivo" type="tBooleano01" minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="id" type="tIdEsploratore" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:key name="chiaveIdEsploratore">
+      <xs:selector xpath="esploratore"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+  </xs:element>
+
+</xs:schema>

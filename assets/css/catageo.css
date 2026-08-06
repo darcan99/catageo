@@ -406,6 +406,17 @@ a.catageo-geotag:hover {
     text-decoration: underline;
 }
 
+/* ----------------------------------------------------------------- ricerca */
+
+/* Copertina nella vista a schede dei risultati. L'altezza e fissa e il ritaglio
+   centrato: senza, schede affiancate con foto di proporzioni diverse darebbero
+   una griglia a scalini, e il confronto fra risultati diventa faticoso. */
+.catageo-copertina-ricerca {
+    height: 9rem;
+    object-fit: cover;
+    object-position: center;
+}
+
 /* -------------------------------------------------------- dati scientifici */
 
 /* Il grafico e SVG generato dal server: i colori li mette qui il CSS, cosi

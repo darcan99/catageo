@@ -6,6 +6,62 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.13.0] — 2026-08-06
+
+Fase 8: la ricerca.
+
+### Aggiunto
+- **Ricerca combinata** in AND su tutti i criteri, valutata in tre passate dalla
+  piu economica alla piu costosa: l'indice CSV in streaming, poi la distanza
+  esatta, poi i criteri specialistici aprendo i file di sezione **dei soli
+  sopravvissuti**. La pagina dichiara quante schede ha esaminato e quante ne ha
+  aperte: un elenco tagliato in silenzio si scambia per un elenco completo.
+- **Testuale** su codice, nome, comune, localita, provincia e regione, insensibile
+  a maiuscole e accenti, estesa ai **codici storici**. Digitando un codice — anche
+  dismesso da una migrazione — si va dritti alla scheda, che e il caso d'uso di
+  chi ha in mano una pubblicazione. Opzione per cercare anche nelle descrizioni,
+  che apre le schede una per una e lo dichiara.
+- **Per attributi**, presenza di contenuti, intervalli su sviluppo, dislivello,
+  quota e date. Un ipogeo senza il dato non compare quando si filtra su quel
+  dato: includerlo riempirebbe i risultati di schede di cui non si sa nulla
+  proprio sul criterio scelto.
+- **Specialistica**: grandezza misurata, specie osservata, periodo archeologico
+  anche per intervallo di anni, presenza di vincolo. L'intervallo di anni trova
+  anche chi ha dichiarato solo il periodo, usando gli estremi del vocabolario.
+- **Geografica** per raggio, con pre-filtro a riquadro e distanza esatta
+  (emisenoverso), ordinamento per distanza crescente.
+- **Tre viste** — tabella, schede, mappa — e **export CSV, GeoJSON e KML**. Tutto
+  in GET: una ricerca e un indirizzo condivisibile e ricaricabile.
+- `Geo` per distanze e riquadri; `Esportazione` per la forma delle feature, ora
+  condivisa con la mappa invece di esserne una seconda copia.
+
+### Corretto
+- **Il riquadro del pre-filtro geografico era tangente al cerchio, non
+  contenente.** Un punto proprio sul bordo, a nord o a sud, poteva cadere fuori
+  per pochi millimetri di arrotondamento e venire scartato prima che la distanza
+  esatta potesse dire la sua: l'unico errore non recuperabile, perche un
+  candidato di troppo si scarta dopo, uno di meno sparisce in silenzio. Aggiunto
+  un margine di sicurezza.
+- La pagina di ricerca dava **errore 500 al primo ingresso**: la condizione
+  usava `?? 'tabella'` ma il ramo positivo accedeva alla chiave nuda.
+- `Ricerca::risolviCodice()` leggeva una chiave che `IndiceCodici::risolvi()` non
+  restituisce, quindi la scorciatoia codice-scheda non scattava mai.
+
+### Aggiunto (lavorazioni parallele)
+- Schemi `gruppi.xsd`, `esploratori.xsd` e `periodi.xsd`. Erano dichiarati dalle
+  rispettive classi fin dalla fase 2 ma non esistevano: le tre anagrafiche si
+  scrivevano **senza validazione**, e senza che nulla lo segnalasse.
+- Estratte in file propri le sei eccezioni ancora dichiarate dentro la classe che
+  le solleva (`CoordinateEccezione`, `IpogeoEccezione`, `ProiezioneEccezione`,
+  `RisorsaEccezione`, `TracciatoEccezione`, `UploadEccezione`): funzionavano solo
+  perche chi le cattura aveva quasi sempre gia usato quella classe.
+
+### Corretto (lavorazioni parallele)
+- `Anagrafica::xsd()` registra un avviso nel log quando lo schema dichiarato
+  manca. La scrittura prosegue comunque (un'installazione a cui manca un file di
+  schema deve restare utilizzabile), ma un controllo che si crede attivo e non
+  c'e e peggio di un controllo che non c'e e basta.
+
 ## [0.12.0] — 2026-08-06
 
 Fase 7d: biospeleologia e archeologia. Con questa la **fase 7 e completa**.

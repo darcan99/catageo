@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.12.0
+ *  Versione .....: 0.13.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.13.0 2026-08-06  D.Candela  Rotte di ricerca ed esportazione.
  *  0.12.0 2026-08-06  D.Candela  Rotte di biospeleologia e archeologia.
  *  0.11.0 2026-08-06  D.Candela  Rotte dei dati scientifici.
  *  0.10.0 2026-08-06  D.Candela  Rotte di bibliografia, opere ed export BibTeX.
@@ -72,7 +73,8 @@ $pagine = [
     'ipogei'       => ['file' => 'ipogei.php',       'permesso' => 'consulta',           'titolo' => 'Ipogei'],
     'risorse'      => ['file' => 'risorse.php',      'permesso' => 'consulta',           'titolo' => 'Risorse'],
     'rilievo'      => ['file' => 'rilievo.php',      'permesso' => 'consulta',           'titolo' => 'Rilievo'],
-    'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
+    'ricerca'      => ['file' => 'ricerca.php',      'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
+    'esporta'      => ['file' => 'esporta.php',      'permesso' => 'esporta',            'titolo' => 'Esportazione', 'grezza' => true],
     'esplorazioni' => ['file' => 'esplorazioni.php', 'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
     'esplorazione' => ['file' => 'esplorazione.php', 'permesso' => 'consulta',           'titolo' => 'Diario'],
     'bibliografia' => ['file' => 'bibliografia.php', 'permesso' => 'consulta',           'titolo' => 'Bibliografia'],
@@ -95,7 +97,6 @@ $pagine = [
 /** Fase di sviluppo dichiarata nelle pagine non ancora realizzate. */
 $fasiPreviste = [
     'ipogei'       => 'Fase 3 — scheda ipogeo, censimento, indice',
-    'ricerca'      => 'Fase 8 — ricerca testuale, per attributi e geografica',
     'anagrafiche'  => 'Fase 2 — gruppi, esploratori, tipologie, grandezze',
     'cataloghi'    => 'Fase 2b — cataloghi e serie di codifica',
     'strumenti'    => 'Fase 9 — indici, integrita, backup, import/export',

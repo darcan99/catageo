@@ -13,12 +13,13 @@ declare(strict_types=1);
  *                  i dati sono comunque partiti dal server. Le schede riservate
  *                  non entrano nella risposta e le coordinate offuscate escono
  *                  gia arrotondate.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.13.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.13.0 2026-08-06  D.Candela  La forma delle feature passa a Esportazione.
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
  * ============================================================================
  */
@@ -54,61 +55,10 @@ $filtro = static function (array $riga) use ($cercaNorm, $filtroCatalogo, $filtr
     return false;
 };
 
-$elementi   = [];
-$senzaCoord = 0;
-
-foreach (IndiceIpogei::elenco($filtro) as $riga) {
-    $coord = Visibilita::coordinateDaRiga($riga);
-
-    if (trim($coord['lat']) === '' || trim($coord['lon']) === '') {
-        $senzaCoord++;
-        continue;
-    }
-
-    $elementi[] = [
-        'type'     => 'Feature',
-        'geometry' => [
-            'type'        => 'Point',
-            // GeoJSON vuole longitudine prima della latitudine: e la sorgente
-            // piu frequente di marker finiti in mezzo al mare.
-            'coordinates' => [(float) $coord['lon'], (float) $coord['lat']],
-        ],
-        'properties' => [
-            'codice'       => (string) $riga['codice'],
-            'nome'         => (string) $riga['nome'],
-            'catalogo'     => (string) $riga['catalogo'],
-            'natura'       => (string) $riga['natura'],
-            'tipologia'    => (string) $riga['tipologia'],
-            'tipologiaNome' => Tipologie::nome((string) $riga['tipologia']),
-            'comune'       => (string) $riga['comune'],
-            'localita'     => (string) $riga['localita'],
-            'quota'        => (string) $riga['quota'],
-            'sviluppo'     => (string) $riga['sviluppo'],
-            'dislivello'   => (string) $riga['dislivello'],
-            'statoAccesso' => (string) $riga['stato_accesso'],
-            'statoScheda'  => (string) $riga['stato_scheda'],
-            'riservatezza' => (string) $riga['riservatezza'],
-            'offuscate'    => $coord['offuscate'],
-            'nFoto'        => (int) $riga['n_foto'],
-            'nRilievi'     => (int) $riga['n_rilievi'],
-            'nEsplorazioni' => (int) $riga['n_esplorazioni'],
-            'haKml'        => $riga['ha_kml'] === '1',
-            'url'          => 'index.php?p=ipogei&azione=scheda&codice=' . urlencode((string) $riga['codice']),
-        ],
-    ];
-}
-
-$geojson = [
-    'type'     => 'FeatureCollection',
-    'features' => $elementi,
-    // Metadati fuori dallo standard ma dentro l'oggetto: comodi per l'interfaccia
-    // e ignorati da qualunque lettore GeoJSON conforme.
-    'catageo'  => [
-        'totale'          => count($elementi),
-        'senzaCoordinate' => $senzaCoord,
-        'generato'        => date('c'),
-    ],
-];
+// La forma delle feature vive in Esportazione: la stessa raccolta viene
+// prodotta dai risultati di ricerca e dagli export, e tre copie della stessa
+// struttura divergerebbero alla prima proprieta aggiunta.
+$geojson = Esportazione::geojson(IndiceIpogei::elenco($filtro));
 
 if (!headers_sent()) {
     header('Content-Type: application/json; charset=UTF-8');

@@ -1535,6 +1535,16 @@ Modalità combinabili in AND, tutte eseguite sull'indice CSV con scansione in st
 
 I criteri di cui al punto 4 che non sono coperti da una colonna dell'indice vengono risolti in seconda passata sui soli candidati sopravvissuti ai filtri precedenti, aprendo il file di sezione interessato. È il compromesso che tiene l'indice di dimensioni ragionevoli senza rinunciare alla ricerca specialistica: un filtro per specie su 3.000 ipogei apre solo i file di biospeleologia dei pochi che hanno superato gli altri criteri.
 
+**Scostamenti assunti in fase 8** (2026-08-06):
+
+- **Il riquadro del pre-filtro geografico porta un margine di sicurezza** (un millesimo del raggio piu un metro). Calcolato esatto risulta tangente al cerchio, e un punto sul bordo a nord o a sud puo caderne fuori per arrotondamento: il pre-filtro lo scarterebbe prima che la distanza esatta possa dire la sua. E l'unico errore non recuperabile dei due possibili.
+- **Vicino ai poli e a cavallo dell'antimeridiano si rinuncia al filtro in longitudine** invece di applicarne uno sbagliato: gli estremi si invertirebbero e il confronto escluderebbe in silenzio meta dei risultati.
+- **Un ipogeo privo del dato non soddisfa un filtro su quel dato.** L'alternativa riempirebbe i risultati di schede di cui non si sa nulla proprio sul criterio scelto.
+- **La ricerca per specie ignora le colonie non consultabili**: comparire fra i risultati rivelerebbe l'esistenza di un roost che l'utente non ha diritto di conoscere.
+- **Gli export applicano la riservatezza** come l'interfaccia: le coordinate offuscate escono offuscate anche dal CSV, e il KML lo dichiara nel segnaposto. Un export non deve essere la via di servizio con cui si ottengono le posizioni esatte.
+- **Nessuna paginazione**: oltre 2.000 risultati il taglio e dichiarato in pagina e dentro il file esportato, ma per vedere i successivi si restringono i criteri. Una paginazione su una scansione in streaming costerebbe una riscansione per pagina.
+- **Le azioni massive sulla selezione** (migrazione, stampa) restano alla fase 8b, insieme allo strumento di migrazione a cui servono.
+
 Risultati presentati in tre viste commutabili — **tabella** (ordinabile, paginata), **schede/card**, **mappa** — con esportazione CSV, KML, GeoJSON, e possibilità di applicare alla selezione un'azione massiva (migrazione tra cataloghi, esportazione, stampa).
 
 ---
