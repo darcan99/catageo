@@ -7,12 +7,13 @@ declare(strict_types=1);
  *  File .........: app/pagine/home.php
  *  Descrizione ..: Pagina iniziale: riepilogo dell'archivio, stato di
  *                  avanzamento delle fasi di sviluppo e collegamenti rapidi.
- *  Versione .....: 0.15.0
+ *  Versione .....: 0.16.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.16.0 2026-08-06  D.Candela  Fase 9b conclusa: resta solo la 10.
  *  0.15.0 2026-08-06  D.Candela  Fase 9 conclusa; l'import CSV diventa 9b.
  *  0.14.0 2026-08-06  D.Candela  Fase 8b conclusa: la fase 8 e completa.
  *  0.13.0 2026-08-06  D.Candela  Fase 8 conclusa; la migrazione diventa 8b.
@@ -75,7 +76,7 @@ $fasi = [
     ['8',  'Ricerca combinata, viste ed esportazioni',         'fatta'],
     ['8b', 'Migrazione fra cataloghi, con anteprima',          'fatta'],
     ['9',  'Indici, integrita, backup, verifica collegamenti',  'fatta'],
-    ['9b', 'Import CSV massivo',                              'da fare'],
+    ['9b', 'Import CSV massivo, con anteprima',                'fatta'],
     ['10', 'Rifinitura e rilascio',                            'da fare'],
 ];
 ?>

@@ -1537,6 +1537,15 @@ Ricostruzione indici · verifica integrità archivio (XML non validi, file orfan
 - **Il ripristino resta manuale**: si estrae lo ZIP dentro `dati/` e si ricostruiscono gli indici, come scritto nel manifesto incluso nell'archivio. Un ripristino automatico che sovrascrive l'archivio e l'operazione piu pericolosa immaginabile e non viene offerta da interfaccia.
 - **La verifica dei collegamenti procede a lotti** di venti: duecento richieste HTTP in una pagina supererebbero qualunque limite di tempo, e un lavoro interrotto a meta senza dirlo lascerebbe meta archivio con esiti vecchi.
 
+**Scostamenti assunti in fase 9b** (2026-08-06):
+
+- **L'anteprima chiama il validatore vero**, `Ipogeo::valida()`, invece di ripetere le sue regole. Il primo tentativo le duplicava e divergeva subito: dichiarava importabili righe che la scrittura avrebbe rifiutato. Un'anteprima che valida in modo diverso dalla scrittura da fiducia proprio dove non deve, e per restare allineata deve chiamare lo stesso codice, non somigliargli.
+- **Si importano solo gli ipogei.** Risorse, esplorazioni, bibliografie e serie di misure hanno gia i loro percorsi di caricamento, e ognuna avrebbe una mappatura sua. Un import completo di un catasto altrui e materia della fase 11.
+- **L'import crea, non aggiorna.** Una riga il cui codice esiste gia viene saltata e dichiarata: mai sovrascritta. Aggiornare in massa schede gia inserite significherebbe decidere quali campi vincono, e su un archivio compilato a mano nell'arco di anni quella decisione non puo prenderla un file CSV.
+- **Le schede importate nascono `bozza`** se il file non dice altrimenti: sono dati che nessuno ha ancora guardato, e pubblicarli d'ufficio li mescolerebbe a quelli verificati.
+- **Il limite e 2000 righe per file**, e il percorso e a due passi obbligati (caricamento con mappatura, poi anteprima) prima che si possa confermare. Senza anteprima la conferma viene rifiutata.
+- **Il backup preventivo e raccomandato, non imposto.** L'import non ha annullamento: un import sbagliato si disfa cancellando le schede una per una. La pagina lo dice, ma non blocca chi decide di procedere lo stesso — stessa scelta gia fatta per la migrazione.
+- **La codifica del file non viene rilevata**: si assume UTF-8, col BOM riconosciuto e saltato. Un CSV salvato in ANSI porterebbe dentro accenti sbagliati senza segnalazione.
 
 ---
 
@@ -1661,7 +1670,8 @@ Altre convenzioni:
 | **7d** | Biospeleologia e archeologia: osservazioni, colonie di chirotteri con conteggi e avviso periodo critico, evidenze, tutela, viste per periodo storico | Barra avvisi della scheda completa e funzionante |
 | **8** | Ricerca: testuale (inclusi codici storici), per catalogo, per attributi, specialistica, geografica per raggio, esportazioni | Tutte le modalità combinabili, con export |
 | **8b** | Migrazione tra cataloghi: singola e multipla, anteprima codici, risoluzione dei codici storici, tracciato | Ipogeo migrato con vecchio codice ancora risolvibile |
-| **9** | Strumenti ADM: ricostruzione indici, verifica integrità, backup per catalogo, import/export CSV | Archivio verificabile e ripristinabile |
+| **9** | Strumenti ADM: ricostruzione indici, verifica integrità, backup per catalogo, verifica link | Archivio verificabile e ripristinabile |
+| **9b** | Import CSV massivo di ipogei: mappatura delle colonne, anteprima riga per riga con la validazione vera, nessuna sovrascrittura | Un CSV sporco importato per le sole righe valide, con motivo e numero di riga per le altre |
 | **10** | Rifinitura: stampa scheda, tema scuro, manuale utente, dati di esempio, tag `v1.0.0` | Release installabile |
 | **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
 

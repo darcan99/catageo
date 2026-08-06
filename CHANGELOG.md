@@ -6,6 +6,47 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.16.0] — 2026-08-06
+
+Fase 9b: importazione massiva da CSV. Con questa la **fase 9 e completa**.
+
+### Aggiunto
+- **Import di ipogei da file CSV**, in due passi obbligati: caricamento con
+  mappatura delle colonne, poi anteprima riga per riga. Riconosce da sole le
+  intestazioni prodotte dall'esportazione della fase 8, cosi un CSV uscito da
+  CATAGEO si reimporta senza toccarlo; le colonne che non combaciano restano da
+  associare a mano, e non si indovinano.
+- **Anteprima che dice, per ogni riga, se entra e con quale codice** — oppure
+  perche viene scartata e a quale riga del file corrisponde. I codici assegnati
+  dalla serie sono simulati in avanti, cosi l'elenco mostra quelli veri e non
+  venti volte lo stesso.
+- **Nessuna sovrascrittura**: un codice gia presente in archivio viene saltato e
+  dichiarato. Anche un codice ripetuto dentro lo stesso file viene saltato alla
+  seconda occorrenza, citando la riga in cui era gia comparso.
+- **Le schede importate nascono bozza** salvo indicazione contraria nel file, e
+  il contatore della serie si riallinea dopo un import con codici manuali.
+
+### Corretto
+- **L'anteprima mentiva.** Dichiarava importabile una riga che la scrittura
+  avrebbe poi rifiutato: l'import controllava solo il nome, mentre
+  `Ipogeo::valida()` esige anche tipologia e coordinate. Chi avesse confermato
+  si sarebbe trovato con meno schede di quelle promesse, e senza sapere quali.
+  Ora l'anteprima **chiama il validatore vero** invece di ripeterne le regole,
+  cosi non puo piu divergere.
+- **I numeri di riga erano sbagliati.** Il lettore CSV riusato dai dati
+  scientifici scarta le righe vuote e compatta l'elenco: una riga vuota a meta
+  file spostava di uno tutte le successive. Per una serie di misure non cambia
+  nulla, qui il numero di riga e l'informazione principale del rapporto e un
+  numero sbagliato manda a correggere la riga che non c'entra.
+
+### Note di progetto
+- **Si importano solo gli ipogei**, non risorse, esplorazioni, bibliografie o
+  serie di misure: quelle hanno gia i loro percorsi di caricamento.
+- **L'import crea e non aggiorna**, e **non ha annullamento**: un import
+  sbagliato si disfa cancellando le schede una per una. La pagina insiste sul
+  backup preventivo ma non lo impone, come per la migrazione.
+- **La codifica non viene rilevata**: si assume UTF-8, col BOM riconosciuto.
+
 ## [0.15.0] — 2026-08-06
 
 Fase 9: strumenti di manutenzione.

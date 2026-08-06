@@ -13,12 +13,13 @@ declare(strict_types=1);
  *                  e una correzione automatica che indovina male su un catasto
  *                  di trent'anni fa piu danni del problema. L'unica cosa che si
  *                  offre di rifare e l'indice, che e una cache.
- *  Versione .....: 0.15.0
+ *  Versione .....: 0.16.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.16.0  2026-08-06  D.Candela  Riquadro dell'importazione da CSV (fase 9b).
  *  0.15.0  2026-08-06  D.Candela  Prima stesura (fase 9).
  * ============================================================================
  */
@@ -247,6 +248,24 @@ $cataloghi = Cataloghi::elenco();
             protegge dal guasto del disco.
           </div>
         <?php endif; ?>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================= import -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><h2 class="h6 mb-0">Importazione da CSV</h2></div>
+      <div class="card-body">
+        <p class="text-body-secondary">
+          Crea molte schede in una volta da un file esterno, con mappatura
+          delle colonne e anteprima riga per riga. Una scheda gia presente
+          <strong>non viene mai sovrascritta</strong>.
+        </p>
+        <a class="btn btn-primary" href="index.php?p=importa">
+          <i class="bi bi-database-add"></i> Importa da CSV
+        </a>
+        <div class="catageo-nota mt-2">Fare un backup prima.</div>
       </div>
     </div>
   </div>
