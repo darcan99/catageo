@@ -1529,6 +1529,15 @@ Elenco dei cataloghi con numero di ipogei, serie di codifica e stato dei contato
 
 Ricostruzione indici · verifica integrità archivio (XML non validi, file orfani, riferimenti rotti, codici duplicati fra cataloghi, contatori disallineati rispetto ai codici presenti, serie CSV orfane del loro descrittore, cartelle non conformi allo standard) · backup ZIP dell'archivio, per intero o per singolo catalogo · import/export CSV massivo · verifica dei link bibliografici · diagnostica ambiente (versione PHP, interi a 64 bit, estensioni, permessi di scrittura, limiti di upload e `post_max_size`, disponibilità di chiamate HTTP in uscita).
 
+**Scostamenti assunti in fase 9** (2026-08-06):
+
+- **L'import CSV massivo non e stato realizzato** e diventa la fase 9b. Scrivere molte schede da un file esterno e l'operazione piu rischiosa dell'applicativo: merita il suo giro di prove, non la coda di una fase gia ampia. L'esportazione c'e dalla fase 8.
+- **La verifica di integrita non corregge nulla.** Segnala e indica cosa fare. L'unica cosa che si offre di rifare e l'indice, che e una cache rigenerabile dai dati; su tutto il resto una correzione automatica che indovina male farebbe piu danni del problema.
+- **Il backup si scrive su file e non si emette in streaming.** Un archivio grande prodotto in streaming, con un limite di tempo di esecuzione, si interromperebbe lasciando uno ZIP corrotto che sembra buono. Su disco, un file incompleto lo nota chi guarda l'elenco e non chi tenta di ripristinarlo.
+- **Il ripristino resta manuale**: si estrae lo ZIP dentro `dati/` e si ricostruiscono gli indici, come scritto nel manifesto incluso nell'archivio. Un ripristino automatico che sovrascrive l'archivio e l'operazione piu pericolosa immaginabile e non viene offerta da interfaccia.
+- **La verifica dei collegamenti procede a lotti** di venti: duecento richieste HTTP in una pagina supererebbero qualunque limite di tempo, e un lavoro interrotto a meta senza dirlo lascerebbe meta archivio con esiti vecchi.
+
+
 ---
 
 ## 10. Ricerca

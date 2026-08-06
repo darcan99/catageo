@@ -6,6 +6,49 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.15.0] — 2026-08-06
+
+Fase 9: strumenti di manutenzione.
+
+### Aggiunto
+- **Verifica dell'integrita dell'archivio**: XML non validi, schede mancanti o
+  illeggibili, riferimenti rotti fra sezioni, codici duplicati fra cataloghi,
+  contatori disallineati rispetto ai codici presenti, file orfani del loro
+  indice e viceversa, serie CSV senza descrittore, cartelle fuori standard.
+  **Non corregge nulla**: segnala, e per ogni problema dice cosa farne. Un
+  archivio di file leggibili a mano si ripara guardando, e una correzione
+  automatica che indovina male su un catasto di trent'anni fa piu danni del
+  problema.
+- **Backup ZIP** dell'intero archivio o di un singolo catalogo, con manifesto
+  dentro lo ZIP: versione, data, autore e istruzioni di ripristino. Il backup di
+  un catalogo comprende anche anagrafiche e indici, senza i quali le schede
+  citerebbero identificativi inesistenti.
+- **Verifica dei collegamenti bibliografici** a lotti di venti, con esito
+  registrato in scheda. Dove le chiamate in uscita sono bloccate lo strumento
+  lo dichiara e non fa nulla: segnare tutti i link come irraggiungibili sarebbe
+  un danno, perche quell'esito finisce scritto nelle schede.
+- **Ricostruzione degli indici** dalla pagina degli strumenti.
+
+### Corretto
+- **Lo strumento che cerca i file rotti si fermava sul primo file rotto.** Un
+  XML malformato faceva sollevare un'eccezione a `Ipogeo::trova()` e
+  interrompeva l'intera verifica: l'utente vedeva una pagina di errore, senza
+  sapere se il resto dell'archivio fosse stato controllato. Ora ogni ipogeo si
+  verifica dentro una rete e l'interruzione diventa essa stessa un problema
+  segnalato.
+- **Due backup creati nello stesso secondo avevano lo stesso nome**, e il
+  secondo sovrascriveva il primo in silenzio: si perdeva un backup proprio
+  mentre si credeva di averne fatti due.
+
+### Note di progetto
+- **L'import CSV massivo non e in questa fase.** Scrivere molte schede da un
+  file esterno e l'operazione piu rischiosa dell'applicativo e merita il suo
+  giro di prove, non la coda di una fase gia ampia: diventa la 9b. L'export c'e
+  dalla fase 8.
+- **Il ripristino non e automatizzato**: lo ZIP si estrae a mano dentro `dati/`.
+  E deliberato — un ripristino automatico che sovrascrive l'archivio e
+  l'operazione piu pericolosa immaginabile — ed e scritto nel manifesto.
+
 ## [0.14.0] — 2026-08-06
 
 Fase 8b: migrazione fra cataloghi. Con questa la **fase 8 e completa**.

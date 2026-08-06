@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.14.0
+ *  Versione .....: 0.15.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.15.0 2026-08-06  D.Candela  Rotte degli strumenti e del backup.
  *  0.14.0 2026-08-06  D.Candela  Rotta della migrazione fra cataloghi.
  *  0.13.0 2026-08-06  D.Candela  Rotte di ricerca ed esportazione.
  *  0.12.0 2026-08-06  D.Candela  Rotte di biospeleologia e archeologia.
@@ -91,7 +92,8 @@ $pagine = [
     'opere'        => ['file' => 'opere.php',        'permesso' => 'anagrafiche',        'titolo' => 'Catalogo delle opere'],
     'vocabolari'   => ['file' => 'vocabolari.php',   'permesso' => 'anagrafiche',        'titolo' => 'Vocabolari'],
     'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],
-    'strumenti'    => ['file' => 'in-sviluppo.php',  'permesso' => 'strumenti',          'titolo' => 'Strumenti'],
+    'strumenti'    => ['file' => 'strumenti.php',    'permesso' => 'strumenti',          'titolo' => 'Strumenti'],
+    'scarica-backup' => ['file' => 'scarica-backup.php', 'permesso' => 'strumenti',        'titolo' => 'Backup', 'grezza' => true],
     'utenti'       => ['file' => 'utenti.php',       'permesso' => 'gestisci_utenti',    'titolo' => 'Gestione utenti'],
     'diagnostica'  => ['file' => 'diagnostica.php',  'permesso' => 'strumenti',          'titolo' => 'Diagnostica'],
 ];
@@ -101,7 +103,6 @@ $fasiPreviste = [
     'ipogei'       => 'Fase 3 — scheda ipogeo, censimento, indice',
     'anagrafiche'  => 'Fase 2 — gruppi, esploratori, tipologie, grandezze',
     'cataloghi'    => 'Fase 2b — cataloghi e serie di codifica',
-    'strumenti'    => 'Fase 9 — indici, integrita, backup, import/export',
 ];
 
 $richiesta = isset($_GET['p']) ? (string) $_GET['p'] : 'home';
