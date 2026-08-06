@@ -6,6 +6,51 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.8.1] — 2026-08-05
+
+Il riquadro nero del visualizzatore 3D.
+
+### Corretto
+- **Ogni nuvola di punti veniva disegnata come superficie**, cioe come una
+  manciata di triangoli fra vertici consecutivi: praticamente invisibile. La
+  distinzione fra nuvola e mesh guardava anche l'attributo delle normali, ma le
+  normali venivano calcolate una riga sopra e quindi c'erano sempre. Ora conta
+  solo la presenza di **facce**, e le normali si calcolano dopo la decisione e
+  solo se il file non le porta.
+- **I modelli in coordinate assolute non arrivavano interi alla scheda grafica.**
+  Il modello veniva centrato spostando l'oggetto e lasciando i vertici a valori
+  come 4.678.705: la somma vertice + posizione la fa la GPU in virgola mobile a
+  32 bit, dove quella grandezza ha una precisione di circa mezzo metro. Un
+  rilievo di dieci metri diventava una scalinata, uno di un metro spariva. Ora si
+  traslano i **vertici**, cosi i valori scendono vicino a zero.
+- La dimensione dei punti si applica a tutte le nuvole dell'oggetto e non solo
+  alla radice: un OBJ puo contenerne piu di una.
+- L'elenco delle fasi nella pagina iniziale era rimasto fermo alla fase 3.
+  Annotato nel codice che le copie sono tre — pagina iniziale, README e piano in
+  analisi — e vanno aggiornate insieme.
+
+### Aggiunto
+- Sotto il visualizzatore ora si leggono **vertici e facce**: «500 vertici ·
+  nuvola di punti, nessuna faccia · ingombro 50,0 x 6,0 x 4,0». Davanti a un
+  riquadro nero, «non e arrivato» e «e arrivato ma non si vede» sono due guasti
+  diversi che si somigliano, e senza numeri non si sa da dove cominciare.
+- Un file valido ma **privo di geometrie** lo dichiara, invece di mostrare il nero.
+
+### Verificato
+- Sei PLY costruiti apposta — nuvola ASCII, con normali, binaria, in UTM, mesh
+  binaria colorata, mesh in UTM — caricati e ispezionati in scena: prima nessuna
+  delle quattro nuvole era riconosciuta come tale, ora tutte.
+- Proiettando i vertici con le matrici della camera, **il 100% dei campioni cade
+  dentro il tronco di visuale** in tutti e sei i modelli. Che ci sia un oggetto in
+  scena non basta: va dimostrato che finisca nell'inquadratura.
+- La suite verifica ora le due premesse nel codice, perche sono esattamente cio
+  che regredirebbe senza accorgersene.
+
+### Nota
+- Il cubo di otto vertici usato nella fase 6 non faceva emergere **nessuno dei
+  due** difetti: e una superficie, con facce e coordinate piccole, cioe l'unico
+  caso che funzionava. I dati di prova troppo gentili nascondono i guasti.
+
 ## [0.8.0] — 2026-08-05
 
 Fase 6: i rilievi.

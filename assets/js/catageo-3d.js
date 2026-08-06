@@ -14,12 +14,15 @@
  *                  all'apertura della pagina: una nuvola di punti di un rilievo
  *                  puo pesare decine di megabyte, e scaricarla per una scheda
  *                  che magari si sta solo consultando sarebbe uno spreco.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.8.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.1  2026-08-05  D.Candela  Nuvole di punti riconosciute dalle facce e
+ *                                non dalle normali; vertici traslati invece
+ *                                dell'oggetto; vertici e facce dichiarati.
  *  0.8.0  2026-08-05  D.Candela  Prima stesura (fase 6).
  * ============================================================================
  */
@@ -151,9 +154,14 @@ function caricatore(estensione) {
 /**
  * Trasforma il risultato del caricatore in un oggetto da mettere in scena.
  *
- * PLY e STL restituiscono una geometria nuda: se ha i colori per vertice — ed e
- * il caso delle nuvole di punti da scanner — si usano quelli, altrimenti un
- * colore neutro. OBJ e GLTF restituiscono gia una gerarchia pronta.
+ * PLY e STL restituiscono una geometria nuda; OBJ e GLTF una gerarchia pronta.
+ *
+ * La distinzione fra nuvola di punti e mesh si fa SOLO sulla presenza di facce,
+ * cioe di un indice. Prima si guardava anche l'attributo delle normali, ma le
+ * normali venivano calcolate qui una riga sopra: erano quindi sempre presenti, e
+ * ogni nuvola finiva disegnata come mesh senza indice — cioe come una manciata
+ * di triangoli fra vertici consecutivi, praticamente invisibile. E il motivo per
+ * cui un rilievo a nuvola di punti mostrava un riquadro nero.
  */
 function aOggetto(risultato, estensione) {
     if (estensione === 'gltf' || estensione === 'glb') {
@@ -165,17 +173,24 @@ function aOggetto(risultato, estensione) {
     }
 
     const geometria = risultato;
-    geometria.computeVertexNormals();
 
+    const indice    = geometria.getIndex();
+    const conFacce  = indice !== null && indice.count > 0;
     const conColori = !!geometria.getAttribute('color');
-    const conFacce  = !!geometria.getIndex() || geometria.getAttribute('normal');
 
     if (!conFacce) {
-        // Nuvola di punti: senza facce una mesh non si vedrebbe affatto.
+        // Nuvola di punti. La dimensione definitiva si calcola in inquadra(),
+        // quando si conosce l'estensione del modello: un valore fisso sarebbe
+        // invisibile su una grotta di due chilometri e un pastello su una sala.
         return new THREE.Points(geometria, new THREE.PointsMaterial({
-            size: 0.02, sizeAttenuation: true,
+            size: 1, sizeAttenuation: true,
             vertexColors: conColori, color: conColori ? 0xffffff : COLORE_MODELLO
         }));
+    }
+
+    // Le normali servono solo alle superfici, e solo se il file non le porta.
+    if (!geometria.getAttribute('normal')) {
+        geometria.computeVertexNormals();
     }
 
     return new THREE.Mesh(geometria, new THREE.MeshStandardMaterial({
@@ -184,6 +199,34 @@ function aOggetto(risultato, estensione) {
         roughness: 0.85, metalness: 0.05,
         side: THREE.DoubleSide   // i rilievi hanno spesso facce orientate a caso
     }));
+}
+
+/**
+ * Conta vertici e facce di un oggetto, per poterlo dire a chi guarda.
+ *
+ * Serve a distinguere «il file non e arrivato» da «il file e arrivato ma non si
+ * vede»: sono due guasti diversi e con un riquadro nero si somigliano.
+ */
+function conteggia(oggetto) {
+    let vertici = 0, facce = 0, nuvole = 0, superfici = 0;
+
+    oggetto.traverse(function (nodo) {
+        if (!nodo.geometry) {
+            return;
+        }
+        const posizione = nodo.geometry.getAttribute('position');
+        if (posizione) {
+            vertici += posizione.count;
+        }
+        const indice = nodo.geometry.getIndex();
+        if (indice) {
+            facce += indice.count / 3;
+        }
+        if (nodo.isPoints) { nuvole++; }
+        if (nodo.isMesh)   { superfici++; }
+    });
+
+    return { vertici, facce, nuvole, superfici };
 }
 
 /**
@@ -202,7 +245,21 @@ function inquadra(stato, oggetto) {
     const centro = riquadro.getCenter(new THREE.Vector3());
     const misura = riquadro.getSize(new THREE.Vector3());
 
-    oggetto.position.sub(centro);
+    // Si traslano i VERTICI, non l'oggetto.
+    //
+    // Spostare l'oggetto lascerebbe i vertici alle loro coordinate assolute, e
+    // la somma vertice+posizione la fa la scheda grafica in virgola mobile a 32
+    // bit: a un nord UTM di 4.678.705 quella precisione vale circa mezzo metro,
+    // quindi un rilievo di dieci metri diventerebbe una scalinata e uno di un
+    // metro sparirebbe. Sottraendo qui, i valori scendono vicino a zero e la
+    // precisione torna piena. Le geometrie condivise si traslano una volta sola.
+    const gia = new Set();
+    oggetto.traverse(function (nodo) {
+        if (nodo.geometry && !gia.has(nodo.geometry)) {
+            gia.add(nodo.geometry);
+            nodo.geometry.translate(-centro.x, -centro.y, -centro.z);
+        }
+    });
 
     const massimo = Math.max(misura.x, misura.y, misura.z) || 1;
     const distanza = massimo * 1.8;
@@ -216,11 +273,15 @@ function inquadra(stato, oggetto) {
     stato.comandi.target.set(0, 0, 0);
     stato.comandi.update();
 
-    // La dimensione dei punti va rapportata al modello: 2 cm vanno bene per una
-    // saletta, non per una grotta di due chilometri.
-    if (oggetto.isPoints && oggetto.material) {
-        oggetto.material.size = massimo / 400;
-    }
+    // La dimensione dei punti va rapportata al modello: due centimetri vanno
+    // bene per una saletta, non per una grotta di due chilometri. Si applica a
+    // tutte le nuvole dell'oggetto, non solo alla radice, perche un OBJ puo
+    // contenerne piu di una.
+    oggetto.traverse(function (nodo) {
+        if (nodo.isPoints && nodo.material) {
+            nodo.material.size = massimo / 400;
+        }
+    });
 
     return { larghezza: misura.x, altezza: misura.y, profondita: misura.z };
 }
@@ -287,14 +348,36 @@ document.addEventListener('DOMContentLoaded', function () {
                     const misura = inquadra(vista, oggetto);
                     vista.dimensione = Math.max(misura.larghezza, misura.altezza, misura.profondita);
 
+                    const conto = conteggia(oggetto);
+
                     if (dati) {
+                        // Vertici e facce servono a distinguere «non e arrivato»
+                        // da «e arrivato ma non si vede»: con un riquadro nero i
+                        // due guasti si somigliano, e senza numeri non si sa
+                        // nemmeno da che parte cominciare a guardare.
+                        const pezzi = [conto.vertici.toLocaleString('it-IT') + ' vertici'];
+                        if (conto.facce > 0) {
+                            pezzi.push(Math.round(conto.facce).toLocaleString('it-IT') + ' facce');
+                        } else {
+                            pezzi.push('nuvola di punti, nessuna faccia');
+                        }
                         // Le unita del file non sono dichiarate da nessuna parte:
                         // si scrive "unita" e non "metri", perche affermare metri
                         // sarebbe un'informazione inventata.
-                        dati.textContent = 'Ingombro: '
+                        pezzi.push('ingombro '
                             + misura.larghezza.toFixed(1) + ' x '
                             + misura.altezza.toFixed(1) + ' x '
-                            + misura.profondita.toFixed(1) + ' unita del file';
+                            + misura.profondita.toFixed(1) + ' unita del file');
+
+                        dati.textContent = pezzi.join(' · ');
+                    }
+
+                    // Un file valido ma senza geometrie darebbe un riquadro nero
+                    // senza spiegazione: meglio dirlo.
+                    if (conto.vertici === 0) {
+                        avvisa('Il file e stato letto ma non contiene geometrie da mostrare.',
+                            'alert-warning');
+                        return;
                     }
 
                     stato3d.pronto = true;

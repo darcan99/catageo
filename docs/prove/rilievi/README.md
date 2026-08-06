@@ -114,11 +114,76 @@ dell'intestazione. Ora lì usa il colore del testo normale, attenuato.
 > WCAG. Non è un difetto; l'audit semplicemente non distingue gli elementi
 > inattivi.
 
+## Il riquadro nero — due difetti trovati con un PLY reale
+
+Un rilievo vero caricato dopo il rilascio mostrava un riquadro nero. Il cubo di
+otto vertici della suite non li faceva emergere **nessuno dei due**, e ora si
+capisce perché: un cubo è una superficie con facce e coordinate piccole, cioè
+l'unico caso che funzionava.
+
+### 1. Ogni nuvola di punti veniva disegnata come superficie
+
+Il codice distingueva nuvola e mesh così:
+
+```js
+geometria.computeVertexNormals();                       // ← una riga sopra
+const conFacce = !!geometria.getIndex() || geometria.getAttribute('normal');
+```
+
+Le normali le calcolava lui stesso la riga prima, quindi `conFacce` era **sempre
+vero**: ogni nuvola diventava una `Mesh` senza indice, cioè una manciata di
+triangoli fra vertici consecutivi. Praticamente invisibile.
+
+Ora la distinzione guarda **solo le facce** (`indice.count > 0`), e le normali si
+calcolano dopo la decisione e solo se il file non le porta.
+
+### 2. Le coordinate assolute non arrivano intere alla scheda grafica
+
+I rilievi escono spesso in coordinate assolute — est 295.964, nord 4.678.705. Il
+modello veniva centrato spostando l'**oggetto**, lasciando i vertici a quei
+valori: la somma vertice + posizione la fa la GPU in virgola mobile a 32 bit, e
+a 4.678.705 quella precisione vale **circa mezzo metro**. Un rilievo di dieci
+metri diventava una scalinata; uno di un metro spariva.
+
+Ora si traslano i **vertici** (`geometry.translate`), così i valori scendono
+vicino a zero e la precisione torna piena. Le geometrie condivise si traslano una
+volta sola.
+
+### Come sono stati verificati
+
+Sei PLY costruiti apposta — nuvola ASCII, nuvola con normali, nuvola binaria,
+nuvola in UTM, mesh binaria colorata, mesh in UTM — caricati e ispezionati in
+scena:
+
+| | prima | dopo |
+|---|---|---|
+| Nuvole riconosciute come tali | 0 su 4 (tutte `Mesh` senza indice) | 4 su 4 `Points` |
+| Primo vertice di un modello UTM | `[295964, 4678705, 230]` | `[-25, 0, 2]` |
+| Dimensione dei punti | fissa a 0,02 | 0,125, proporzionata al modello |
+
+E poi la verifica che conta davvero: proiettando i vertici con le matrici della
+camera, **il 100% dei campioni cade dentro il tronco di visuale** in tutti e sei
+i modelli. «C'è un oggetto in scena» non basta: va dimostrato che finisce
+nell'inquadratura.
+
+### Cosa è stato aggiunto perché non ricapiti muto
+
+La riga sotto il visualizzatore ora dichiara **vertici e facce**: «500 vertici ·
+nuvola di punti, nessuna faccia · ingombro 50,0 × 6,0 × 4,0». Con un riquadro
+nero, «il file non è arrivato» e «il file è arrivato ma non si vede» sono due
+guasti diversi che si somigliano, e senza numeri non si sa da che parte
+cominciare. Un file valido ma **senza geometrie** lo dice esplicitamente invece
+di mostrare il nero.
+
+La suite verifica ora le due premesse nel codice — distinzione per facce,
+traslazione dei vertici — perché sono esattamente ciò che regredirebbe senza che
+nessuno se ne accorga.
+
 ## Cosa questi controlli **non** coprono
 
-- **Modelli reali di rilievo.** Il PLY di prova è un cubo di otto vertici. Una
-  nuvola da scanner con milioni di punti non è stata provata: né la memoria, né
-  la fluidità, né il ridimensionamento automatico dei punti.
+- **Modelli reali di grandi dimensioni.** I PLY di prova arrivano a 500 punti.
+  Una nuvola da scanner con milioni di punti non è stata provata: né la memoria,
+  né la fluidità.
 - **OBJ, STL e GLTF.** I caricatori sono installati e collegati, ma solo il ramo
   PLY è stato esercitato con un file vero.
 - **Materiali e texture** dei GLTF: la liberazione della memoria video le

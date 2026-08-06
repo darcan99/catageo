@@ -9,12 +9,13 @@ declare(strict_types=1);
  *                  classi, gestione degli errori, caricamento della
  *                  configurazione, fuso orario e avvio della sessione.
  *                  Va incluso da index.php e da installa.php.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.8.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.1  2026-08-05  D.Candela  Versione 0.8.1.
  *  0.8.0  2026-08-05  D.Candela  Versione 0.8.0 (fase 6).
  *  0.7.1  2026-08-05  D.Candela  Versione 0.7.1.
  *  0.7.0  2026-08-05  D.Candela  Versione 0.7.0 (fase 5).
@@ -32,7 +33,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '0.8.0');
+define('CATAGEO_VERSIONE', '0.8.1');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');

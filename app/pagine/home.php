@@ -7,12 +7,13 @@ declare(strict_types=1);
  *  File .........: app/pagine/home.php
  *  Descrizione ..: Pagina iniziale: riepilogo dell'archivio, stato di
  *                  avanzamento delle fasi di sviluppo e collegamenti rapidi.
- *  Versione .....: 0.1.0
+ *  Versione .....: 0.8.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.1  2026-08-05  D.Candela  Elenco delle fasi riallineato allo stato.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -40,20 +41,29 @@ if (is_dir($radice)) {
 $numeroIpogei = Csv::conta(Percorsi::indice('ipogei.csv'));
 $numeroUtenti = count(Utenti::elenco());
 
-/** Stato delle fasi: aggiornato man mano che lo sviluppo procede. */
+/**
+ * Stato delle fasi.
+ *
+ * ATTENZIONE: lo stesso elenco compare in README.md e nel piano di ANALISI.md.
+ * Sono tre copie, e questa e gia rimasta indietro una volta di tre fasi: a fine
+ * fase vanno aggiornate tutte e tre insieme, con il CHANGELOG.
+ */
 $fasi = [
-    ['0',  'Struttura, configurazione, diagnostica',          'fatta'],
-    ['1',  'Core, autenticazione, utenti, installer',         'fatta'],
-    ['2',  'Anagrafiche: gruppi, esploratori, vocabolari',    'fatta'],
-    ['2b', 'Cataloghi e serie di codifica',                   'fatta'],
-    ['3',  'Ipogei: scheda, censimento, indice',              'fatta'],
-    ['4',  'Mappa: Leaflet/OSM, marker, WMS',                 'da fare'],
-    ['5',  'Allegati, foto, video',                           'da fare'],
-    ['6',  'Rilievi 2D/3D, KML su mappa',                     'da fare'],
-    ['7',  'Esplorazioni, bibliografia, scienza, bio, archeo','da fare'],
-    ['8',  'Ricerca e migrazione fra cataloghi',              'da fare'],
-    ['9',  'Strumenti di manutenzione',                       'da fare'],
-    ['10', 'Rifinitura e rilascio',                           'da fare'],
+    ['0',  'Struttura, configurazione, diagnostica',           'fatta'],
+    ['1',  'Core, autenticazione, utenti, installer',          'fatta'],
+    ['2',  'Anagrafiche: gruppi, esploratori, vocabolari',     'fatta'],
+    ['2b', 'Cataloghi e serie di codifica',                    'fatta'],
+    ['3',  'Ipogei: scheda, censimento, indice',               'fatta'],
+    ['—',  'Coordinate: gradi, UTM, Gauss-Boaga, ED50',        'fatta'],
+    ['4',  'Mappa: Leaflet/OSM, marker, WMS',                  'fatta'],
+    ['4b', 'Provider Google Maps alternativo',                 'da fare'],
+    ['5',  'Allegati, foto con miniature, video, metadati',    'fatta'],
+    ['6',  'Rilievi 2D/3D, KML su mappa, viewer three.js',     'fatta'],
+    ['6b', 'Geologia e layer cartografici tematici',           'da fare'],
+    ['7',  'Esplorazioni, bibliografia, scienza, bio, archeo', 'da fare'],
+    ['8',  'Ricerca e migrazione fra cataloghi',               'da fare'],
+    ['9',  'Strumenti di manutenzione',                        'da fare'],
+    ['10', 'Rifinitura e rilascio',                            'da fare'],
 ];
 ?>
 
