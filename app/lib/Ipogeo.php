@@ -476,6 +476,130 @@ final class Ipogeo
     }
 
     /**
+     * Sposta un ipogeo in un altro catalogo, assegnandogli il codice della
+     * serie di destinazione e conservando la memoria di quello di origine (5.5).
+     *
+     * Sta qui e non in una classe a parte perche riusa gli stessi passaggi di
+     * cambiaCodice — traccia storica, rinomina di cartella e contenuto,
+     * riscrittura della scheda, indici — e averne due copie significherebbe
+     * correggerne una sola quando cambia lo standard dei nomi.
+     *
+     * L'ordine dei passi non e casuale: si sposta la cartella PRIMA di
+     * rinominarla, perche se lo spostamento fallisce l'ipogeo resta intero al
+     * suo posto col suo codice. Rinominare prima lascerebbe, in caso di errore,
+     * un ipogeo col codice del catalogo sbagliato.
+     *
+     * @return array{codice:string,codicePrecedente:string,catalogoPrecedente:string,percorso:string}
+     * @throws IpogeoEccezione
+     */
+    public static function migra(string $codice, string $siglaDestinazione, string $motivo = 'migrazione catalogo'): array
+    {
+        $destinazione = Cataloghi::trova($siglaDestinazione);
+        if ($destinazione === null) {
+            throw new IpogeoEccezione('Catalogo di destinazione non trovato: ' . $siglaDestinazione);
+        }
+        if (!$destinazione['attivo']) {
+            throw new IpogeoEccezione(
+                'Il catalogo "' . $siglaDestinazione . '" e disattivato: non accetta ipogei.');
+        }
+
+        $scheda = self::trova($codice);
+        if ($scheda === null) {
+            throw new IpogeoEccezione('Ipogeo non trovato: ' . $codice);
+        }
+
+        $catalogoOrigine = (string) $scheda['catasto']['catalogo'];
+        if (strcasecmp($catalogoOrigine, (string) $destinazione['sigla']) === 0) {
+            throw new IpogeoEccezione(
+                'L\'ipogeo ' . $codice . ' e gia nel catalogo ' . $destinazione['sigla'] . '.');
+        }
+
+        $cartella = (string) $scheda['_percorso'];
+
+        // 1. Codice nuovo dalla serie di destinazione. Si assegna per primo:
+        //    se il catalogo non ha una serie adatta e meglio saperlo prima di
+        //    aver toccato il filesystem.
+        $assegnato = CodiceCatastale::assegna((string) $destinazione['sigla'], self::attributiPerSerie($scheda));
+        $nuovoCodice = $assegnato['codice'];
+
+        // 2. Traccia storica nella scheda.
+        $scheda['identificazione']['codiciStorici'][] = [
+            'codice'       => $codice,
+            'catalogo'     => $catalogoOrigine,
+            'nomeCatalogo' => (string) $scheda['catasto']['nomeCatalogo'],
+            'dal'          => (string) $scheda['catasto']['creazioneData'] !== ''
+                ? substr((string) $scheda['catasto']['creazioneData'], 0, 10) : '',
+            'al'           => date('Y-m-d'),
+            'motivo'       => $motivo,
+            'utente'       => Auth::usernameCorrente(),
+        ];
+        $scheda['identificazione']['codice'] = $nuovoCodice;
+        $scheda['catasto']['catalogo']     = (string) $destinazione['sigla'];
+        $scheda['catasto']['nomeCatalogo'] = (string) $destinazione['nome'];
+        $scheda['catasto']['serieCodice']  = (string) $assegnato['prefisso'];
+
+        // 3. Spostamento dell'albero sotto il catalogo di destinazione, ancora
+        //    col vecchio nome di cartella.
+        $cartellaIpogei = Percorsi::unisci(
+            Percorsi::cataloghi((string) $destinazione['cartella']), 'ipogei');
+        Percorsi::assicuraCartella($cartellaIpogei);
+
+        $provvisoria = Percorsi::unisci($cartellaIpogei, basename($cartella));
+        if (is_dir($provvisoria)) {
+            throw new IpogeoEccezione(
+                'Nel catalogo di destinazione esiste gia una cartella "' . basename($cartella) . '".');
+        }
+        if (!@rename($cartella, $provvisoria)) {
+            throw new IpogeoEccezione(
+                'Spostamento nel catalogo di destinazione non riuscito: verificare che la '
+                . 'cartella non sia aperta da un altro programma.');
+        }
+
+        // 4. Da qui in poi un errore lascerebbe l'ipogeo spostato ma non
+        //    rinominato: si riporta indietro e si rilancia, cosi lo stato
+        //    intermedio non sopravvive all'operazione.
+        try {
+            self::rinominaContenuto($provvisoria, $codice, $nuovoCodice);
+            $nuovaCartella = self::rinominaCartella(
+                $provvisoria, $nuovoCodice, (string) $scheda['identificazione']['nome'], $codice);
+
+            $adesso = date('Y-m-d\TH:i:s');
+            $scheda['catasto']['modificaData']   = $adesso;
+            $scheda['catasto']['modificaUtente'] = Auth::usernameCorrente();
+            $scheda['catasto']['revisione']      = (int) $scheda['catasto']['revisione'] + 1;
+
+            $doc = Xml::nuovo('ipogeo', [
+                'versioneSchema' => self::VERSIONE_SCHEMA,
+                'catalogo'       => (string) $destinazione['sigla'],
+            ]);
+            self::scriviScheda($doc, $scheda);
+            Xml::salva($doc, Percorsi::unisci($nuovaCartella, $nuovoCodice . ' - Dati.xml'), self::xsd());
+        } catch (Throwable $e) {
+            @rename($provvisoria, $cartella);
+            throw new IpogeoEccezione(
+                'Migrazione di ' . $codice . ' non riuscita, ipogeo riportato nel catalogo '
+                . 'di origine: ' . $e->getMessage());
+        }
+
+        // 5. Indici: il vecchio codice diventa storico e continua a risolvere.
+        //    E il punto per cui la migrazione esiste — un codice citato in una
+        //    pubblicazione cartacea non si puo aggiornare.
+        IndiceCodici::sostituisci($codice, $nuovoCodice, (string) $destinazione['sigla']);
+        IndiceIpogei::rimuovi($codice);
+        IndiceIpogei::aggiorna($nuovoCodice);
+
+        Log::modifica('migrazione', (string) $destinazione['sigla'], $nuovoCodice, 'ipogei',
+            'da ' . $catalogoOrigine . '/' . $codice . ' (' . $motivo . ')');
+
+        return [
+            'codice'             => $nuovoCodice,
+            'codicePrecedente'   => $codice,
+            'catalogoPrecedente' => $catalogoOrigine,
+            'percorso'           => $nuovaCartella,
+        ];
+    }
+
+    /**
      * Cancellazione conservativa: l'albero dell'ipogeo viene spostato in
      * dati/_eliminati, non rimosso.
      *

@@ -337,6 +337,14 @@ Sequenza dell'operazione (riservata ADM, transazionale, con backup preventivo de
 
 È prevista anche la **migrazione multipla** (selezione da ricerca → sposta N ipogei), con anteprima dei codici che verrebbero assegnati e conferma esplicita prima di scrivere.
 
+**Scostamenti assunti in fase 8b** (2026-08-06):
+
+- **Il backup preventivo dell'albero non e stato realizzato.** Al suo posto c'e un rollback: se la rinomina fallisce dopo lo spostamento, la cartella torna al catalogo di origine. Copre il caso frequente, non un guasto a meta rinomina dei file interni. Il backup per catalogo arriva in fase 9 ed e li che va costruito una volta sola, invece di averne due implementazioni.
+- **Un lotto non e transazionale nel suo insieme**: lo e ogni singolo ipogeo. Annullare un lotto a meta richiederebbe di rimettere indietro cartelle gia spostate e contatori gia consumati, cioe piu movimento di file proprio quando qualcosa non funziona. Cio che e riuscito e cio che e fallito viene dichiarato e tracciato.
+- **L'anteprima simula i contatori.** Senza, mostrerebbe lo stesso codice per tutti gli ipogei di un lotto diretto allo stesso catalogo, e chi conferma crederebbe di aver visto cio che accadra. Dopo la scrittura i codici assegnati si confrontano con quelli mostrati e le differenze si dichiarano.
+- **I riferimenti fra ipogei (`<collegamenti>`) non vengono riscritti**: restano col codice storico, che continua a risolvere grazie a `codici.csv`. Riscriverli richiederebbe di scandire tutto l'archivio a ogni migrazione, per un guadagno solo estetico.
+- **Limite di cento ipogei per lotto**, di prudenza e non tecnico: un elenco piu lungo non lo si controlla davvero prima di confermare.
+
 ---
 
 ## 6. Modello dati

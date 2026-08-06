@@ -15,12 +15,13 @@ declare(strict_types=1);
  *                  Se il testo cercato e un codice — anche dismesso da una
  *                  migrazione — si va dritti alla scheda: e il caso d'uso piu
  *                  frequente, quello di chi ha in mano una pubblicazione.
- *  Versione .....: 0.13.0
+ *  Versione .....: 0.14.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.14.0  2026-08-06  D.Candela  Selezione dei risultati per la migrazione.
  *  0.13.0  2026-08-06  D.Candela  Prima stesura (fase 8).
  * ============================================================================
  */
@@ -540,11 +541,20 @@ if ($vista === 'mappa' && $righe !== []) {
 
 <?php elseif ($vista === 'tabella'): ?>
 
+  <?php $puoMigrare = Auth::puo('migra_catalogo'); ?>
+  <form method="get" action="index.php">
+  <input type="hidden" name="p" value="migrazione">
+
   <div class="card">
     <div class="table-responsive">
       <table class="table catageo-tabella mb-0 align-middle">
         <thead>
           <tr>
+            <?php if ($puoMigrare): ?>
+              <th style="width:2.5rem">
+                <span class="visually-hidden">Selezione</span>
+              </th>
+            <?php endif; ?>
             <th style="width:6rem">Codice</th>
             <th>Nome</th>
             <th>Tipologia</th>
@@ -560,6 +570,13 @@ if ($vista === 'mappa' && $righe !== []) {
         <tbody>
           <?php foreach ($righe as $riga): ?>
             <tr>
+              <?php if ($puoMigrare): ?>
+                <td>
+                  <input class="form-check-input" type="checkbox" name="codici[]"
+                         value="<?= Testo::esc((string) $riga['codice']) ?>"
+                         aria-label="Seleziona <?= Testo::esc((string) $riga['codice']) ?>">
+                </td>
+              <?php endif; ?>
               <td>
                 <a href="index.php?p=ipogei&amp;azione=scheda&amp;codice=<?= urlencode((string) $riga['codice']) ?>">
                   <span class="catageo-codice"><?= Testo::esc((string) $riga['codice']) ?></span>
@@ -607,7 +624,20 @@ if ($vista === 'mappa' && $righe !== []) {
         </tbody>
       </table>
     </div>
+
+    <?php if ($puoMigrare): ?>
+      <div class="card-body catageo-non-stampare">
+        <button type="submit" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left-right"></i> Migra i selezionati
+        </button>
+        <span class="catageo-nota ms-2">
+          Porta alla schermata di anteprima: da li si sceglie il catalogo e si
+          vedono i codici che verrebbero assegnati, prima di confermare.
+        </span>
+      </div>
+    <?php endif; ?>
   </div>
+  </form>
 
 <?php elseif ($vista === 'schede'): ?>
 

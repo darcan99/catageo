@@ -6,6 +6,40 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.14.0] — 2026-08-06
+
+Fase 8b: migrazione fra cataloghi. Con questa la **fase 8 e completa**.
+
+### Aggiunto
+- **Migrazione di uno o piu ipogei** in un altro catalogo: assegnazione del
+  codice dalla serie di destinazione, spostamento e rinomina dell'albero,
+  traccia storica in scheda, indici aggiornati. Il **codice di origine continua
+  a risolvere**: e il motivo per cui l'operazione esiste, perche un codice
+  citato in una pubblicazione cartacea non si puo aggiornare.
+- **Anteprima obbligatoria** con i codici esatti che verranno assegnati.
+  `CodiceCatastale::anteprima()` risponde sempre col prossimo progressivo della
+  serie: su cinque ipogei diretti allo stesso catalogo mostrerebbe cinque volte
+  lo stesso codice. Qui i contatori si simulano, uno per prefisso, e si saltano
+  i codici gia presenti come fa l'assegnazione vera. Dopo la scrittura i codici
+  assegnati si confrontano con quelli mostrati, e le differenze si dichiarano.
+- **Tracciato** in `dati/_log/migrazioni.csv`, che registra anche i fallimenti
+  col motivo: se un lotto si e fermato a meta, il file deve dire dove e perche.
+- **Selezione dai risultati di ricerca**, visibile solo a chi ha il permesso.
+
+### Note di progetto
+- Un lotto **non e transazionale nel suo insieme**: ogni ipogeo lo e per conto
+  suo. Se il terzo di cinque fallisce, i primi due restano migrati e lo si
+  dichiara. Annullare tutto richiederebbe di rimettere indietro cartelle gia
+  spostate e contatori gia consumati, cioe piu movimento di file proprio nel
+  momento in cui qualcosa non funziona.
+- L'ordine dei passi non e casuale: si sposta la cartella **prima** di
+  rinominarla, cosi un fallimento lascia l'ipogeo intero al suo posto col suo
+  codice invece che col codice del catalogo sbagliato.
+- **Il backup preventivo dell'albero non c'e ancora** (§5.5 lo prevede): il
+  rollback riporta la cartella al suo posto, che copre il caso frequente ma non
+  un guasto a meta rinomina. Il backup per catalogo arriva in fase 9, ed e li
+  che va costruito una volta sola.
+
 ## [0.13.0] — 2026-08-06
 
 Fase 8: la ricerca.
