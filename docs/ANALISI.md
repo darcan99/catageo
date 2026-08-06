@@ -1427,7 +1427,7 @@ Un rilievo con `<visualizzaInMappa>1</visualizzaInMappa>` e formato KML/KMZ/GPX 
 
 Vista a schede (tab Bootstrap): **Dati · Descrizione · Mappa · Foto · Rilievi · Allegati · Video · Esplorazioni · Bibliografia · Dati scientifici · Biospeleologia · Archeologia · Geologia · Storico**. I tab delle sezioni vuote restano visibili ma segnalati come non compilati: la scheda dichiara sempre cosa manca, invece di nascondere le lacune.
 
-Editing con form generato dal template standard, campi obbligatori minimi: catalogo, nome, natura, tipologia, coordinate (il codice è assegnato dal sistema o inserito a mano se il catalogo lo consente). Salvataggio con validazione XSD, ricalcolo delle sintesi di §6.8, aggiornamento indice, log della modifica. Stampa/PDF della scheda tramite CSS `@media print` (nessuna libreria PDF, che sarebbe pesante su hosting economico), con selezione delle sezioni da includere.
+Editing con form generato dal template standard, campi obbligatori minimi: catalogo, nome, natura, tipologia, coordinate (il codice è assegnato dal sistema o inserito a mano se il catalogo lo consente). Salvataggio con validazione XSD, ricalcolo delle sintesi di §6.8, aggiornamento indice, log della modifica. Stampa/PDF della scheda **senza libreria PDF**, che sarebbe pesante su hosting economico: si usa la stampa del browser, con selezione delle sezioni da includere (vedi lo scostamento in §9.15).
 
 In testa alla scheda una **barra di avvisi** raccoglie ciò che chi programma un'uscita deve sapere prima di leggere il resto: vincolo archeologico con autorizzazione necessaria (§6.15), periodo critico per i chirotteri in corso (§6.14), rischi geologici rilevanti (§6.16), stato di accesso chiuso o interrato, permessi di proprietà.
 
@@ -1546,6 +1546,31 @@ Ricostruzione indici · verifica integrità archivio (XML non validi, file orfan
 - **Il limite e 2000 righe per file**, e il percorso e a due passi obbligati (caricamento con mappatura, poi anteprima) prima che si possa confermare. Senza anteprima la conferma viene rifiutata.
 - **Il backup preventivo e raccomandato, non imposto.** L'import non ha annullamento: un import sbagliato si disfa cancellando le schede una per una. La pagina lo dice, ma non blocca chi decide di procedere lo stesso — stessa scelta gia fatta per la migrazione.
 - **La codifica del file non viene rilevata**: si assume UTF-8, col BOM riconosciuto e saltato. Un CSV salvato in ANSI porterebbe dentro accenti sbagliati senza segnalazione.
+
+### 9.15 Stampa della scheda
+
+Pagina dedicata (`?p=stampa&codice=…`), documento HTML autonomo con foglio di stile proprio, che si manda alla stampante o si salva in PDF con la stampa del browser. Nessuna libreria PDF, come previsto dal §9.1.
+
+**Scostamenti assunti in fase 10** (2026-08-07):
+
+- **Non è la scheda con un `@media print`, ma una pagina a parte.** Il §9.1 prevedeva un foglio di stile sulla scheda. La scheda però tiene il contenuto in linguette Bootstrap, e una linguetta non attiva è `display:none`: alla stampante arriverebbe la sola linguetta aperta. Il risultato sarebbe un foglio che *sembra* la scheda e non lo è, e chi lo porta in campagna al posto dell'applicativo non ha modo di accorgersene. Un difetto silenzioso su un documento che nasce per essere usato lontano dal computer.
+- **Il foglio di stile della stampa non usa Bootstrap.** Un framework pensato per il viewport, dentro un A4, porta colonne che si spezzano, fondi grigi e margini sbagliati. Il foglio dedicato è nero su bianco, senza fondi pieni e senza icone: su una stampante monocromatica un fondo colorato diventa grigio e il testo sopra diventa illeggibile.
+- **Niente mappa sul foglio.** Disegnarla vorrebbe dire scaricare i tile da un server esterno, e una stampa non deve dipendere dalla rete. Ci sono invece le coordinate in tutte le notazioni d'uso.
+- **La riservatezza si applica identica a quella dello schermo, e il foglio la dichiara.** Un foglio esce dall'applicativo e non ci torna: da quel momento nessun permesso lo protegge. Quando contiene dati riservati che l'utente ha il diritto di vedere, porta in testa un timbro che lo dice.
+- **Massimo sei foto in pagina**, e il foglio dichiara quante ne ha lasciate fuori. Una scheda con ottanta foto genererebbe quaranta fogli di immagini.
+- **Le foto riservate non si stampano** a chi non le puo scaricare: la richiesta verrebbe rifiutata e sul foglio resterebbe un riquadro rotto. La riga nell'elenco delle risorse resta comunque, come nella pagina delle risorse: l'archivio dichiara cosa contiene, non lo consegna.
+- **I codici diventano parole**: natura, grandezza misurata, periodo storico, censore e gruppo censore si stampano risolti in anagrafica. Su carta un `E003` o un `T-ARIA` non dice niente a nessuno, e non c'è un'interfaccia intorno che lo spieghi.
+- **I diari di esplorazione e le letture delle serie non si stampano per esteso**: compaiono come elenco con i loro estremi. Un diario completo si stampa dalla sua pagina; una serie da datalogger vale decine di migliaia di righe e si esporta in CSV.
+
+### 9.16 Dati di esempio
+
+`esempi/genera-esempi.php`, script da riga di comando che popola un catalogo `ESEMPI` con cinque cavità fittizie e le relative sezioni, e lo rimuove con `--rimuovi`.
+
+**Scostamenti assunti in fase 10** (2026-08-07):
+
+- **Un generatore, non una cartella di file pronti.** Un archivio di esempio versionato invecchia: al primo cambio di schema diventa un archivio non valido distribuito insieme all'applicativo che lo rifiuta. Il generatore scrive passando dalle stesse classi dell'interfaccia, quindi o produce dati validi per la versione corrente o fallisce subito, dicendolo.
+- **Solo da riga di comando.** Un generatore di dati raggiungibile via HTTP è un modo per riempire l'archivio di qualcun altro.
+- **Scrive in un catalogo suo e si rifiuta di procedere se esiste già**, così i dati veri non vengono toccati nemmeno per sbaglio. La rimozione passa da `Ipogeo::elimina()`, quindi le schede finiscono in `_eliminati` come tutte le altre: la regola dell'archivio vale anche per gli esempi.
 
 ---
 
@@ -1672,7 +1697,7 @@ Altre convenzioni:
 | **8b** | Migrazione tra cataloghi: singola e multipla, anteprima codici, risoluzione dei codici storici, tracciato | Ipogeo migrato con vecchio codice ancora risolvibile |
 | **9** | Strumenti ADM: ricostruzione indici, verifica integrità, backup per catalogo, verifica link | Archivio verificabile e ripristinabile |
 | **9b** | Import CSV massivo di ipogei: mappatura delle colonne, anteprima riga per riga con la validazione vera, nessuna sovrascrittura | Un CSV sporco importato per le sole righe valide, con motivo e numero di riga per le altre |
-| **10** | Rifinitura: stampa scheda, tema scuro, manuale utente, dati di esempio, tag `v1.0.0` | Release installabile |
+| **10** | Rifinitura: stampa scheda, manuale utente, guida di installazione, dati di esempio, tag `v1.0.0` | Release installabile |
 | **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
 
 Al termine di ogni fase: commit, aggiornamento `CHANGELOG.md`, incremento delle versioni dei file toccati.

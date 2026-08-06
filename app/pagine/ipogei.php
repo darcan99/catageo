@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 0.8.0
+ *  Versione .....: 1.0.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.0.0  2026-08-07  D.Candela  Pulsante di stampa: la scheda a linguette
+ *                                non si stampa, e una pagina a parte.
  *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sulla mappetta e
  *                                collegamento alla pagina del rilievo.
  *  0.7.1  2026-08-05  D.Candela  Finestra dei media anche nella scheda; i
@@ -376,6 +378,16 @@ if ($azione === 'scheda' && $codice !== '') {
             <i class="bi bi-pencil"></i> Modifica
           </a>
         <?php endif; ?>
+        <?php
+        // La stampa e una pagina a parte, non questa con un foglio di stile:
+        // qui il contenuto sta in linguette, e una linguetta chiusa e
+        // display:none. Chi stampasse da qui otterrebbe la sola linguetta
+        // aperta credendo di avere la scheda intera.
+        ?>
+        <a class="btn btn-outline-secondary" target="_blank" rel="noopener"
+           href="index.php?p=stampa&amp;codice=<?= urlencode($codiceCorrente) ?>">
+          <i class="bi bi-printer"></i> Stampa
+        </a>
         <a class="btn btn-outline-secondary" href="index.php?p=ipogei"><i class="bi bi-list"></i> Elenco</a>
       </div>
     </div>

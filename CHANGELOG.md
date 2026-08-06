@@ -6,6 +6,66 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.0.0] — 2026-08-07
+
+Fase 10: rifinitura e **prima release installabile**.
+
+### Aggiunto
+- **Scheda da stampare**: un documento lineare, completo e autoconsistente, che
+  si manda alla stampante o si salva in PDF con la stampa del browser. Riporta
+  tutte le sezioni una dopo l'altra, con gli avvisi in cima, le coordinate in
+  tutte le notazioni d'uso e, in fondo, chi ha stampato e quando. Si scelgono
+  le sezioni da includere.
+- **Manuale utente** (`docs/MANUALE.md`): livelli di utenza, cataloghi e
+  codici, censimento, coordinate, riservatezza, tutte le sezioni della scheda,
+  ricerca, esportazioni, stampa, importazione, strumenti, e dove stanno i dati.
+- **Guida di installazione** (`docs/INSTALLAZIONE.md`): installazione,
+  aggiornamento, spostamento di un archivio, backup e ripristino, e i guasti
+  che capitano davvero su hosting condiviso.
+- **Dati di esempio**: `php esempi/genera-esempi.php` crea un catalogo `ESEMPI`
+  con cinque cavita fittizie che coprono i casi interessanti — scheda completa,
+  cavita artificiale con archeologia, ubicazione a precisione ridotta, scheda
+  riservata, bozza — con esplorazioni, bibliografia, misure, chirotteri e
+  vincolo. Si toglie con `--rimuovi`.
+
+### Corretto
+- **L'avviso di vincolo archeologico finiva con due punti** quando le
+  prescrizioni ne avevano gia uno loro. Compariva cosi in scheda e in entrambe
+  le pagine di sezione.
+- **Una foto riservata sarebbe finita rotta sul foglio.** La stampa chiedeva
+  l'immagine anche a chi non poteva scaricarla, e al posto della foto restava
+  il riquadro dell'errore. Ora le foto non visibili si saltano; la riga
+  nell'elenco delle risorse resta, come nella pagina delle risorse.
+
+### Note di progetto
+- **La stampa e una pagina a parte, non la scheda con un `@media print`**, come
+  invece prevedeva l'analisi. La scheda tiene il contenuto in linguette, e una
+  linguetta chiusa e `display:none`: alla stampante sarebbe arrivata la sola
+  linguetta aperta. Un foglio che sembra la scheda e non lo e, su un documento
+  che nasce per essere usato lontano dal computer.
+- **Sul foglio non c'e la mappa**: disegnarla richiederebbe di scaricare i tile
+  da un server esterno, e una stampa non deve dipendere dalla rete.
+- **La riservatezza vale sul foglio come a schermo**, e quando il foglio
+  contiene dati riservati lo dichiara con un timbro: una stampa esce
+  dall'applicativo e da quel momento nessun permesso la protegge.
+- **I dati di esempio sono un generatore e non file versionati**: un archivio
+  di esempio congelato diventerebbe, al primo cambio di schema, un archivio non
+  valido distribuito insieme all'applicativo che lo rifiuta.
+- **Cosa non c'e in 1.0.0**: il provider **Google Maps** alternativo (fase 4b) e
+  la sezione **geologia** con i layer cartografici tematici (fase 6b). Sono
+  descritti nell'analisi e restano da fare; la cartografia funziona con
+  OpenStreetMap e i layer WMS configurabili.
+
+### Verificato
+- Nuova suite della stampa: 112 controlli via HTTP, fra cui che tutte le
+  sezioni compaiano in un solo documento, che le coordinate ridotte restino
+  ridotte, che le sezioni riservate non finiscano sul foglio di chi non puo
+  vederle, e che una foto sparita dal disco venga saltata senza rompere la
+  pagina.
+- Suite del generatore di esempi: 21 controlli, compresa la verifica di
+  integrita sull'archivio generato e il comportamento al secondo lancio.
+- Regressione completa su tutte le suite precedenti: nessun fallimento.
+
 ## [0.16.0] — 2026-08-06
 
 Fase 9b: importazione massiva da CSV. Con questa la **fase 9 e completa**.

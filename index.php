@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.16.0
+ *  Versione .....: 1.0.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.0.0  2026-08-07  D.Candela  Rotta della scheda da stampare.
  *  0.16.0 2026-08-06  D.Candela  Rotta dell'importazione massiva.
  *  0.15.0 2026-08-06  D.Candela  Rotte degli strumenti e del backup.
  *  0.14.0 2026-08-06  D.Candela  Rotta della migrazione fra cataloghi.
@@ -74,6 +75,7 @@ $pagine = [
     'geojson'      => ['file' => 'geojson.php',      'permesso' => 'consulta',           'titolo' => 'GeoJSON', 'grezza' => true],
     'tracciato'    => ['file' => 'tracciato.php',    'permesso' => 'consulta',           'titolo' => 'Tracciato', 'grezza' => true],
     'ipogei'       => ['file' => 'ipogei.php',       'permesso' => 'consulta',           'titolo' => 'Ipogei'],
+    'stampa'       => ['file' => 'stampa.php',       'permesso' => 'consulta',           'titolo' => 'Scheda da stampare', 'grezza' => true],
     'risorse'      => ['file' => 'risorse.php',      'permesso' => 'consulta',           'titolo' => 'Risorse'],
     'rilievo'      => ['file' => 'rilievo.php',      'permesso' => 'consulta',           'titolo' => 'Rilievo'],
     'ricerca'      => ['file' => 'ricerca.php',      'permesso' => 'ricerca',            'titolo' => 'Ricerca'],

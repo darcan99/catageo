@@ -1,0 +1,341 @@
+/* ============================================================================
+ *  CATAGEO — Catasto Ipogei
+ * ============================================================================
+ *  File .........: assets/css/catageo-stampa.css
+ *  Descrizione ..: Foglio di stile della scheda da stampare. Non dipende da
+ *                  Bootstrap: la pagina di stampa e un documento a se, e
+ *                  caricare un framework pensato per lo schermo dentro un
+ *                  foglio A4 porta piu problemi che aiuto (colonne che si
+ *                  spezzano, fondi grigi, margini pensati per il viewport).
+ *
+ *                  Regola generale: nero su bianco, niente fondi pieni, niente
+ *                  icone. Su una stampante in bianco e nero un fondo colorato
+ *                  diventa grigio e il testo sopra diventa illeggibile.
+ *  Versione .....: 1.0.0
+ *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+ *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
+ *  Copyright ....: (c) 2026 Dario Candela
+ * ----------------------------------------------------------------------------
+ *  CRONOLOGIA
+ *  1.0.0 2026-08-06  D.Candela  Prima stesura (fase 10).
+ * ============================================================================
+ */
+
+/* ============================================================================
+ *  PAGINA
+ *  Margini fissi in millimetri: la stampa e un oggetto fisico e le unita
+ *  relative non hanno senso qui. L'intestazione ripetuta su ogni foglio si
+ *  ottiene con position:fixed dentro @media print, che nei browser attuali
+ *  significa "in cima a ogni pagina".
+ * ========================================================================= */
+
+@page {
+    size: A4 portrait;
+    margin: 16mm 14mm 18mm 14mm;
+}
+
+html {
+    background: #fff;
+}
+
+body {
+    margin: 0;
+    padding: 12mm;
+    background: #fff;
+    color: #000;
+    font-family: "DejaVu Serif", Georgia, "Times New Roman", serif;
+    font-size: 10.5pt;
+    line-height: 1.4;
+}
+
+/* Anteprima a schermo: si simula il foglio, cosi chi guarda capisce subito
+   cosa uscira dalla stampante e non scopre l'impaginazione dopo. */
+@media screen {
+    body {
+        max-width: 210mm;
+        margin: 1.5rem auto;
+        padding: 14mm;
+        border: 1px solid #bbb;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+}
+
+/* ============================================================================
+ *  BARRA DEI COMANDI
+ *  Esiste solo a schermo: e il pulsante di stampa e il ritorno alla scheda.
+ * ========================================================================= */
+
+.stampa-comandi {
+    max-width: 210mm;
+    margin: 1.5rem auto -0.5rem auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 0.9rem;
+}
+
+.stampa-comandi a,
+.stampa-comandi button {
+    font: inherit;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid #666;
+    border-radius: 0.25rem;
+    background: #f4f4f4;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.stampa-comandi .stampa-nota {
+    border: 0;
+    background: none;
+    color: #444;
+    padding-left: 0.25rem;
+}
+
+@media print {
+    .stampa-comandi,
+    .stampa-solo-schermo {
+        display: none !important;
+    }
+}
+
+/* ============================================================================
+ *  TESTATA E PIEDE
+ * ========================================================================= */
+
+.stampa-testata {
+    border-bottom: 2px solid #000;
+    padding-bottom: 3mm;
+    margin-bottom: 5mm;
+}
+
+.stampa-testata .stampa-ente {
+    font-size: 8.5pt;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #333;
+}
+
+.stampa-testata h1 {
+    font-size: 16pt;
+    margin: 1mm 0 0 0;
+    line-height: 1.2;
+}
+
+.stampa-testata h1 .stampa-codice {
+    font-family: "DejaVu Sans Mono", Consolas, "Courier New", monospace;
+    font-size: 14pt;
+    margin-right: 0.4em;
+}
+
+.stampa-testata .stampa-sottotitolo {
+    font-size: 9.5pt;
+    color: #333;
+    margin: 1.5mm 0 0 0;
+}
+
+.stampa-piede {
+    margin-top: 6mm;
+    padding-top: 2mm;
+    border-top: 1px solid #000;
+    font-size: 8pt;
+    color: #333;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2mm;
+}
+
+/* ============================================================================
+ *  AVVISI
+ *  Riquadrati e non colorati: devono restare visibili in bianco e nero, ed e
+ *  cio che chi porta il foglio in campagna deve leggere per primo.
+ * ========================================================================= */
+
+.stampa-avvisi {
+    margin: 0 0 5mm 0;
+    padding: 0;
+    list-style: none;
+    border: 1.5pt solid #000;
+    padding: 2.5mm 3mm;
+}
+
+.stampa-avvisi li {
+    margin: 0 0 1.2mm 0;
+    padding-left: 1.2em;
+    text-indent: -1.2em;
+}
+
+.stampa-avvisi li:last-child {
+    margin-bottom: 0;
+}
+
+.stampa-avvisi li::before {
+    content: "\25A0\00A0";
+}
+
+.stampa-avvisi .stampa-grave {
+    font-weight: bold;
+}
+
+/* Timbro della riservatezza: un foglio che esce dall'applicativo e fuori da
+   ogni controllo, quindi lo deve dire da solo, su ogni pagina. */
+.stampa-riservato {
+    border: 2pt solid #000;
+    padding: 2mm 3mm;
+    margin-bottom: 4mm;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 9.5pt;
+}
+
+/* ============================================================================
+ *  SEZIONI E TABELLE DI CAMPI
+ * ========================================================================= */
+
+.stampa-sezione {
+    margin-bottom: 5mm;
+    /* Una sezione non deve iniziare a fondo pagina lasciando il titolo solo. */
+    break-inside: auto;
+}
+
+.stampa-sezione > h2 {
+    font-size: 11pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #000;
+    padding-bottom: 1mm;
+    margin: 0 0 2.5mm 0;
+    break-after: avoid;
+}
+
+.stampa-sezione > h3 {
+    font-size: 10pt;
+    margin: 3mm 0 1.5mm 0;
+    break-after: avoid;
+}
+
+.stampa-campi {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.stampa-campi th,
+.stampa-campi td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.7mm 2mm 0.7mm 0;
+    border-bottom: 0.5pt dotted #aaa;
+}
+
+.stampa-campi th {
+    width: 34mm;
+    font-weight: normal;
+    color: #333;
+}
+
+/* Due colonne di campi sulla stessa riga: la scheda ha molti valori corti e
+   una colonna sola sprecherebbe mezza pagina di bianco. */
+.stampa-doppia {
+    display: flex;
+    gap: 8mm;
+}
+
+.stampa-doppia > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.stampa-valore-mono {
+    font-family: "DejaVu Sans Mono", Consolas, "Courier New", monospace;
+}
+
+.stampa-vuoto {
+    color: #777;
+}
+
+/* ============================================================================
+ *  ELENCHI TABELLARI (esplorazioni, bibliografia, serie, evidenze)
+ * ========================================================================= */
+
+.stampa-elenco {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+}
+
+.stampa-elenco th,
+.stampa-elenco td {
+    text-align: left;
+    vertical-align: top;
+    padding: 1mm 2mm 1mm 0;
+    border-bottom: 0.5pt solid #ccc;
+}
+
+.stampa-elenco thead th {
+    border-bottom: 1pt solid #000;
+    font-size: 8.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.stampa-elenco tr {
+    break-inside: avoid;
+}
+
+/* ============================================================================
+ *  TESTI LUNGHI
+ * ========================================================================= */
+
+.stampa-testo {
+    margin: 0 0 2.5mm 0;
+    text-align: justify;
+    hyphens: auto;
+}
+
+.stampa-testo:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================================================
+ *  IMMAGINI
+ *  Un limite in millimetri e non in percentuale: la foto deve stare nella
+ *  pagina, non nella larghezza del viewport di chi ha premuto stampa.
+ * ========================================================================= */
+
+.stampa-immagini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4mm;
+}
+
+.stampa-immagine {
+    break-inside: avoid;
+    max-width: 84mm;
+}
+
+.stampa-immagine img {
+    display: block;
+    max-width: 84mm;
+    max-height: 70mm;
+    border: 0.5pt solid #999;
+}
+
+.stampa-immagine figcaption {
+    font-size: 8pt;
+    color: #333;
+    margin-top: 1mm;
+}
+
+/* ============================================================================
+ *  SALTO PAGINA
+ * ========================================================================= */
+
+.stampa-nuova-pagina {
+    break-before: page;
+}

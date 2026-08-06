@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.16.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+**Versione 1.0.0** — prima release installabile. Tutto quello che l'elenco qui sopra descrive è realizzato e provato, con due eccezioni dichiarate: il **provider Google Maps** alternativo (fase 4b) e la **sezione geologia** con i layer cartografici tematici (fase 6b) non ci sono ancora. La riga della geologia nell'elenco delle caratteristiche descrive quindi il progetto, non questa versione.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -47,7 +47,8 @@
 | 8b | Migrazione fra cataloghi: anteprima dei codici, lotto, tracciato, codici storici sempre risolvibili | ✅ fatto |
 | 9 | Strumenti: ricostruzione indici, verifica integrita, backup ZIP per catalogo, verifica dei collegamenti | ✅ fatto |
 | 9b | Import CSV massivo, con mappatura delle colonne e anteprima riga per riga | ✅ fatto |
-| 10 | Rifinitura, manuale utente, `v1.0.0` | ⏳ da fare |
+| 10 | Stampa della scheda, manuale utente, guida di installazione, dati di esempio, `v1.0.0` | ✅ fatto |
+| 11 | *(post-release)* Acquisizione da fonti pubbliche, previa verifica delle licenze | ⏳ da fare |
 
 Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.
 
@@ -61,7 +62,19 @@ Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): archi
 
 ## Installazione
 
-Documentazione in arrivo (`docs/INSTALLAZIONE.md`). In sintesi: copia della cartella via FTP, copia di `config.xml.dist` in `config.xml`, esecuzione di `installa.php` per creare l'archivio e il primo utente amministratore.
+Guida completa in **[docs/INSTALLAZIONE.md](docs/INSTALLAZIONE.md)**. In sintesi: copia della cartella via FTP, poi `installa.php` nel browser, che genera `config.xml`, crea l'archivio, i vocabolari e il primo amministratore.
+
+Per vedere l'applicativo pieno invece che vuoto:
+
+```
+php esempi/genera-esempi.php
+```
+
+crea un catalogo `ESEMPI` con cinque cavità fittizie che coprono i casi interessanti — scheda completa, cavità artificiale con archeologia, ubicazione a precisione ridotta, scheda riservata, bozza — e si toglie con `--rimuovi`.
+
+## Uso
+
+Il **[manuale utente](docs/MANUALE.md)** copre livelli di utenza, cataloghi e codici, censimento, coordinate, riservatezza, tutte le sezioni della scheda, ricerca, esportazioni, stampa, importazione e strumenti di manutenzione.
 
 ## Licenza
 

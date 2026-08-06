@@ -19,12 +19,15 @@ declare(strict_types=1);
  *                  programma un'uscita deve vedere subito che serve
  *                  un'autorizzazione, informazione che oggi vive nella memoria
  *                  di chi ha fatto le pratiche.
- *  Versione .....: 0.12.0
+ *  Versione .....: 1.0.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.0.0 2026-08-06  D.Candela  Via il punto doppio in coda all'avviso di
+ *                                vincolo, quando le prescrizioni finiscono con
+ *                                un punto loro.
  *  0.12.0  2026-08-06  D.Candela  Prima stesura (fase 7d).
  * ============================================================================
  */
@@ -212,6 +215,10 @@ final class Archeologia
         if ((string) $tutela['prescrizioni'] !== '') {
             $pezzi[] = (string) $tutela['prescrizioni'];
         }
+
+        // Le prescrizioni sono testo libero e di solito finiscono gia con un
+        // punto: senza togliere quello dei pezzi, l'avviso chiudeva con due.
+        $pezzi = array_map(static fn (string $p): string => rtrim(trim($p), '.'), $pezzi);
 
         return [[
             'livello' => 'warning',

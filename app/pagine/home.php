@@ -7,12 +7,13 @@ declare(strict_types=1);
  *  File .........: app/pagine/home.php
  *  Descrizione ..: Pagina iniziale: riepilogo dell'archivio, stato di
  *                  avanzamento delle fasi di sviluppo e collegamenti rapidi.
- *  Versione .....: 0.16.0
+ *  Versione .....: 1.0.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.0.0  2026-08-07  D.Candela  Fase 10 conclusa: prima release.
  *  0.16.0 2026-08-06  D.Candela  Fase 9b conclusa: resta solo la 10.
  *  0.15.0 2026-08-06  D.Candela  Fase 9 conclusa; l'import CSV diventa 9b.
  *  0.14.0 2026-08-06  D.Candela  Fase 8b conclusa: la fase 8 e completa.
@@ -77,7 +78,8 @@ $fasi = [
     ['8b', 'Migrazione fra cataloghi, con anteprima',          'fatta'],
     ['9',  'Indici, integrita, backup, verifica collegamenti',  'fatta'],
     ['9b', 'Import CSV massivo, con anteprima',                'fatta'],
-    ['10', 'Rifinitura e rilascio',                            'da fare'],
+    ['10', 'Stampa, manuale, dati di esempio, rilascio',      'fatta'],
+    ['11', 'Acquisizione da fonti pubbliche (post-release)',   'da fare'],
 ];
 ?>
 
@@ -228,6 +230,9 @@ $fasi = [
               <i class="bi bi-people-fill"></i> Utenti
             </a>
           <?php endif; ?>
+          <a class="btn btn-sm btn-outline-secondary" href="docs/MANUALE.md">
+            <i class="bi bi-book"></i> Manuale
+          </a>
           <a class="btn btn-sm btn-outline-secondary" href="docs/ANALISI.md">
             <i class="bi bi-file-text"></i> Documento di analisi
           </a>
