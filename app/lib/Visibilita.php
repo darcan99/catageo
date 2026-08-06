@@ -12,12 +12,14 @@ declare(strict_types=1);
  *                  all'elenco, alla scheda e alla mappa: tre punti diversi che
  *                  devono decidere allo stesso modo. Una regola di riservatezza
  *                  applicata in due posti su tre e una fuga di dati.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.11.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.11.0 2026-08-06  D.Candela  livelloVisibile() per le sezioni con
+ *                                riservatezza propria.
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
  * ============================================================================
  */
@@ -37,6 +39,20 @@ final class Visibilita
             return false;
         }
         return true;
+    }
+
+    /**
+     * True se l'utente corrente puo vedere qualcosa marcato con questo livello
+     * di riservatezza, indipendentemente dalla scheda che lo contiene.
+     *
+     * Serve alle sezioni che hanno una riservatezza propria e prevalente su
+     * quella dell'ipogeo: una serie di monitoraggio o un roost di chirotteri
+     * possono essere riservati dentro una cavita pubblica. Il caso contrario
+     * non si pone, perche a una scheda non visibile non si arriva.
+     */
+    public static function livelloVisibile(string $riservatezza): bool
+    {
+        return $riservatezza !== 'riservata' || Auth::puo('vedi_riservati');
     }
 
     /**

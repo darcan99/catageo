@@ -5,12 +5,13 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.9.0
+ *  Versione .....: 0.11.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.11.0 2026-08-06  D.Candela  Grafico SVG e voci bibliografiche.
  *  0.9.0  2026-08-06  D.Candela  Voci di diario, in lettura e nel modulo.
  *  0.8.0  2026-08-05  D.Candela  Visualizzatore 3D, documenti 2D, nota
  *                                leggibile nelle intestazioni.
@@ -403,6 +404,47 @@ a.catageo-geotag {
 
 a.catageo-geotag:hover {
     text-decoration: underline;
+}
+
+/* -------------------------------------------------------- dati scientifici */
+
+/* Il grafico e SVG generato dal server: i colori li mette qui il CSS, cosi
+   segue tema e tavolozza invece di restare l'unico riquadro chiaro in una
+   pagina scura. preserveAspectRatio="none" nell'SVG lo lascia deformare in
+   larghezza; l'altezza la fissa questa regola. */
+.catageo-grafico {
+    display: block;
+    width: 100%;
+    height: 18rem;
+    overflow: visible;
+}
+
+.catageo-grafico-linea {
+    fill: none;
+    stroke: var(--bs-primary);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    /* Senza questo la deformazione orizzontale della tela stirerebbe anche lo
+       spessore del tratto, rendendolo un nastro invece che una linea. */
+    vector-effect: non-scaling-stroke;
+}
+
+.catageo-grafico-griglia {
+    stroke: var(--bs-border-color);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+.catageo-grafico-asse {
+    stroke: var(--bs-secondary-color);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+.catageo-grafico-scala {
+    fill: var(--bs-secondary-color);
+    font-size: 11px;
+    font-family: var(--bs-font-monospace);
 }
 
 /* ------------------------------------------------------------ bibliografia */

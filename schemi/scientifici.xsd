@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/scientifici.xsd
+   Descrizione ..: Schema di "[codice] - Scientifici.xml": punti di misura e
+                   descrittori delle serie (6.13).
+
+                   Lo schema copre il DESCRITTORE, non le letture: quelle
+                   stanno nei CSV affiancati, uno per serie. Validare decine di
+                   migliaia di letture a ogni scrittura costerebbe piu della
+                   scrittura stessa, e un CSV si controlla meglio riga per riga
+                   in lettura, dove un valore fuori posto puo essere marcato
+                   invece che rifiutato.
+
+                   La riservatezza della serie e indipendente da quella
+                   dell'ipogeo: una cavita pubblica puo ospitare un
+                   monitoraggio che non va divulgato.
+   Versione .....: 0.11.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.11.0  2026-08-06  D.Candela  Prima stesura (fase 7c).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:simpleType name="tCifre">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodiceIpogeo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{1,60}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tData">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tGradi">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[+\-]?[0-9]{1,3}(\.[0-9]{1,10})?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tIdPunto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|PM[0-9]{1,9}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTipoAcquisizione">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="puntuale"/>
+      <xs:enumeration value="datalogger"/>
+      <xs:enumeration value="campagna"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tProvenienza">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="rilevamento_proprio"/>
+      <xs:enumeration value="ente_esterno"/>
+      <xs:enumeration value="pubblicazione"/>
+      <xs:enumeration value="stima"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Solo due valori: "coordinate_offuscate", che ha senso per un ingresso,
+       non ne ha per una serie di misure. -->
+  <xs:simpleType name="tRiservatezzaSerie">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="pubblica"/>
+      <xs:enumeration value="riservata"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="tMisuraConUnita">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="unita" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="scientifici">
+    <xs:complexType>
+      <xs:sequence>
+
+        <xs:element name="puntiMisura" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="punto" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="descrizione" type="xs:string" minOccurs="0"/>
+                    <xs:element name="latitudine" type="tGradi" minOccurs="0"/>
+                    <xs:element name="longitudine" type="tGradi" minOccurs="0"/>
+                    <xs:element name="quota" type="tMisuraConUnita" minOccurs="0"/>
+                    <!-- Distanza dall'ingresso lungo lo sviluppo: in cavita e
+                         piu utile della quota per ritrovare un punto. -->
+                    <xs:element name="progressivaInterna" type="tMisuraConUnita" minOccurs="0"/>
+                  </xs:all>
+                  <xs:attribute name="id" type="tIdPunto" use="required"/>
+                  <xs:attribute name="nome" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="serie" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="file" type="xs:string"/>
+              <xs:element name="titolo" type="xs:string"/>
+              <!-- Codice da grandezze.xml: il vocabolario e modificabile da
+                   ADM, quindi qui non si puo enumerare. Il controllo di
+                   esistenza lo fa la classe Scientifici. -->
+              <xs:element name="grandezza" type="xs:string"/>
+              <xs:element name="unita" type="xs:string" minOccurs="0"/>
+              <xs:element name="puntoMisura" type="tIdPunto" minOccurs="0"/>
+              <xs:element name="tipoAcquisizione" type="tTipoAcquisizione" minOccurs="0"/>
+              <!-- Durata ISO 8601, es. PT1H; vuoto se il passo e irregolare. -->
+              <xs:element name="passoTemporale" type="xs:string" minOccurs="0"/>
+
+              <xs:element name="strumento" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="modello" type="xs:string" minOccurs="0"/>
+                    <xs:element name="matricola" type="xs:string" minOccurs="0"/>
+                    <xs:element name="ultimaTaratura" type="tData" minOccurs="0"/>
+                    <xs:element name="incertezza" type="xs:string" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="responsabile" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="esploratoreId" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="gruppo" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="id" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="provenienza" minOccurs="0">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="tipo" type="tProvenienza" use="optional"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="periodo" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="dal" type="tData" use="optional"/>
+                  <xs:attribute name="al" type="tData" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="numeroLetture" type="tCifre" minOccurs="0"/>
+              <xs:element name="riservatezza" type="tRiservatezzaSerie" minOccurs="0"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+            </xs:all>
+
+            <xs:attribute name="progressivo" type="tCifre" use="required"/>
+            <xs:attribute name="sigla" type="xs:string" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+      <xs:attribute name="codiceIpogeo" type="tCodiceIpogeo" use="required"/>
+      <xs:attribute name="ultimoProgressivo" type="tCifre" use="required"/>
+    </xs:complexType>
+
+    <xs:unique name="unicitaProgressivoSerie">
+      <xs:selector xpath="serie"/>
+      <xs:field xpath="@progressivo"/>
+    </xs:unique>
+
+    <xs:unique name="unicitaIdPunto">
+      <xs:selector xpath="puntiMisura/punto"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

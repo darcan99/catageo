@@ -1027,6 +1027,16 @@ Tre scelte da motivare:
 
 Funzioni previste: inserimento manuale di una lettura singola, **importazione di CSV da datalogger** con mappatura interattiva delle colonne e riconoscimento dei formati di data, riepiloghi statistici (min/max/media/mediana per periodo), **grafici SVG generati lato server in PHP** — nessuna libreria JS di charting da includere, coerentemente col vincolo di zero dipendenze — ed esportazione della serie.
 
+**Scostamenti e precisazioni assunti in fase 7c** (2026-08-06):
+
+- **Il descrittore porta `<titolo>`**, che nello schema qui sopra non compariva: serve a nominare la serie in interfaccia e a comporre il nome del file CSV. Il nome del file **non segue** le modifiche del titolo, perché contiene dati e potrebbe essere già stato scaricato o citato.
+- **L'unità non si chiede a chi compila**: viene dalla grandezza scelta in `grandezze.xml`. Lasciarla libera permetterebbe di registrare gradi in una serie di metri senza che nulla lo segnali.
+- **`numeroLetture` e `<periodo>` sono ricalcolati** dal CSV a ogni scrittura, non dichiarati a mano: sono derivati, e un derivato scritto a mano prima o poi contraddice i dati da cui deriva.
+- **Le statistiche si fermano a 200.000 letture** per lettura singola, e il taglio è dichiarato in pagina quando scatta. Il CSV si scarica sempre intero: chi scarica vuole i dati, non un campione.
+- **La riduzione dei punti del grafico non è una media.** Ogni intervallo contribuisce con il proprio minimo e massimo, nell'ordine in cui compaiono: in una serie ambientale l'informazione sta nei picchi, e una media mobile leviga proprio quelli.
+- **Le statistiche per intervallo di date non ci sono ancora**: il riepilogo è sull'intera serie. Il taglio per periodo arriva con la ricerca (fase 8), che è dove serve davvero.
+- **La riservatezza della serie ammette solo `pubblica` e `riservata`**: `coordinate_offuscate` ha senso per un ingresso, non per una serie di misure.
+
 ### 6.14 Biospeleologia — `[codice] - Biospeleologia/`
 
 Osservazioni faunistiche generali più un blocco dedicato alle **colonie di chirotteri**, che per rilevanza conservazionistica e normativa merita trattamento a sé.

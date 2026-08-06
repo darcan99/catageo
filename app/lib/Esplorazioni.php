@@ -33,10 +33,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class EsplorazioneEccezione extends RuntimeException
-{
-}
-
 final class Esplorazioni
 {
     /** Versione dello schema scritta nei diari nuovi. */

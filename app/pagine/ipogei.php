@@ -943,6 +943,89 @@ if ($azione === 'scheda' && $codice !== '') {
         ?>
 
         <?php
+        /*
+         * I dati scientifici sono descrittori piu CSV, non risorse caricate:
+         * anche questa sezione si presenta da se. Le serie riservate non
+         * compaiono, perche la loro riservatezza e indipendente da quella
+         * dell'ipogeo e prevale su di essa.
+         */
+        if ($sigla === 'SC') {
+            $serieVisibili = Scientifici::serieVisibili($codiceCorrente);
+            $puntiMisura   = Scientifici::puntiMisura($codiceCorrente);
+            ?>
+            <div class="tab-pane fade" id="tabSezioneSC">
+              <div class="catageo-intestazione mb-3">
+                <div>
+                  <h2 class="h5 mb-0">Dati scientifici</h2>
+                  <p class="text-body-secondary mb-0">
+                    <?= count($serieVisibili) ?> serie ·
+                    <?= count($puntiMisura) ?> punt<?= count($puntiMisura) === 1 ? 'o' : 'i' ?> di misura
+                  </p>
+                </div>
+                <a class="btn btn-sm <?= $serieVisibili === [] ? 'btn-primary' : 'btn-outline-secondary' ?> catageo-non-stampare"
+                   href="index.php?p=scientifici&amp;codice=<?= urlencode($codiceCorrente) ?>">
+                  <i class="bi bi-graph-up"></i>
+                  <?= $serieVisibili === [] ? 'Avvia un monitoraggio' : 'Gestisci le serie' ?>
+                </a>
+              </div>
+
+              <?php if ($serieVisibili === []): ?>
+                <div class="card">
+                  <div class="card-body d-flex gap-3">
+                    <i class="bi bi-graph-up fs-3 text-body-secondary" aria-hidden="true"></i>
+                    <div>
+                      <h3 class="h6 mb-1">Nessuna serie di misure</h3>
+                      <p class="text-body-secondary mb-0">
+                        Ogni serie e un CSV di letture con il suo descrittore, che
+                        si accoda nel tempo e si apre in un foglio di calcolo.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              <?php else: ?>
+                <div class="card">
+                  <div class="table-responsive">
+                    <table class="table catageo-tabella mb-0 align-middle">
+                      <thead>
+                        <tr>
+                          <th style="width:5rem">Rif.</th>
+                          <th>Serie</th>
+                          <th>Grandezza</th>
+                          <th>Periodo</th>
+                          <th class="text-end">Letture</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($serieVisibili as $s): ?>
+                          <?php $ps = (int) $s['progressivo']; ?>
+                          <tr>
+                            <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('SC', $ps)) ?></span></td>
+                            <td>
+                              <a href="index.php?p=scientifici&amp;codice=<?= urlencode($codiceCorrente) ?>&amp;azione=serie&amp;prog=<?= $ps ?>">
+                                <?= Testo::esc((string) $s['titolo']) ?>
+                              </a>
+                            </td>
+                            <td><?= Testo::esc(Grandezze::etichetta((string) $s['grandezza'])) ?></td>
+                            <td class="catageo-nota">
+                              <?= Testo::esc((string) $s['periodoDal']) ?>
+                              <?= (string) $s['periodoAl'] !== (string) $s['periodoDal']
+                                  ? '→ ' . Testo::esc((string) $s['periodoAl']) : '' ?>
+                            </td>
+                            <td class="text-end catageo-valore"><?= (int) ($s['numeroLetture'] ?: 0) ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </div>
+            <?php
+            continue;
+        }
+        ?>
+
+        <?php
         $contenuti  = Risorse::elenco($codiceCorrente, $sigla);
         $caricabile = Sezioni::caricabile($sigla);
         $vista      = Sezioni::anteprima($sigla);

@@ -33,10 +33,6 @@ declare(strict_types=1);
  * ============================================================================
  */
 
-class BibliografiaEccezione extends RuntimeException
-{
-}
-
 final class Bibliografia
 {
     public const VERSIONE_SCHEMA = '1.0';

@@ -6,6 +6,53 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.11.0] — 2026-08-06
+
+Fase 7c: dati scientifici.
+
+### Aggiunto
+- **Punti di misura** stabili nel tempo: due misure "in sala grande" prese a
+  cinque anni di distanza restano confrontabili solo se riferite allo stesso
+  punto dichiarato. Un punto usato da una serie non si puo togliere.
+- **Serie di misure** a due file: un descrittore XML con strumento, taratura,
+  responsabile e provenienza; un CSV per le letture, che si accoda senza
+  rileggerlo e si apre in un foglio di calcolo. Il CSV ripete strumento, unita
+  e provenienza in ogni riga, cosi resta comprensibile anche estratto da solo.
+- **Le letture sbagliate non si cancellano, si marcano** (valido, sospetto,
+  anomalo, scartato); un valore vuoto e ammesso e significa "lo strumento c'era
+  e non ha misurato", cosa diversa dall'assenza di riga.
+- **Importazione da datalogger** in due passi, con anteprima del file e
+  mappatura delle colonne suggerita per nome. Riconosce il separatore, il BOM,
+  le date italiane e la virgola decimale; le righe illeggibili vengono scartate
+  **e dichiarate col motivo**, non perse in silenzio.
+- **Statistiche** (minimo, massimo, media, mediana, periodo) e **grafico SVG
+  generato dal server**: nessuna libreria JS di charting, coerentemente col
+  vincolo di zero dipendenze. Il grafico si stampa, si vede senza JavaScript e
+  segue tema e tavolozza perche i colori li mette il CSS.
+- La riduzione dei punti del grafico **conserva minimo e massimo di ogni
+  intervallo** invece di mediare: in una serie ambientale l'informazione sta nei
+  picchi, e una media li leviga via. Il taglio e dichiarato sul grafico stesso.
+- **Riservatezza propria della serie**, indipendente da quella dell'ipogeo e
+  prevalente: una cavita pubblica puo ospitare un monitoraggio che non va
+  divulgato. Vale anche per lo scarico del CSV.
+- Pannello Dati scientifici nella scheda; schema `scientifici.xsd`.
+- `Visibilita::livelloVisibile()`, per le sezioni con riservatezza propria.
+
+### Corretto
+- **Errore fatale al posto del messaggio di errore.** Sollevare
+  `ScientificiEccezione` in un ramo raggiunto prima di qualunque uso della
+  classe `Scientifici` produceva un 500: l'autoload risolve una classe per file,
+  e l'eccezione era dichiarata dentro `Scientifici.php`. La convenzione giusta
+  era gia documentata in `XmlEccezione.php` ma non era stata seguita: le
+  eccezioni di fase 7, 7b e 7c sono ora in file propri.
+
+### Note sulle prove
+- Due controlli fallivano per difetti dell'harness che **imitavano** difetti del
+  codice: `` `u{FEFF} `` e sintassi di PowerShell 6+ e in 5.1 finiva nel file di
+  prova come testo, quindi la prova sul BOM non provava il BOM; e un trattino
+  lungo in uno script letto come ANSI non corrisponde a quello della pagina.
+  Terza volta che uno strumento di misura viene scambiato per un difetto.
+
 ## [0.10.0] — 2026-08-06
 
 Fase 7b: bibliografia.
