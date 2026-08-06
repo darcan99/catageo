@@ -42,6 +42,14 @@ $schede = [
         'attive'      => Esploratori::conta(true),
     ],
     [
+        'url'         => 'index.php?p=opere',
+        'titolo'      => 'Catalogo delle opere',
+        'icona'       => 'bi-journals',
+        'descrizione' => 'Opere citabili da piu schede: si censiscono una volta e si correggono in un posto solo.',
+        'conteggio'   => Opere::conta(),
+        'attive'      => Opere::conta(true),
+    ],
+    [
         'url'         => 'index.php?p=vocabolari&amp;voc=tipologie',
         'titolo'      => 'Tipologie di ipogeo',
         'icona'       => 'bi-diagram-3',

@@ -952,6 +952,14 @@ Il catalogo generale `dati/bibliografia_generale.xml` esiste per un motivo prati
 
 `dati/bibliografia_generale.xml` contiene le stesse informazioni bibliografiche di una voce `inline`, con `id="OP012"`. Fra gli strumenti ADM è prevista una **verifica dei link** che interroga gli URL e aggiorna `<ultimaVerifica>`, con invito ad archiviare una copia locale delle pagine importanti: i riferimenti web si rompono in pochi anni e un catasto ha vita più lunga.
 
+**Scostamenti e precisazioni assunti in fase 7b** (2026-08-06):
+
+- **La verifica dei link è per ora manuale.** L'esito si registra dalla scheda, scegliendolo fra `raggiungibile`, `irraggiungibile`, `spostato`, `non verificato`. Interrogare davvero gli URL richiede chiamate in uscita, che molti hosting economici bloccano: l'automatismo resta in fase 9, con degradazione dichiarata. La struttura del dato è però già quella definitiva.
+- **L'indice porta `ultimoProgressivo`**, come per le esplorazioni: i progressivi delle voci non si riusano, così `BB002` citato in una relazione indica sempre la stessa fonte.
+- **`n_biblio` conta le voci dell'indice, non i file.** La bibliografia è l'unica sezione senza file per voce, e il conteggio generale — che scorre le cartelle — restituiva sempre zero.
+- **Lo schema non lega i campi al tipo di voce.** XSD 1.0 non sa scegliere un tipo complesso in base a un attributo, e usare tre elementi con nomi diversi farebbe perdere l'ordinamento unico per progressivo. La coerenza fra tipo e campi è quindi imposta dalla classe `Bibliografia`, che scrive solo i campi previsti; l'XSD controlla ciò che sa controllare davvero (vocabolari chiusi, formato delle date, unicità dei progressivi).
+- **Gli identificativi delle opere si riusano.** `Anagrafica` deriva il prossimo id dal massimo presente: cancellando `OP012` il successivo torna a essere `OP012`. Il rischio in applicativo è chiuso, perché un'opera citata non è cancellabile; ma un riferimento cartaceo a `OP012` non sarebbe più affidabile. Vale per tutte le anagrafiche ed è da risolvere con un `ultimoId` persistente, come già fatto per le sezioni.
+
 ### 6.13 Dati scientifici — `[codice] - Scientifici/`
 
 Sezione a **due file** (D8): un XML che descrive punti di misura, strumenti e serie; uno o più **CSV** che contengono le letture. Ogni serie ha storicità completa e i campi richiesti — misura, unità di misura, data, strumento, esploratore e/o provenienza del dato.

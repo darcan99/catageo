@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/bibliografia.xsd
+   Descrizione ..: Schema di "[codice] - Bibliografia.xml", la bibliografia di
+                   un singolo ipogeo (6.12).
+
+                   Le tre forme di voce - riferimento, inline, link - hanno
+                   campi diversi ma vivono nello stesso elemento <voce>,
+                   distinte dall'attributo "tipo". Sarebbe piu preciso definire
+                   tre tipi complessi distinti, ma XSD 1.0 non sa scegliere il
+                   tipo in base a un attributo: l'unica alternativa sarebbero
+                   tre elementi con nomi diversi, e la sezione perderebbe
+                   l'ordinamento unico per progressivo che le serve.
+
+                   Il compromesso e quindi consapevole: tutti i campi sono
+                   opzionali e lo schema non impedisce a un <voce tipo="link">
+                   di portare un ISBN. A far rispettare la coerenza fra tipo e
+                   campi e la classe Bibliografia, che scrive solo i campi
+                   previsti dal tipo; qui si controlla cio che XSD sa
+                   controllare davvero - vocabolari chiusi, formato delle date,
+                   unicita dei progressivi.
+   Versione .....: 0.10.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.10.0  2026-08-06  D.Candela  Prima stesura (fase 7b).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:simpleType name="tCifre">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodiceIpogeo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{1,60}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tData">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tAnno">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Riferimento a un'altra sezione dello stesso ipogeo: AL001, FO003... -->
+  <xs:simpleType name="tRiferimento">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Z]{2}[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tIdOpera">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|OP[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTipoVoce">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="riferimento"/>
+      <xs:enumeration value="inline"/>
+      <xs:enumeration value="link"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTipoOpera">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="libro"/>
+      <xs:enumeration value="articolo"/>
+      <xs:enumeration value="atti"/>
+      <xs:enumeration value="tesi"/>
+      <xs:enumeration value="relazione"/>
+      <xs:enumeration value="cartografia"/>
+      <xs:enumeration value="archivio"/>
+      <xs:enumeration value="web"/>
+      <xs:enumeration value="altro"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Quanto la fonte pesa per QUESTO ipogeo, non in assoluto. -->
+  <xs:simpleType name="tRilevanza">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="primaria"/>
+      <xs:enumeration value="secondaria"/>
+      <xs:enumeration value="citazione"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tEsitoVerifica">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="raggiungibile"/>
+      <xs:enumeration value="irraggiungibile"/>
+      <xs:enumeration value="spostato"/>
+      <xs:enumeration value="non verificato"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="tUltimaVerifica">
+    <xs:simpleContent>
+      <xs:extension base="tData">
+        <xs:attribute name="esito" type="tEsitoVerifica" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="bibliografia">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="voce" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <!-- riferimento -->
+              <xs:element name="operaId" type="tIdOpera" minOccurs="0"/>
+              <xs:element name="tavole" type="xs:string" minOccurs="0"/>
+
+              <!-- inline -->
+              <xs:element name="tipoOpera" type="tTipoOpera" minOccurs="0"/>
+              <xs:element name="autori" type="xs:string" minOccurs="0"/>
+              <xs:element name="contenitore" type="xs:string" minOccurs="0"/>
+              <xs:element name="editore" type="xs:string" minOccurs="0"/>
+              <xs:element name="luogo" type="xs:string" minOccurs="0"/>
+              <xs:element name="anno" type="tAnno" minOccurs="0"/>
+              <xs:element name="volume" type="xs:string" minOccurs="0"/>
+              <xs:element name="fascicolo" type="xs:string" minOccurs="0"/>
+              <xs:element name="isbnIssn" type="xs:string" minOccurs="0"/>
+              <xs:element name="doi" type="xs:string" minOccurs="0"/>
+              <xs:element name="lingua" type="xs:string" minOccurs="0"/>
+              <xs:element name="abstract" type="xs:string" minOccurs="0"/>
+              <xs:element name="allegatoRif" type="tRiferimento" minOccurs="0"/>
+
+              <!-- link -->
+              <xs:element name="url" type="xs:string" minOccurs="0"/>
+              <xs:element name="ente" type="xs:string" minOccurs="0"/>
+              <xs:element name="dataConsultazione" type="tData" minOccurs="0"/>
+              <xs:element name="copiaArchiviata" type="tRiferimento" minOccurs="0"/>
+              <xs:element name="ultimaVerifica" type="tUltimaVerifica" minOccurs="0"/>
+
+              <!-- comuni: titolo e pagine servono a piu di un tipo -->
+              <xs:element name="titolo" type="xs:string" minOccurs="0"/>
+              <xs:element name="pagine" type="xs:string" minOccurs="0"/>
+              <xs:element name="rilevanza" type="tRilevanza" minOccurs="0"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+            </xs:all>
+
+            <xs:attribute name="progressivo" type="tCifre" use="required"/>
+            <xs:attribute name="sigla" type="xs:string" use="optional"/>
+            <xs:attribute name="tipo" type="tTipoVoce" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+      <xs:attribute name="codiceIpogeo" type="tCodiceIpogeo" use="required"/>
+      <!-- L'ultimo numero assegnato, non il piu alto presente: i progressivi
+           non si riusano, cosi "BB002" citato in una relazione indica sempre
+           la stessa fonte. -->
+      <xs:attribute name="ultimoProgressivo" type="tCifre" use="required"/>
+    </xs:complexType>
+
+    <xs:unique name="unicitaProgressivoVoce">
+      <xs:selector xpath="voce"/>
+      <xs:field xpath="@progressivo"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

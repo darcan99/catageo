@@ -16,12 +16,15 @@ declare(strict_types=1);
  *                  E unico e globale, con la colonna del catalogo in testa:
  *                  una sola scansione copre tutta l'installazione e il filtro
  *                  per catalogo diventa un confronto di campo.
- *  Versione .....: 0.4.0
+ *  Versione .....: 0.10.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.10.0 2026-08-06  D.Candela  n_biblio contava file in una sezione che non
+ *                                ne ha, quindi restava sempre a zero: ora
+ *                                conta le voci dell'indice.
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
  * ============================================================================
  */
@@ -346,6 +349,18 @@ final class IndiceIpogei
         foreach (Sezioni::sigle() as $sigla) {
             $sotto = Percorsi::unisci($cartella, Sezioni::nomeCartella($codice, $sigla));
             if (!is_dir($sotto)) {
+                continue;
+            }
+
+            /*
+             * La bibliografia e l'unica sezione senza file per voce: una fonte
+             * e solo metadato, e l'eventuale PDF vive fra gli allegati.
+             * Contando i file si otteneva sempre zero, perche l'unico file
+             * presente e proprio l'indice, che viene escluso. Qui si contano
+             * quindi le voci dentro l'indice.
+             */
+            if ($sigla === 'BB') {
+                $conteggi['BB'] = Bibliografia::conta($codice);
                 continue;
             }
 

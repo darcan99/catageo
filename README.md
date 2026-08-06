@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.9.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+🚧 **In sviluppo** — versione corrente **0.10.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -40,7 +40,8 @@
 | 5 | Allegati, foto con miniature, video, consegna mediata, metadati EXIF/GPS | ✅ fatto |
 | 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ✅ fatto |
 | 7 | Esplorazioni: diari di uscita, partecipanti anche fuori anagrafica, punti georiferiti, cronologia e filtri | ✅ fatto |
-| 7b | Bibliografia, dati scientifici, biospeleologia, archeologia | ⏳ da fare |
+| 7b | Bibliografia: catalogo generale delle opere, tre forme di voce, citazioni per sigla, export BibTeX | ✅ fatto |
+| 7c | Dati scientifici, biospeleologia, archeologia | ⏳ da fare |
 | 8 | Ricerca testuale, per attributi e geografica; migrazione fra cataloghi | ⏳ da fare |
 | 9–10 | Strumenti di manutenzione, rifinitura, manuale, `v1.0.0` | ⏳ da fare |
 

@@ -6,6 +6,46 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.10.0] — 2026-08-06
+
+Fase 7b: bibliografia.
+
+### Aggiunto
+- **Catalogo generale delle opere** (`dati/bibliografia_generale.xml`), fra le
+  anagrafiche. Una monografia che descrive quaranta cavita si censisce una volta
+  e si cita quaranta volte: correggerne l'editore costa una correzione, non
+  quaranta. L'elenco di chi la cita non e memorizzato, si ricava.
+- **Bibliografia di sezione** con tre forme di voce: rimando a un'opera del
+  catalogo (con pagine e tavole di *questa* cavita), fonte propria dell'ipogeo,
+  risorsa in rete. Le voci si presentano raggruppate per rilevanza, che e
+  l'ordine in cui si vogliono leggere.
+- **Export BibTeX** della bibliografia di un ipogeo e dell'intero catalogo.
+  CATAGEO non impone uno stile bibliografico normalizzato: chi deve applicarne
+  uno lo fa con lo strumento che gia usa.
+- **Verifica dei collegamenti**: l'esito si registra dalla scheda, anche quando
+  e negativo. Sapere che un link e rotto vale piu che non sapere nulla, ed e
+  cio che spinge ad archiviarne una copia fra gli allegati.
+- Pannello Bibliografia nella scheda dell'ipogeo.
+- Schemi `bibliografia.xsd` e `bibliografia-generale.xsd`.
+
+### Corretto
+- **`n_biblio` nell'indice generale era sempre zero.** Il conteggio scorre i
+  file presenti nella cartella di una sezione, escludendo l'XML di indice; la
+  bibliografia e l'unica sezione **senza file per voce**, quindi l'unico file
+  presente era proprio quello escluso. Ora per `BB` si contano le voci.
+- **Una rilevanza non indicata faceva fallire il salvataggio** con un errore di
+  validazione XSD invece di prendere il valore di riposo: il modulo manda tutti
+  i campi, anche vuoti, e la stringa vuota vinceva sul valore predefinito.
+
+### Note sulle prove
+- Tutti i controlli sull'export BibTeX fallivano per un difetto dell'harness,
+  non dell'applicativo: con un `Content-Type` che PowerShell non riconosce come
+  testo, `Invoke-WebRequest` restituisce i byte grezzi. Il file era corretto
+  dall'inizio. Prima di credere a un fallimento, verificare lo strumento.
+- Resta noto e documentato che **gli identificativi delle anagrafiche si
+  riusano** dopo una cancellazione. In applicativo il danno e chiuso, perche
+  un'opera citata non si puo cancellare; un riferimento cartaceo a `OP012` no.
+
 ## [0.9.0] — 2026-08-06
 
 Fase 7: i diari di esplorazione.

@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.9.0
+ *  Versione .....: 0.10.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.10.0 2026-08-06  D.Candela  Rotte di bibliografia, opere ed export BibTeX.
  *  0.9.0  2026-08-06  D.Candela  Rotte delle esplorazioni.
  *  0.8.0  2026-08-05  D.Candela  Rotte del rilievo e del tracciato.
  *  0.7.0  2026-08-05  D.Candela  Rotta della gestione risorse.
@@ -72,9 +73,12 @@ $pagine = [
     'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
     'esplorazioni' => ['file' => 'esplorazioni.php', 'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
     'esplorazione' => ['file' => 'esplorazione.php', 'permesso' => 'consulta',           'titolo' => 'Diario'],
+    'bibliografia' => ['file' => 'bibliografia.php', 'permesso' => 'consulta',           'titolo' => 'Bibliografia'],
+    'bibtex'       => ['file' => 'bibtex.php',       'permesso' => 'esporta',            'titolo' => 'BibTeX', 'grezza' => true],
     'anagrafiche'  => ['file' => 'anagrafiche.php',  'permesso' => 'anagrafiche',        'titolo' => 'Anagrafiche'],
     'gruppi'       => ['file' => 'gruppi.php',       'permesso' => 'anagrafiche',        'titolo' => 'Gruppi speleologici'],
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
+    'opere'        => ['file' => 'opere.php',        'permesso' => 'anagrafiche',        'titolo' => 'Catalogo delle opere'],
     'vocabolari'   => ['file' => 'vocabolari.php',   'permesso' => 'anagrafiche',        'titolo' => 'Vocabolari'],
     'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],
     'strumenti'    => ['file' => 'in-sviluppo.php',  'permesso' => 'strumenti',          'titolo' => 'Strumenti'],

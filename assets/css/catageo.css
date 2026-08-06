@@ -405,6 +405,30 @@ a.catageo-geotag:hover {
     text-decoration: underline;
 }
 
+/* ------------------------------------------------------------ bibliografia */
+
+/* Una voce bibliografica e un blocco di testo che continua a capo: il rientro
+   sulle righe successive e la convenzione tipografica che permette di contare
+   le voci a colpo d'occhio in un elenco lungo. */
+.catageo-voce-biblio {
+    padding: 0.55rem 0;
+    padding-left: 1.6rem;
+    text-indent: -1.6rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.catageo-voce-biblio:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+/* Il rientro negativo vale per il testo della citazione, non per i blocchi
+   annidati: senza questo, dati e note ereditano la sporgenza e si disallineano. */
+.catageo-voce-biblio .catageo-dati-media,
+.catageo-voce-biblio p {
+    text-indent: 0;
+}
+
 /* ------------------------------------------------------------- esplorazioni */
 
 /* Una voce di diario e un'ora accanto a un racconto. La colonna dell'ora e

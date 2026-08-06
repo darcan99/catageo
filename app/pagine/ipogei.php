@@ -882,6 +882,67 @@ if ($azione === 'scheda' && $codice !== '') {
         ?>
 
         <?php
+        /*
+         * La bibliografia non ha file per voce: una fonte e solo metadato, e
+         * l'eventuale PDF vive fra gli allegati. Anche questa sezione si
+         * presenta da se, con la propria pagina al posto della gestione
+         * risorse.
+         */
+        if ($sigla === 'BB') {
+            $fonti = array_map([Bibliografia::class, 'risolvi'], Bibliografia::elenco($codiceCorrente));
+            ?>
+            <div class="tab-pane fade" id="tabSezioneBB">
+              <div class="catageo-intestazione mb-3">
+                <div>
+                  <h2 class="h5 mb-0">Bibliografia</h2>
+                  <p class="text-body-secondary mb-0">
+                    <?= count($fonti) ?> font<?= count($fonti) === 1 ? 'e' : 'i' ?>
+                  </p>
+                </div>
+                <a class="btn btn-sm <?= $fonti === [] ? 'btn-primary' : 'btn-outline-secondary' ?> catageo-non-stampare"
+                   href="index.php?p=bibliografia&amp;codice=<?= urlencode($codiceCorrente) ?>">
+                  <i class="bi bi-book"></i>
+                  <?= $fonti === [] ? 'Registra la prima fonte' : 'Gestisci le fonti' ?>
+                </a>
+              </div>
+
+              <?php if ($fonti === []): ?>
+                <div class="card">
+                  <div class="card-body d-flex gap-3">
+                    <i class="bi bi-book fs-3 text-body-secondary" aria-hidden="true"></i>
+                    <div>
+                      <h3 class="h6 mb-1">Nessuna fonte registrata</h3>
+                      <p class="text-body-secondary mb-0">
+                        Un rimando al catalogo generale delle opere, una fonte
+                        propria di questo ipogeo, o una risorsa in rete.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              <?php else: ?>
+                <div class="card">
+                  <div class="card-body">
+                    <?php foreach ($fonti as $fonte): ?>
+                      <div class="catageo-voce-biblio">
+                        <span class="catageo-valore">
+                          <?= Testo::esc(Sezioni::riferimento('BB', (int) $fonte['progressivo'])) ?>
+                        </span>
+                        <?= Testo::esc(Bibliografia::citazione($fonte)) ?>
+                        <span class="catageo-nota">
+                          · <?= Testo::esc(Bibliografia::RILEVANZE[(string) $fonte['rilevanza']] ?? '') ?>
+                        </span>
+                      </div>
+                    <?php endforeach; ?>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </div>
+            <?php
+            continue;
+        }
+        ?>
+
+        <?php
         $contenuti  = Risorse::elenco($codiceCorrente, $sigla);
         $caricabile = Sezioni::caricabile($sigla);
         $vista      = Sezioni::anteprima($sigla);
