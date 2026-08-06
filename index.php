@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.9.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.9.0  2026-08-06  D.Candela  Rotte delle esplorazioni.
  *  0.8.0  2026-08-05  D.Candela  Rotte del rilievo e del tracciato.
  *  0.7.0  2026-08-05  D.Candela  Rotta della gestione risorse.
  *  0.6.0  2026-08-05  D.Candela  Rotte della mappa e del GeoJSON; risposte
@@ -69,7 +70,8 @@ $pagine = [
     'risorse'      => ['file' => 'risorse.php',      'permesso' => 'consulta',           'titolo' => 'Risorse'],
     'rilievo'      => ['file' => 'rilievo.php',      'permesso' => 'consulta',           'titolo' => 'Rilievo'],
     'ricerca'      => ['file' => 'in-sviluppo.php',  'permesso' => 'ricerca',            'titolo' => 'Ricerca'],
-    'esplorazioni' => ['file' => 'in-sviluppo.php',  'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
+    'esplorazioni' => ['file' => 'esplorazioni.php', 'permesso' => 'consulta',           'titolo' => 'Esplorazioni'],
+    'esplorazione' => ['file' => 'esplorazione.php', 'permesso' => 'consulta',           'titolo' => 'Diario'],
     'anagrafiche'  => ['file' => 'anagrafiche.php',  'permesso' => 'anagrafiche',        'titolo' => 'Anagrafiche'],
     'gruppi'       => ['file' => 'gruppi.php',       'permesso' => 'anagrafiche',        'titolo' => 'Gruppi speleologici'],
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
@@ -84,7 +86,6 @@ $pagine = [
 $fasiPreviste = [
     'ipogei'       => 'Fase 3 — scheda ipogeo, censimento, indice',
     'ricerca'      => 'Fase 8 — ricerca testuale, per attributi e geografica',
-    'esplorazioni' => 'Fase 7 — diari esplorativi',
     'anagrafiche'  => 'Fase 2 — gruppi, esploratori, tipologie, grandezze',
     'cataloghi'    => 'Fase 2b — cataloghi e serie di codifica',
     'strumenti'    => 'Fase 9 — indici, integrita, backup, import/export',

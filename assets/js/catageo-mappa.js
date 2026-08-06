@@ -13,12 +13,13 @@
  *                  I dati arrivano dal GeoJSON del server, che ha gia applicato
  *                  la riservatezza: qui non si decide cosa mostrare, si mostra
  *                  cio che e stato inviato.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.9.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.9.0  2026-08-06  D.Candela  Tracciato da dati gia presenti in pagina.
  *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sovrapposti.
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
  * ============================================================================
@@ -377,6 +378,27 @@
         window.CATAGEO.mappa = mappa;
     }
 
+    /** Tracciato i cui dati sono gia nella pagina (punti di un diario). */
+    function avviaMappaTracciatoInPagina(contenitore, cfg, dati) {
+        var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
+        aggiungiCoordinate(mappa);
+
+        window.CATAGEO = window.CATAGEO || {};
+        window.CATAGEO.mappa = mappa;
+
+        if (!dati || !dati.features || !dati.features.length) {
+            return;
+        }
+
+        var strato = costruisciTracciato(dati);
+        strato.addTo(mappa);
+
+        var limiti = strato.getBounds();
+        if (limiti.isValid()) {
+            mappa.fitBounds(limiti, { padding: [30, 30], maxZoom: cfg.zoomScheda || 17 });
+        }
+    }
+
     function avviaMappaElenco(contenitore, cfg) {
         var urlDati = contenitore.getAttribute('data-catageo-geojson');
         var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
@@ -637,6 +659,29 @@
      * Restituisce il layer creato, cosi chi chiama puo inquadrarlo insieme al
      * resto invece di due inquadrature che si sovrascrivono.
      */
+    /**
+     * Strato Leaflet da una raccolta GeoJSON gia in memoria.
+     *
+     * E separato dallo scaricamento perche non tutti i tracciati arrivano dalla
+     * rete: i punti di un diario sono gia nella pagina che li elenca, e farne
+     * una seconda richiesta significherebbe rileggere lo stesso file due volte.
+     */
+    function costruisciTracciato(dati) {
+        return L.geoJSON(dati, {
+            style: function () { return STILE_TRACCIATO; },
+            pointToLayer: function (elemento, posizione) {
+                return L.circleMarker(posizione, {
+                    radius: 4, color: '#ffffff', weight: 1.5,
+                    fillColor: STILE_TRACCIATO.color, fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function (elemento, strato) {
+                var contenuto = popupTracciato(elemento.properties || {});
+                if (contenuto) { strato.bindPopup(contenuto); }
+            }
+        });
+    }
+
     function aggiungiTracciato(mappa, url, alFatto) {
         fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
             .then(function (risposta) {
@@ -646,20 +691,7 @@
             .then(function (dati) {
                 if (dati.errore) { throw new Error(dati.errore); }
 
-                var strato = L.geoJSON(dati, {
-                    style: function () { return STILE_TRACCIATO; },
-                    pointToLayer: function (elemento, posizione) {
-                        return L.circleMarker(posizione, {
-                            radius: 4, color: '#ffffff', weight: 1.5,
-                            fillColor: STILE_TRACCIATO.color, fillOpacity: 0.9
-                        });
-                    },
-                    onEachFeature: function (elemento, strato) {
-                        var contenuto = popupTracciato(elemento.properties || {});
-                        if (contenuto) { strato.bindPopup(contenuto); }
-                    }
-                });
-
+                var strato = costruisciTracciato(dati);
                 strato.addTo(mappa);
                 alFatto(null, strato, dati.catageo || {});
             })
@@ -753,11 +785,15 @@
 
         var elenco = document.getElementById('catageoMappa');
         if (elenco) {
-            // Lo stesso contenitore serve due usi: l'elenco degli ipogei e la
-            // vista di un singolo tracciato. Li distingue l'attributo presente.
+            // Lo stesso contenitore serve tre usi: l'elenco degli ipogei, un
+            // tracciato da scaricare e un tracciato gia presente in pagina.
+            // Li distingue l'attributo presente.
             var tracciato = elenco.getAttribute('data-catageo-tracciato');
+            var inPagina  = elenco.getAttribute('data-catageo-tracciato-json');
             if (tracciato) {
                 avviaMappaTracciato(elenco, cfg, tracciato);
+            } else if (inPagina) {
+                avviaMappaTracciatoInPagina(elenco, cfg, leggiJson(inPagina, null));
             } else {
                 avviaMappaElenco(elenco, cfg);
             }

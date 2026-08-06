@@ -5,12 +5,13 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.8.0
+ *  Versione .....: 0.9.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.9.0  2026-08-06  D.Candela  Voci di diario, in lettura e nel modulo.
  *  0.8.0  2026-08-05  D.Candela  Visualizzatore 3D, documenti 2D, nota
  *                                leggibile nelle intestazioni.
  *  0.7.1  2026-08-05  D.Candela  Finestra dei media e dati sotto le miniature.
@@ -402,6 +403,46 @@ a.catageo-geotag {
 
 a.catageo-geotag:hover {
     text-decoration: underline;
+}
+
+/* ------------------------------------------------------------- esplorazioni */
+
+/* Una voce di diario e un'ora accanto a un racconto. La colonna dell'ora e
+   stretta e a larghezza fissa: se seguisse il contenuto, le ore si
+   disallineerebbero fra una voce e l'altra e si perderebbe la sequenza, che
+   e la sola cosa che un diario deve rendere evidente. */
+.catageo-voce {
+    display: flex;
+    gap: 0.85rem;
+    padding: 0.65rem 0;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.catageo-voce:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.catageo-voce-ora {
+    flex: 0 0 3.6rem;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color);
+    padding-top: 0.1rem;
+}
+
+.catageo-voce-corpo {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Nel modulo ogni voce e un blocco riquadrato: senza un contorno le righe di
+   campi di voci diverse si fondono e non si capisce piu dove finisce una. */
+.catageo-voce-modulo {
+    border: 1px solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
 }
 
 /* ------------------------------------------------------------------ rilievi */

@@ -7,12 +7,14 @@ declare(strict_types=1);
  *  File .........: app/pagine/home.php
  *  Descrizione ..: Pagina iniziale: riepilogo dell'archivio, stato di
  *                  avanzamento delle fasi di sviluppo e collegamenti rapidi.
- *  Versione .....: 0.8.1
+ *  Versione .....: 0.9.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.9.0  2026-08-06  D.Candela  Fase 7 conclusa; la parte non fatta della 7
+ *                                diventa 7b, cosi l'elenco dice il vero.
  *  0.8.1  2026-08-05  D.Candela  Elenco delle fasi riallineato allo stato.
  *  0.1.0  2026-08-04  D.Candela  Prima stesura.
  * ============================================================================
@@ -60,7 +62,8 @@ $fasi = [
     ['5',  'Allegati, foto con miniature, video, metadati',    'fatta'],
     ['6',  'Rilievi 2D/3D, KML su mappa, viewer three.js',     'fatta'],
     ['6b', 'Geologia e layer cartografici tematici',           'da fare'],
-    ['7',  'Esplorazioni, bibliografia, scienza, bio, archeo', 'da fare'],
+    ['7',  'Esplorazioni: diari, partecipanti, cronologia',    'fatta'],
+    ['7b', 'Bibliografia, scienza, biospeleologia, archeo',    'da fare'],
     ['8',  'Ricerca e migrazione fra cataloghi',               'da fare'],
     ['9',  'Strumenti di manutenzione',                        'da fare'],
     ['10', 'Rifinitura e rilascio',                            'da fare'],

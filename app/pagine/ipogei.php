@@ -804,6 +804,83 @@ if ($azione === 'scheda' && $codice !== '') {
 
       <!-- ------------------------------------------------------- sezioni -->
       <?php foreach (Sezioni::sigle() as $sigla): ?>
+
+        <?php
+        /*
+         * Le esplorazioni non sono file caricati ma documenti redatti, e il loro
+         * indice ha una forma tutta sua: la sezione si presenta da se, con la
+         * pagina dei diari al posto della gestione delle risorse.
+         */
+        if ($sigla === 'ES') {
+            $diari = Esplorazioni::elenco($codiceCorrente);
+            ?>
+            <div class="tab-pane fade" id="tabSezioneES">
+              <div class="catageo-intestazione mb-3">
+                <div>
+                  <h2 class="h5 mb-0">Esplorazioni</h2>
+                  <p class="text-body-secondary mb-0">
+                    <?= count($diari) ?> uscit<?= count($diari) === 1 ? 'a' : 'e' ?>
+                  </p>
+                </div>
+                <a class="btn btn-sm <?= $diari === [] ? 'btn-primary' : 'btn-outline-secondary' ?> catageo-non-stampare"
+                   href="index.php?p=esplorazione&amp;codice=<?= urlencode($codiceCorrente) ?>">
+                  <i class="bi bi-journal-text"></i>
+                  <?= $diari === [] ? 'Scrivi il primo diario' : 'Vedi i diari' ?>
+                </a>
+              </div>
+
+              <?php if ($diari === []): ?>
+                <div class="card">
+                  <div class="card-body d-flex gap-3">
+                    <i class="bi bi-journal-text fs-3 text-body-secondary" aria-hidden="true"></i>
+                    <div>
+                      <h3 class="h6 mb-1">Nessun diario</h3>
+                      <p class="text-body-secondary mb-0">
+                        Ogni uscita diventa un documento autonomo nella cartella
+                        <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codiceCorrente, 'ES')) ?></span>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              <?php else: ?>
+                <div class="card">
+                  <div class="table-responsive">
+                    <table class="table catageo-tabella mb-0 align-middle">
+                      <thead>
+                        <tr>
+                          <th style="width:5rem">Rif.</th>
+                          <th style="width:7rem">Data</th>
+                          <th>Titolo</th>
+                          <th>Tipo</th>
+                          <th class="text-end">Voci</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php foreach ($diari as $d): ?>
+                          <?php $pd = (int) $d['progressivo']; ?>
+                          <tr>
+                            <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('ES', $pd)) ?></span></td>
+                            <td><?= Testo::esc((string) $d['dataInizio']) ?></td>
+                            <td>
+                              <a href="index.php?p=esplorazione&amp;codice=<?= urlencode($codiceCorrente) ?>&amp;azione=vedi&amp;prog=<?= $pd ?>">
+                                <?= Testo::esc((string) $d['titolo']) ?>
+                              </a>
+                            </td>
+                            <td><?= Testo::esc(Esplorazioni::TIPI[(string) $d['tipo']] ?? (string) $d['tipo']) ?></td>
+                            <td class="text-end catageo-valore"><?= (int) $d['voci'] ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              <?php endif; ?>
+            </div>
+            <?php
+            continue;
+        }
+        ?>
+
         <?php
         $contenuti  = Risorse::elenco($codiceCorrente, $sigla);
         $caricabile = Sezioni::caricabile($sigla);

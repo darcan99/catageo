@@ -832,7 +832,8 @@ Un file per esplorazione, così che il diario resti un documento autonomo e legg
   <oraInizio>09:30</oraInizio>
   <dataFine>2024-05-12</dataFine>
   <oraFine>15:45</oraFine>
-  <durataOre>6.25</durataOre>
+  <!-- la durata non si memorizza: si ricalcola, vedi nota di progetto -->
+
   <gruppi>
     <gruppo id="G001"/>
     <gruppo id="G004"/>
@@ -873,9 +874,15 @@ Un file per esplorazione, così che il diario resti un documento autonomo e legg
 </esplorazione>
 ```
 
-**Nota di progetto**: le foto **non** vengono duplicate nella cartella Esplorazioni. Restano in `[codice] - Foto` e vengono richiamate per codice (`FO001`). Una singola foto può così comparire nella galleria dell'ipogeo e nel diario, con un solo file su disco.
+**Nota di progetto**: le foto **non** vengono duplicate nella cartella Esplorazioni. Restano in `[codice] - Foto` e vengono richiamate per codice (`FO001`). Una singola foto può così comparire nella galleria dell'ipogeo e nel diario, con un solo file su disco. Un riferimento a una foto poi rimossa viene **segnalato** nella pagina del diario, non omesso: un buco silenzioso fa credere che la voce non avesse foto.
 
 `[codice] - Esplorazioni.xml` fa da indice leggero (progressivo, titolo, date, gruppi, file) per non aprire tutti i diari.
+
+**Scostamenti assunti in fase 7** (2026-08-06):
+
+- **`<durataOre>` non viene memorizzata.** Lo schema qui sopra la prevedeva come elemento; è invece **ricalcolata** da date e orari a ogni lettura. Un dato derivato memorizzato è un dato che prima o poi contraddice quelli da cui deriva — basta correggere l'ora di uscita e dimenticare di aggiornare la durata.
+- **L'indice porta `ultimoProgressivo`.** È l'unico dato dell'indice che *non* si ricava dai diari presenti: serve a non riusare il numero di un diario rimosso, perché un «ES003» citato in una relazione deve indicare la stessa uscita anche fra dieci anni. Il numero si cerca anche fra i file in `[codice] - _rimossi`, così sopravvive alla cancellazione dell'indice, che resta una cache ricostruibile.
+- **Partecipanti fuori anagrafica.** Un `<partecipante>` ha `esploratoreId` **oppure** `nome`: chi partecipa a una sola uscita si registra col nome, senza obbligare a creare una scheda di anagrafica che poi resta lì.
 
 ### 6.11 Formato degli indici CSV
 

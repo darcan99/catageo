@@ -6,6 +6,47 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.9.0] — 2026-08-06
+
+Fase 7: i diari di esplorazione.
+
+### Aggiunto
+- **Diari di uscita**, uno per file XML nella cartella `[codice] - Esplorazioni`.
+  Un diario e un documento che sta in piedi da solo e va letto anche fuori
+  dall'applicativo: per questo non finisce dentro `Dati.xml` ma resta un file
+  con un nome che dice cosa contiene.
+- **Voci di diario** con ora, testo libero, posizione e foto. Le posizioni
+  finiscono su una mappa nella pagina del diario; le foto sono **riferimenti**
+  alla galleria dell'ipogeo (`FO001`) e non copie, cosi la stessa foto resta un
+  file solo. Un riferimento a una foto poi rimossa viene **segnalato in rosso**,
+  non nascosto: un buco silenzioso e peggio di un buco visibile.
+- **Partecipanti** presi dall'anagrafica oppure scritti a mano: chi viene una
+  volta sola non deve costringere a creare una scheda che poi resta li.
+- **Vista trasversale** delle esplorazioni di tutto il catasto, con filtri per
+  gruppo, esploratore, periodo e catalogo, cronologia raggruppata per anno e
+  riepiloghi per tipo e per anno.
+- Pannello Esplorazioni nella scheda dell'ipogeo, al posto del segnaposto
+  "in arrivo".
+- Schemi `esplorazione.xsd` ed `esplorazioni-indice.xsd`.
+
+### Corretto
+- **I progressivi delle esplorazioni si riusavano.** Il prossimo numero veniva
+  dedotto dai file presenti: rimosso ES001, il diario successivo tornava a
+  essere ES001, e ogni "ES001" gia citato in una relazione avrebbe puntato a
+  un'altra uscita. Ora l'indice registra `ultimoProgressivo`, e il numero si
+  cerca anche fra i file in `_rimossi`, cosi resiste pure alla cancellazione
+  dell'indice.
+- La scrittura di un diario **pretendeva tutti i campi**: registrare un'uscita
+  con solo titolo, tipo e data faceva fallire il salvataggio invece di lasciare
+  vuoto il resto.
+
+### Note sulle prove
+- Un utente USR **non riceve alcun token CSRF** da nessuna pagina, perche non
+  gli viene mai mostrato un modulo. Il suo tentativo di POST viene quindi
+  respinto dal controllo del token *prima* di arrivare a quello del permesso: la
+  prova lo dichiara apertamente e verifica il controllo del permesso sul codice,
+  invece di spacciare per prova sui permessi una prova che parla d'altro.
+
 ## [0.8.1] — 2026-08-05
 
 Il riquadro nero del visualizzatore 3D.
