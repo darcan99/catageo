@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.7.1**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+🚧 **In sviluppo** — versione corrente **0.8.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -38,7 +38,7 @@
 | 4 | Mappa Leaflet/OSM, marker, raggruppamento, layer WMS, mappa di scheda | ✅ fatto |
 | 4b | Provider Google Maps alternativo | ⏳ da fare |
 | 5 | Allegati, foto con miniature, video, consegna mediata, metadati EXIF/GPS | ✅ fatto |
-| 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ⏳ da fare |
+| 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ✅ fatto |
 | 7 | Esplorazioni, bibliografia, dati scientifici, biospeleologia, archeologia | ⏳ da fare |
 | 8 | Ricerca testuale, per attributi e geografica; migrazione fra cataloghi | ⏳ da fare |
 | 9–10 | Strumenti di manutenzione, rifinitura, manuale, `v1.0.0` | ⏳ da fare |
@@ -49,6 +49,8 @@ Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): archi
 
 - PHP **8.0+** (compatibile 7.4) con `dom`, `libxml`, `simplexml`, `mbstring`, `json`, `fileinfo`, `session`
 - `gd` opzionale (generazione miniature, con fallback se assente)
+- `exif` opzionale (data e coordinate dalle foto)
+- `zip` opzionale (rilievi in formato KMZ; i KML funzionano comunque)
 - Nessun database, nessun `mod_rewrite`, nessuna shell
 
 ## Installazione

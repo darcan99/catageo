@@ -13,12 +13,13 @@ declare(strict_types=1);
  *                  le due cose avrebbe aggiunto altre cinquecento righe a un
  *                  file che ne ha gia millesettecento, e chi consulta non ha
  *                  bisogno di vedere i moduli di caricamento.
- *  Versione .....: 0.7.1
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  Sezione dei rilievi con i suoi campi.
  *  0.7.1  2026-08-05  D.Candela  Finestra dei media, dati sotto le miniature,
  *                                coordinate correggibili a mano.
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
@@ -110,6 +111,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'urlEsterno'        => (string) ($_POST['urlEsterno'] ?? ''),
             'latitudine'        => catageoGradi((string) ($_POST['latitudine'] ?? ''), 90.0),
             'longitudine'       => catageoGradi((string) ($_POST['longitudine'] ?? ''), 180.0),
+
+            'tipoRilievo'        => (string) ($_POST['tipoRilievo'] ?? ''),
+            'scala'              => (string) ($_POST['scala'] ?? ''),
+            'sistemaRiferimento' => (string) ($_POST['sistemaRiferimento'] ?? ''),
+            'dataRilievo'        => (string) ($_POST['dataRilievo'] ?? ''),
+            'strumentazione'     => (string) ($_POST['strumentazione'] ?? ''),
+            'rilevatori'         => (string) ($_POST['rilevatori'] ?? ''),
+            // Una casella non spuntata non arriva affatto nel POST: senza il
+            // campo sentinella ogni caricamento spegnerebbe il tracciato, perche
+            // il modulo di caricamento la casella non ce l'ha.
+            'mostraInMappa'      => isset($_POST['conMostraInMappa'])
+                ? (empty($_POST['mostraInMappa']) ? '0' : '1')
+                : '1',
         ];
     };
 
@@ -479,7 +493,13 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
               </td>
               <td>
                 <?php if ($presente): ?>
-                  <?php if ($conFinestra): ?>
+                  <?php if ($anteprima === 'rilievo'): ?>
+                    <?php // Il rilievo ha una pagina propria: si guarda a lungo. ?>
+                    <a href="index.php?p=rilievo&amp;codice=<?= urlencode($codice) ?>&amp;prog=<?= $prog ?>">
+                      <i class="bi bi-<?= Risorse::tridimensionale($risorsa) ? 'badge-3d' : 'file-earmark-ruled' ?>"></i>
+                      <?= Testo::esc((string) $risorsa['file']) ?>
+                    </a>
+                  <?php elseif ($conFinestra): ?>
                     <a href="<?= Testo::esc($url($prog, false, true)) ?>"
                        <?= catageoAttributiMedia($risorsa, $codice, $sigla) ?>>
                       <i class="bi bi-play-circle"></i>
@@ -489,6 +509,30 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
                     <a href="<?= Testo::esc($url($prog)) ?>"><?= Testo::esc((string) $risorsa['file']) ?></a>
                   <?php endif; ?>
                   <?= catageoDatiMedia($risorsa, false) ?>
+
+                  <?php if ($anteprima === 'rilievo'): ?>
+                    <div class="catageo-dati-media">
+                      <?php if (Risorse::tridimensionale($risorsa)): ?>
+                        <span class="badge text-bg-light border"><i class="bi bi-badge-3d"></i> modello 3D</span>
+                      <?php endif; ?>
+                      <?php if (Tracciato::convertibile((string) $risorsa['file'])): ?>
+                        <?php if (Risorse::mappabile($risorsa)): ?>
+                          <span class="badge text-bg-light border"><i class="bi bi-bezier2"></i> in mappa</span>
+                        <?php else: ?>
+                          <span class="badge text-bg-light border text-body-secondary"
+                                title="Tracciato convertibile ma escluso dalla mappa">
+                            <i class="bi bi-eye-slash"></i> escluso dalla mappa
+                          </span>
+                        <?php endif; ?>
+                      <?php endif; ?>
+                      <?php if ((string) $risorsa['tipoRilievo'] !== ''): ?>
+                        <span><?= Testo::esc((string) $risorsa['tipoRilievo']) ?></span>
+                      <?php endif; ?>
+                      <?php if ((string) $risorsa['scala'] !== ''): ?>
+                        <span>scala <?= Testo::esc((string) $risorsa['scala']) ?></span>
+                      <?php endif; ?>
+                    </div>
+                  <?php endif; ?>
                 <?php else: ?>
                   <span class="text-danger" title="Registrato nell'indice ma assente dalla cartella">
                     <i class="bi bi-exclamation-triangle-fill"></i>
@@ -651,6 +695,76 @@ $inModifica   = $daModificare > 0 && $puoGestire
               <?php endif; ?>
             </div>
           </div>
+        <?php endif; ?>
+
+        <?php if ($anteprima === 'rilievo'): ?>
+          <input type="hidden" name="conMostraInMappa" value="1">
+
+          <div class="col-md-4">
+            <label for="mTipoRilievo" class="form-label">Tipo di rilievo</label>
+            <select class="form-select" id="mTipoRilievo" name="tipoRilievo">
+              <option value="">—</option>
+              <?php foreach (['pianta', 'sezione', 'spaccato', 'poligonale', 'modello 3D'] as $t): ?>
+                <option value="<?= $t ?>" <?= (string) $inModifica['tipoRilievo'] === $t ? 'selected' : '' ?>><?= $t ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label for="mScala" class="form-label">Scala</label>
+            <input type="text" class="form-control" id="mScala" name="scala" maxlength="40"
+                   value="<?= Testo::esc((string) $inModifica['scala']) ?>" placeholder="1:100">
+          </div>
+
+          <div class="col-md-4">
+            <label for="mDataRilievo" class="form-label">Data del rilievo</label>
+            <input type="date" class="form-control" id="mDataRilievo" name="dataRilievo"
+                   value="<?= Testo::esc((string) $inModifica['dataRilievo']) ?>">
+          </div>
+
+          <div class="col-md-4">
+            <label for="mSistema" class="form-label">Sistema di riferimento</label>
+            <select class="form-select" id="mSistema" name="sistemaRiferimento">
+              <option value="">—</option>
+              <?php foreach (Coordinate::sistemi() as $cod => $sis): ?>
+                <option value="<?= Testo::esc((string) $cod) ?>"
+                  <?= (string) $inModifica['sistemaRiferimento'] === (string) $cod ? 'selected' : '' ?>>
+                  <?= Testo::esc((string) $sis['nome']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+            <div class="catageo-nota">In che sistema sono le coordinate del rilievo.</div>
+          </div>
+
+          <div class="col-md-4">
+            <label for="mStrumentazione" class="form-label">Strumentazione</label>
+            <input type="text" class="form-control" id="mStrumentazione" name="strumentazione" maxlength="200"
+                   value="<?= Testo::esc((string) $inModifica['strumentazione']) ?>"
+                   placeholder="DistoX2, bussola e clinometro">
+          </div>
+
+          <div class="col-md-4">
+            <label for="mRilevatori" class="form-label">Rilevatori</label>
+            <input type="text" class="form-control" id="mRilevatori" name="rilevatori" maxlength="300"
+                   value="<?= Testo::esc((string) $inModifica['rilevatori']) ?>"
+                   placeholder="Separati da virgola">
+          </div>
+
+          <?php if (Tracciato::convertibile((string) $inModifica['file'])): ?>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="mMostraInMappa" name="mostraInMappa"
+                       value="1" <?= (string) $inModifica['mostraInMappa'] !== '0' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="mMostraInMappa">
+                  Sovrapponi questo tracciato alla mappa della scheda
+                </label>
+              </div>
+              <div class="catageo-nota">
+                Da spegnere quando un ipogeo ha piu rilievi dello stesso ramo e mostrarli
+                tutti insieme renderebbe la mappa illeggibile.
+              </div>
+            </div>
+          <?php endif; ?>
         <?php endif; ?>
 
         <div class="col-12">

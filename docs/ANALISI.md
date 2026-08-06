@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Progetto** | CATAGEO (CATAsto ipoGEi) |
-| **Versione documento** | 1.3.0 |
+| **Versione documento** | 1.4.0 |
 | **Data** | 2026-08-05 |
 | **Autore** | Dario Candela — darcan99@gmail.com |
 | **Repository** | github.com/darcan99/catageo |
@@ -19,6 +19,7 @@
 | 1.1.0 | 2026-08-04 | Dario Candela | Cataloghi multipli con serie di codifica a contatori indipendenti e strumento di migrazione tra cataloghi; padding del progressivo a soglia minima e senza tetto; testi senza limiti di lunghezza; nuove sezioni su file dedicati (bibliografia, dati scientifici, biospeleologia, archeologia, geologia); apertura al censimento di ipogei esteri |
 | 1.2.0 | 2026-08-05 | Dario Candela | Sistemi di riferimento e formati delle coordinate (D13) e conversione reale fra datum diversi (D14); stato di realizzazione della cartografia dopo la fase 4 (§7.2.1) e attributi dei layer (§7.2.2), con lo scostamento sull'astrazione del provider dichiarato in §7.1.1 |
 | 1.3.0 | 2026-08-05 | Dario Candela | Stato di realizzazione delle risorse dopo la fase 5 (§9.2–9.5); riservatezza per singola risorsa oltre che per scheda |
+| 1.4.0 | 2026-08-05 | Dario Candela | Stato di realizzazione dei rilievi dopo la fase 6 (§9.4.1); gli stili del KML dichiarati fuori ambito con la motivazione |
 
 ---
 
@@ -1422,6 +1423,28 @@ Una precisazione rispetto a quanto scritto sopra: la riservatezza è **per singo
 - **2D**: PDF (viewer nativo del browser in `<iframe>`), immagini raster/SVG con zoom-pan, DXF/DWG solo come download.
 - **Sulla mappa**: KML/KMZ/GPX come da §7.3.
 - **3D**: viewer three.js self-hosted per **PLY, OBJ, STL, GLTF/GLB** (loader inclusi), con orbit control, wireframe, assi, misura approssimativa della bounding box. Formati topografici specialistici (Therion `.th/.th2`, Survex `.3d`, VisualTopo `.tro`, Compass `.plt`) sono **archiviati e scaricabili**, ma la visualizzazione richiede l'esportazione da parte dell'operatore in KML (per la mappa) e/o PLY/OBJ (per il 3D). Questa è una scelta deliberata: implementare parser di quei formati in PHP/JS non è sostenibile in v1.
+
+#### 9.4.1 Stato di realizzazione (fase 6)
+
+| Funzione | Stato | Nota |
+|---|---|---|
+| Caricamento dei rilievi con i metadati di 6.9 | fatto | tipo, scala, sistema, data, strumentazione, rilevatori |
+| KML, KMZ e GPX convertiti in GeoJSON lato server | fatto | `Tracciato`, senza plugin JavaScript |
+| Tracciato sulla mappa della scheda e su quella del rilievo | fatto | l'inquadratura si estende, non sostituisce |
+| Esclusione di un singolo tracciato dalla mappa | fatto | quando piu rilievi dello stesso ramo la renderebbero illeggibile |
+| PDF nel visualizzatore nativo del browser | fatto | `<iframe>`, niente libreria di rendering |
+| Immagini raster come rilievo 2D | fatto | senza zoom-pan dedicato |
+| Viewer 3D per PLY, OBJ, STL, GLTF/GLB | fatto | three.js r169 in locale, caricamento su richiesta |
+| Orbit control, filo di ferro, assi, ingombro | fatto | l'ingombro e in "unita del file", non in metri |
+| Formati specialistici archiviati e scaricabili | fatto | con l'indicazione di cosa esportare |
+| **Zoom-pan** dedicato per le immagini 2D | **da fare** | oggi si apre l'originale a dimensione piena |
+| **Stili del KML** | **non previsto** | vedi sotto |
+| **GroundOverlay** del KML | **da fare** | le sovrapposizioni raster vengono ignorate |
+| **Misura sul modello 3D** | **da fare** | oggi si legge solo l'ingombro complessivo |
+
+Sugli **stili**: la conversione legge geometrie e nomi, non `<Style>`. Uno stile tradotto a meta produce una mappa peggiore di una mappa con uno stile coerente scelto da noi, quindi il colore dei tracciati lo decide CATAGEO. E una scelta, non una mancanza.
+
+Sul **limite di 12 MB** per la conversione: un rilievo di poligonale sta in poche centinaia di kilobyte, e un KML da decine di megabyte e quasi sempre un modello esportato per sbaglio. Oltre il limite il file resta archiviato e scaricabile, ma non viene sovrapposto alla mappa.
 
 ### 9.5 Video
 

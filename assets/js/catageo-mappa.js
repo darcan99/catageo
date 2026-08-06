@@ -13,12 +13,13 @@
  *                  I dati arrivano dal GeoJSON del server, che ha gia applicato
  *                  la riservatezza: qui non si decide cosa mostrare, si mostra
  *                  cio che e stato inviato.
- *  Versione .....: 0.6.0
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sovrapposti.
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
  * ============================================================================
  */
@@ -332,6 +333,50 @@
 
     // ------------------------------------------------------- mappa principale
 
+    /**
+     * Mappa che mostra soltanto un tracciato di rilievo.
+     *
+     * E il caso della pagina del singolo rilievo: non ci sono marker di ipogei
+     * da raggruppare, c'e una geometria da guardare.
+     */
+    function avviaMappaTracciato(contenitore, cfg, urlTracciato) {
+        var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
+        var stato = document.getElementById('catageoTracciatoStato');
+
+        aggiungiCoordinate(mappa);
+
+        if (stato) { stato.textContent = 'Caricamento del tracciato…'; }
+
+        aggiungiTracciato(mappa, urlTracciato, function (errore, strato, meta) {
+            if (errore) {
+                if (stato) { stato.textContent = 'Tracciato non caricato: ' + errore.message; }
+                return;
+            }
+
+            var limiti = strato.getBounds();
+            if (limiti.isValid()) {
+                mappa.fitBounds(limiti, { padding: [30, 30], maxZoom: 19 });
+            }
+
+            if (stato) {
+                var pezzi = [];
+                Object.keys(meta.riepilogo || {}).forEach(function (tipo) {
+                    pezzi.push(meta.riepilogo[tipo] + ' ' + tipo);
+                });
+                stato.textContent = pezzi.length ? pezzi.join(' · ') : 'Nessuna geometria nel file';
+
+                // Gli avvisi non si nascondono: un rilievo che non si e potuto
+                // convertire deve dirlo, altrimenti sembra solo che manchi.
+                if (meta.avvisi && meta.avvisi.length) {
+                    stato.textContent += ' — ' + meta.avvisi.join(' ');
+                }
+            }
+        });
+
+        window.CATAGEO = window.CATAGEO || {};
+        window.CATAGEO.mappa = mappa;
+    }
+
     function avviaMappaElenco(contenitore, cfg) {
         var urlDati = contenitore.getAttribute('data-catageo-geojson');
         var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
@@ -552,6 +597,77 @@
             });
     }
 
+    // ------------------------------------------------------------- tracciati
+
+    /**
+     * Stile dei rilievi sovrapposti alla mappa.
+     *
+     * Il colore lo decide CATAGEO e non il file: gli stili KML tradotti a meta
+     * producono una mappa peggiore di una mappa con uno stile coerente. Il
+     * magenta non e casuale — non compare quasi mai nella cartografia di sfondo,
+     * quindi un tracciato resta visibile sia su bosco sia su abitato.
+     */
+    var STILE_TRACCIATO = {
+        color: '#d6208f',
+        weight: 3,
+        opacity: 0.95,
+        fillColor: '#d6208f',
+        fillOpacity: 0.15
+    };
+
+    /** Contenuto del popup di una geometria di rilievo. */
+    function popupTracciato(proprieta) {
+        var righe = '';
+        if (proprieta.nome) {
+            righe += '<div class="catageo-popup-titolo">' + esc(proprieta.nome) + '</div>';
+        }
+        if (proprieta.rilievo) {
+            righe += '<div class="catageo-popup-codice">' + esc(proprieta.rilievo)
+                  + (proprieta.rilievoTitolo ? ' · ' + esc(proprieta.rilievoTitolo) : '') + '</div>';
+        }
+        if (proprieta.descrizione) {
+            righe += '<div class="mt-1">' + esc(proprieta.descrizione) + '</div>';
+        }
+        return righe === '' ? null : '<div class="catageo-popup">' + righe + '</div>';
+    }
+
+    /**
+     * Scarica un tracciato GeoJSON e lo sovrappone alla mappa.
+     *
+     * Restituisce il layer creato, cosi chi chiama puo inquadrarlo insieme al
+     * resto invece di due inquadrature che si sovrascrivono.
+     */
+    function aggiungiTracciato(mappa, url, alFatto) {
+        fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+            .then(function (risposta) {
+                if (!risposta.ok) { throw new Error('HTTP ' + risposta.status); }
+                return risposta.json();
+            })
+            .then(function (dati) {
+                if (dati.errore) { throw new Error(dati.errore); }
+
+                var strato = L.geoJSON(dati, {
+                    style: function () { return STILE_TRACCIATO; },
+                    pointToLayer: function (elemento, posizione) {
+                        return L.circleMarker(posizione, {
+                            radius: 4, color: '#ffffff', weight: 1.5,
+                            fillColor: STILE_TRACCIATO.color, fillOpacity: 0.9
+                        });
+                    },
+                    onEachFeature: function (elemento, strato) {
+                        var contenuto = popupTracciato(elemento.properties || {});
+                        if (contenuto) { strato.bindPopup(contenuto); }
+                    }
+                });
+
+                strato.addTo(mappa);
+                alFatto(null, strato, dati.catageo || {});
+            })
+            .catch(function (errore) {
+                alFatto(errore, null, null);
+            });
+    }
+
     // --------------------------------------------------------- mappa di scheda
 
     function avviaMappaScheda(contenitore, cfg) {
@@ -602,6 +718,26 @@
 
         aggiungiCoordinate(mappa);
 
+        // Rilievi georiferiti dell'ipogeo, se ce ne sono: e la sovrapposizione
+        // che rende la mappa di scheda utile a chi cerca l'ingresso, perche
+        // mostra dove va la cavita e non solo dove si entra.
+        var urlTracciati = contenitore.getAttribute('data-catageo-tracciati');
+        if (urlTracciati) {
+            aggiungiTracciato(mappa, urlTracciati, function (errore, strato, meta) {
+                if (errore || !strato) {
+                    return; // la mappa col solo ingresso resta valida
+                }
+                var limiti = strato.getBounds();
+                if (limiti.isValid()) {
+                    // Si estende l'inquadratura al tracciato tenendo dentro
+                    // l'ingresso: inquadrare solo il tracciato lo perderebbe.
+                    limiti.extend(latlng);
+                    mappa.fitBounds(limiti, { padding: [25, 25], maxZoom: cfg.zoomScheda });
+                }
+                window.CATAGEO.tracciati = meta;
+            });
+        }
+
         window.CATAGEO = window.CATAGEO || {};
         window.CATAGEO.mappa = mappa;
         window.CATAGEO.punto = latlng;
@@ -617,7 +753,14 @@
 
         var elenco = document.getElementById('catageoMappa');
         if (elenco) {
-            avviaMappaElenco(elenco, cfg);
+            // Lo stesso contenitore serve due usi: l'elenco degli ipogei e la
+            // vista di un singolo tracciato. Li distingue l'attributo presente.
+            var tracciato = elenco.getAttribute('data-catageo-tracciato');
+            if (tracciato) {
+                avviaMappaTracciato(elenco, cfg, tracciato);
+            } else {
+                avviaMappaElenco(elenco, cfg);
+            }
         }
 
         var scheda = document.getElementById('catageoMappaSchedaBox');

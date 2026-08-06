@@ -19,12 +19,13 @@
                    - l'ordine degli elementi dentro <risorsa> non e imposto
                      (xs:all): un indice corretto a mano resta valido anche se
                      chi lo modifica sposta una riga.
-   Versione .....: 0.7.1
+   Versione .....: 0.8.0
    Sviluppatore .: Dario Candela <darcan99@gmail.com>
    Licenza ......: GNU GPL v3.0 - vedi LICENSE
    Copyright ....: (c) 2026 Dario Candela
   ............................................................................
    CRONOLOGIA
+   0.8.0  2026-08-05  D.Candela  Campi dei rilievi.
    0.7.1  2026-08-05  D.Candela  Coordinate della singola risorsa.
    0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
   ============================================================================
@@ -135,6 +136,18 @@
 
       <!-- Specifico dei video ospitati altrove, per non consumare spazio. -->
       <xs:element name="urlEsterno" type="xs:string" minOccurs="0"/>
+
+      <!-- Specifici dei rilievi (6.9). La possibilita di sovrapporre il
+           tracciato alla mappa e di aprire il modello in 3D si deduce dal
+           formato del file; mostraInMappa serve solo a spegnere un tracciato
+           che sporcherebbe la mappa, non ad accenderne uno non convertibile. -->
+      <xs:element name="tipoRilievo" type="xs:string" minOccurs="0"/>
+      <xs:element name="scala" type="xs:string" minOccurs="0"/>
+      <xs:element name="sistemaRiferimento" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataRilievo" type="tData" minOccurs="0"/>
+      <xs:element name="strumentazione" type="xs:string" minOccurs="0"/>
+      <xs:element name="rilevatori" type="xs:string" minOccurs="0"/>
+      <xs:element name="mostraInMappa" type="tBooleano" minOccurs="0"/>
 
       <xs:element name="caricato" minOccurs="0">
         <xs:complexType>

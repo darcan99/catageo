@@ -8,12 +8,13 @@ declare(strict_types=1);
  *  Descrizione ..: Struttura comune delle pagine: intestazione HTML, navbar,
  *                  messaggi, contenuto e footer. Riceve dalle pagine le
  *                  variabili $titolo e $contenuto.
- *  Versione .....: 0.6.4
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  Moduli ES per il visualizzatore 3D.
  *  0.6.4  2026-08-05  D.Candela  Menu Aspetto: tema e tavolozza scelti da
  *                                chi consulta.
  *  0.6.3  2026-08-05  D.Candela  Fondo di navbar e piede dalla tavolozza:
@@ -52,6 +53,11 @@ $tavolozza = Aspetto::tavolozza();
 // mezzo megabyte di cartografia.
 $cssPagina = $cssPagina ?? [];
 $jsPagina  = $jsPagina ?? [];
+
+// I moduli ES stanno in un elenco a parte: three.js e i suoi caricatori sono
+// moduli, e caricarli come script normali produrrebbe un errore di sintassi
+// sulla prima riga di import.
+$jsModuli = $jsModuli ?? [];
 
 /** Voci di menu: etichetta, pagina, icona, permesso richiesto. */
 $voci = [
@@ -234,6 +240,9 @@ $voci = [
 <script src="assets/js/catageo.js"></script>
 <?php foreach ($jsPagina as $script): ?>
 <script src="<?= Testo::esc($script) ?>"></script>
+<?php endforeach; ?>
+<?php foreach ($jsModuli as $modulo): ?>
+<script type="module" src="<?= Testo::esc($modulo) ?>"></script>
 <?php endforeach; ?>
 </body>
 </html>

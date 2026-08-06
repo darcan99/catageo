@@ -20,12 +20,14 @@ declare(strict_types=1);
  *                  riferimento vecchio a un contenuto nuovo. Per questo l'ultimo
  *                  assegnato e memorizzato nell'indice e non ricalcolato dai
  *                  file presenti.
- *  Versione .....: 0.7.1
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  Campi del rilievo e riconoscimento dei
+ *                                formati mappabili e tridimensionali.
  *  0.7.1  2026-08-05  D.Candela  Coordinate della risorsa e acquisizione dei
  *                                metadati incorporati al caricamento.
  *  0.7.0  2026-08-05  D.Candela  Prima stesura (fase 5).
@@ -63,6 +65,15 @@ final class Risorse
         'urlEsterno'      => '',
         'latitudine'      => '',
         'longitudine'     => '',
+
+        // Specifici dei rilievi (6.9).
+        'tipoRilievo'     => '',
+        'scala'           => '',
+        'sistemaRiferimento' => '',
+        'dataRilievo'     => '',
+        'strumentazione'  => '',
+        'rilevatori'      => '',
+        'mostraInMappa'   => '1',
     ];
 
     // ========================================================================
@@ -143,6 +154,68 @@ final class Risorse
         }
 
         return $percorso;
+    }
+
+    // ------------------------------------------------------------ rilievi
+
+    /** Formati che il visualizzatore tridimensionale sa aprire. */
+    public const FORMATI_3D = ['ply', 'obj', 'stl', 'gltf', 'glb'];
+
+    /** Formati che si mostrano direttamente nel browser, in due dimensioni. */
+    public const FORMATI_2D = ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'gif'];
+
+    /**
+     * True se il tracciato si puo sovrapporre alla mappa.
+     *
+     * Dipende dal formato, non da una scelta: un DXF non diventa mappabile
+     * spuntando una casella. La casella serve solo a spegnere un tracciato
+     * convertibile che sporcherebbe la mappa.
+     *
+     * @param array<string,mixed> $risorsa
+     */
+    public static function mappabile(array $risorsa): bool
+    {
+        return Tracciato::convertibile((string) $risorsa['file'])
+            && (string) ($risorsa['mostraInMappa'] ?? '1') !== '0';
+    }
+
+    /**
+     * True se il file e un modello apribile nel visualizzatore 3D.
+     *
+     * @param array<string,mixed> $risorsa
+     */
+    public static function tridimensionale(array $risorsa): bool
+    {
+        return in_array(self::estensione($risorsa), self::FORMATI_3D, true);
+    }
+
+    /**
+     * True se il file si guarda direttamente nel browser.
+     *
+     * @param array<string,mixed> $risorsa
+     */
+    public static function bidimensionale(array $risorsa): bool
+    {
+        return in_array(self::estensione($risorsa), self::FORMATI_2D, true);
+    }
+
+    /** @param array<string,mixed> $risorsa */
+    public static function estensione(array $risorsa): string
+    {
+        return strtolower((string) pathinfo((string) $risorsa['file'], PATHINFO_EXTENSION));
+    }
+
+    /**
+     * Rilievi di un ipogeo sovrapponibili alla mappa.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function tracciati(string $codice): array
+    {
+        return array_values(array_filter(
+            self::elenco($codice, 'RI'),
+            static fn (array $r): bool => self::mappabile($r)
+        ));
     }
 
     /** Cartella di una sezione per un ipogeo, o null se l'ipogeo non esiste. */
@@ -541,6 +614,15 @@ final class Risorse
         $risorsa['latitudine']  = Xml::testo($nodo, 'coordinate/latitudine');
         $risorsa['longitudine'] = Xml::testo($nodo, 'coordinate/longitudine');
 
+        foreach (['tipoRilievo', 'scala', 'sistemaRiferimento', 'dataRilievo',
+                  'strumentazione', 'rilevatori'] as $campo) {
+            $risorsa[$campo] = Xml::testo($nodo, $campo);
+        }
+
+        // Assente significa acceso: un tracciato appena caricato si vede.
+        $mostra = Xml::primo($nodo, 'mostraInMappa');
+        $risorsa['mostraInMappa'] = $mostra === null ? '1' : (trim($mostra->textContent) === '0' ? '0' : '1');
+
         if ((string) $risorsa['riservatezza'] === '') {
             $risorsa['riservatezza'] = 'pubblica';
         }
@@ -576,7 +658,8 @@ final class Risorse
             Xml::aggiungi($nodo, 'gruppo', null, ['id' => (string) $risorsa['gruppoId']]);
         }
 
-        foreach (['licenza', 'categoriaAllegato', 'urlEsterno'] as $campo) {
+        foreach (['licenza', 'categoriaAllegato', 'urlEsterno', 'tipoRilievo', 'scala',
+                  'sistemaRiferimento', 'dataRilievo', 'strumentazione', 'rilevatori'] as $campo) {
             if ((string) $risorsa[$campo] !== '') {
                 Xml::imposta($nodo, $campo, (string) $risorsa[$campo]);
             }
@@ -594,6 +677,12 @@ final class Risorse
 
         if (!empty($risorsa['copertina'])) {
             Xml::imposta($nodo, 'copertina', '1');
+        }
+
+        // Si scrive solo quando e spento: l'acceso e il comportamento normale e
+        // riempire l'indice di 1 inutili lo rende solo piu lungo da leggere.
+        if ((string) $risorsa['mostraInMappa'] === '0') {
+            Xml::imposta($nodo, 'mostraInMappa', '0');
         }
 
         Xml::imposta($nodo, 'mime', (string) $risorsa['mime']);

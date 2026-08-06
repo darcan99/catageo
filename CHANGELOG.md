@@ -6,6 +6,83 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.8.0] — 2026-08-05
+
+Fase 6: i rilievi.
+
+### Aggiunto
+- **La sezione Rilievi accetta caricamenti**, con i metadati previsti in analisi
+  6.9: tipo, scala, sistema di riferimento, data, strumentazione, rilevatori.
+- **KML, KMZ e GPX diventano tracciati sulla mappa.** La conversione in GeoJSON
+  avviene sul server: Leaflet lo consuma nativamente, non serve alcun plugin, e
+  soprattutto il file non e mai raggiungibile per URL diretto, quindi la
+  riservatezza continua a valere.
+- **Tracciato sulla mappa della scheda**: e cio che distingue «dove si entra» da
+  «dove va la cavita». L'inquadratura si **estende** al tracciato tenendo dentro
+  l'ingresso, invece di sostituirla e perderlo di vista.
+- **Pagina propria per ogni rilievo**: un rilievo si guarda a lungo — ci si gira
+  intorno, si legge la scala, si confronta con la mappa — e una finestra che
+  copre il resto sarebbe d'intralcio.
+- **Visualizzatore tridimensionale** per PLY, OBJ, STL e GLTF/GLB, con three.js
+  r169 servito in locale: orbita, filo di ferro, assi di riferimento, ingombro,
+  schermo intero.
+- **PDF nel visualizzatore nativo del browser**: e gia installato ovunque, sa
+  cercare e stampare, ed evita di portarsi dietro una libreria di rendering.
+- Un tracciato si puo **escludere dalla mappa** senza rimuoverlo: serve quando un
+  ipogeo ha piu rilievi dello stesso ramo e mostrarli tutti la renderebbe
+  illeggibile. Resta comunque consultabile dalla sua pagina.
+- `?p=tracciato` unisce le geometrie di piu rilievi in una raccolta sola, e
+  ognuna porta con se **da quale rilievo viene**: sovrapposti devono restare
+  distinguibili.
+
+### Scelte dichiarate
+- **Gli stili del KML non vengono letti.** Uno stile tradotto a meta produce una
+  mappa peggiore di una mappa con uno stile coerente: il colore lo decide
+  CATAGEO. Il magenta non e casuale — non compare quasi mai nella cartografia di
+  sfondo, quindi un tracciato resta visibile sia su bosco sia su abitato.
+- **Il modello 3D non si carica all'apertura della pagina.** Una nuvola di punti
+  puo pesare decine di megabyte, e chi apre la scheda per leggere la scala non
+  deve scaricarla: c'e un pulsante che dichiara anche quanto pesa.
+- L'ingombro del modello e dichiarato in «unita del file» e non in metri: le
+  unita di un PLY non sono scritte da nessuna parte, e affermare metri sarebbe
+  un'informazione inventata.
+- I **formati topografici specialistici** (Therion, Survex, VisualTopo, Compass,
+  DXF) restano archiviati e scaricabili, con l'indicazione di cosa esportare per
+  vederli qui dentro. Riscrivere in PHP il programma che li ha prodotti non
+  sarebbe sostenibile.
+- Limite di **12 MB** per la conversione in mappa: oltre, il file resta
+  archiviato ma non viene sovrapposto. Un rilievo di poligonale sta in poche
+  centinaia di kilobyte.
+
+### Sicurezza
+- I file di rilievo arrivano da programmi di terzi: si leggono **senza rete e
+  senza entita esterne** (`LIBXML_NONET`), con un tetto di dimensione e uno di
+  punti. Un documento che tenti di far scaricare qualcosa al server non ci
+  riesce, ed e verificato.
+- three.js e i suoi caricatori sono **serviti in locale**. I loro `import 'three'`
+  sono stati riscritti per puntare al file locale: un'import map avrebbe richiesto
+  uno script inline, che la Content-Security-Policy vieta.
+
+### Corretto
+- Nella scheda dell'ipogeo i rilievi non portavano alla loro pagina: il ramo
+  esisteva per i video ma non per i rilievi.
+- La nota dentro l'intestazione di una scheda scendeva a **4,25:1**: sul fondo
+  tinto dell'intestazione il colore secondario non regge.
+
+### Verificato
+- `prova-tracciato.php`: 40 controlli su documenti veri, compresi KML senza
+  namespace, con prefissi inusuali, `gx:Track`, KMZ come archivio zip reale e
+  geometrie degeneri. Sono i file irregolari a dover essere provati, non quelli
+  puliti.
+- `prova-rilievi.ps1`: 60 controlli end-to-end via HTTP.
+- Nel browser: modello PLY reale caricato e ispezionato in scena (8 vertici, 12
+  facce, tre luci, camera centrata), comandi verificati, tracciati disegnati
+  sulla mappa e ingresso che resta inquadrato.
+- Sette pagine nuove misurate nei due temi: nessun elemento sotto soglia.
+- `docs/prove/rilievi/README.md` elenca anche cio che **non** e coperto: modelli
+  reali di grandi dimensioni, OBJ/STL/GLTF con file veri, GroundOverlay, misura
+  sul modello.
+
 ## [0.7.1] — 2026-08-05
 
 Media: quello che il file sa gia dire, e come si guarda.

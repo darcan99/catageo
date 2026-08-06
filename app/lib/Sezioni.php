@@ -13,12 +13,13 @@ declare(strict_types=1);
  *                  averle definite in un unico punto e la garanzia che lo
  *                  standard di nomenclatura non divergga fra le parti che lo
  *                  applicano.
- *  Versione .....: 0.7.0
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  I rilievi accettano caricamenti (fase 6).
  *  0.7.0  2026-08-05  D.Candela  Estensioni ammesse, tipo di anteprima e
  *                                sezioni caricabili (fase 5).
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
@@ -40,7 +41,8 @@ final class Sezioni
      * indice     = la sezione ha un XML di indice "[codice] - [cartella].xml"
      * estensioni = chiave di <upload><estensioni sezione="…"> in config.xml,
      *              oppure '' se la sezione non riceve caricamenti
-     * anteprima  = come si mostra il contenuto: immagine, video, documento o ''
+     * anteprima  = come si mostra il contenuto: immagine, video, rilievo,
+     *              documento o ''
      * caricabile = la sezione accetta caricamenti dall'interfaccia (fase 5:
      *              allegati, foto e video; le altre arrivano dopo)
      */
@@ -52,7 +54,7 @@ final class Sezioni
         'VI' => ['cartella' => 'Video',          'etichetta' => 'Video',            'conFile' => true,  'indice' => true,
                  'estensioni' => 'video',        'anteprima' => 'video',     'caricabile' => true],
         'RI' => ['cartella' => 'Rilievi',        'etichetta' => 'Rilievi',          'conFile' => true,  'indice' => true,
-                 'estensioni' => 'rilievi',      'anteprima' => 'documento', 'caricabile' => false],
+                 'estensioni' => 'rilievi',      'anteprima' => 'rilievo',   'caricabile' => true],
         'ES' => ['cartella' => 'Esplorazioni',   'etichetta' => 'Esplorazioni',     'conFile' => true,  'indice' => true,
                  'estensioni' => '',             'anteprima' => '',          'caricabile' => false],
         'BB' => ['cartella' => 'Bibliografia',   'etichetta' => 'Bibliografia',     'conFile' => false, 'indice' => true,

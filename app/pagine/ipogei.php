@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 0.7.1
+ *  Versione .....: 0.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sulla mappetta e
+ *                                collegamento alla pagina del rilievo.
  *  0.7.1  2026-08-05  D.Candela  Finestra dei media anche nella scheda; i
  *                                video si guardano invece di scaricarsi.
  *  0.7.0  2026-08-05  D.Candela  Contenuti delle sezioni nei rispettivi
@@ -651,7 +653,21 @@ if ($azione === 'scheda' && $codice !== '') {
                   </a>
                 </div>
                 <div class="card-body">
-                  <div id="catageoMappaSchedaBox" class="catageo-mappa catageo-mappa-scheda"></div>
+                  <?php
+                  // Se l'ipogeo ha rilievi georiferiti, la mappetta li sovrappone:
+                  // e cio che distingue "dove si entra" da "dove va la cavita".
+                  $conTracciati = Risorse::tracciati($codiceCorrente) !== [];
+                  ?>
+                  <div id="catageoMappaSchedaBox" class="catageo-mappa catageo-mappa-scheda"
+                       <?= $conTracciati
+                           ? 'data-catageo-tracciati="index.php?p=tracciato&amp;codice=' . urlencode($codiceCorrente) . '"'
+                           : '' ?>></div>
+                  <?php if ($conTracciati): ?>
+                    <div class="catageo-nota mt-2">
+                      <i class="bi bi-bezier2"></i>
+                      Il tracciato in magenta viene dai rilievi georiferiti della scheda.
+                    </div>
+                  <?php endif; ?>
                   <?php if ($coord['offuscate']): ?>
                     <div class="catageo-nota mt-2">
                       Il cerchio indica l'area entro cui si trova l'ingresso: le coordinate
@@ -908,7 +924,14 @@ if ($azione === 'scheda' && $codice !== '') {
                         </td>
                         <td>
                           <?php if (Risorse::percorsoFile($codiceCorrente, $sigla, $p) !== null): ?>
-                            <?php if ($vista === 'video'): ?>
+                            <?php if ($vista === 'rilievo'): ?>
+                              <?php // Il rilievo ha una pagina propria: modello
+                                    // 3D, documento o tracciato sulla mappa. ?>
+                              <a href="index.php?p=rilievo&amp;codice=<?= urlencode($codiceCorrente) ?>&amp;prog=<?= $p ?>">
+                                <i class="bi bi-<?= Risorse::tridimensionale($risorsa) ? 'badge-3d' : 'file-earmark-ruled' ?>"></i>
+                                <?= Testo::esc((string) $risorsa['file']) ?>
+                              </a>
+                            <?php elseif ($vista === 'video'): ?>
                               <?php // Il video si guarda nella finestra: prima
                                     // c'era solo il nome del file da scaricare. ?>
                               <a href="<?= Testo::esc($urlFile($p, false, true)) ?>"
