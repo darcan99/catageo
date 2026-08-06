@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/archeologia.xsd
+   Descrizione ..: Schema di "[codice] - Archeologia.xml": inquadramento,
+                   evidenze, tutela e indagini (6.15).
+
+                   Gli anni della datazione sono xs:string con pattern e non
+                   xs:integer: devono ammettere valori negativi (-27 e il 27
+                   a.C.) e la stringa vuota, che l'applicativo scrive quando il
+                   dato manca.
+
+                   I codici di periodo non sono enumerati perche vengono da
+                   periodi_storici.xml, che ADM puo modificare: enumerarli qui
+                   renderebbe non validi i file appena qualcuno aggiunge un
+                   periodo. Il controllo di esistenza lo fa la classe
+                   Archeologia.
+   Versione .....: 0.12.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   0.12.0  2026-08-06  D.Candela  Prima stesura (fase 7d).
+  ============================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:simpleType name="tCifre">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tCodiceIpogeo">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Za-z0-9._\-]{1,60}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tData">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Anno, eventualmente avanti Cristo. -->
+  <xs:simpleType name="tAnnoStorico">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|-?[0-9]{1,5}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tRiferimento">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Z]{2}[0-9]{1,18}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTipoEvidenza">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="struttura muraria"/>
+      <xs:enumeration value="tecnica costruttiva"/>
+      <xs:enumeration value="iscrizione"/>
+      <xs:enumeration value="graffito"/>
+      <xs:enumeration value="ceramica"/>
+      <xs:enumeration value="affresco"/>
+      <xs:enumeration value="mosaico"/>
+      <xs:enumeration value="sepoltura"/>
+      <xs:enumeration value="impianto idraulico"/>
+      <xs:enumeration value="traccia di strumenti"/>
+      <xs:enumeration value="materiale di reimpiego"/>
+      <xs:enumeration value="altro"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tConservazione">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="ottimo"/>
+      <xs:enumeration value="buono"/>
+      <xs:enumeration value="discreto"/>
+      <xs:enumeration value="degradato"/>
+      <xs:enumeration value="in pericolo"/>
+      <xs:enumeration value="perduto"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Dichiarare la precisione evita di far passare per certa una datazione
+       che e solo plausibile. -->
+  <xs:simpleType name="tPrecisione">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="anno"/>
+      <xs:enumeration value="decennio"/>
+      <xs:enumeration value="secolo"/>
+      <xs:enumeration value="periodo"/>
+      <xs:enumeration value="ignota"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTipoIndagine">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ricognizione"/>
+      <xs:enumeration value="scavo"/>
+      <xs:enumeration value="documentazione"/>
+      <xs:enumeration value="rilievo"/>
+      <xs:enumeration value="datazione"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="archeologia">
+    <xs:complexType>
+      <xs:sequence>
+
+        <xs:element name="inquadramento" minOccurs="0">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="periodoPrincipale" type="xs:string" minOccurs="0"/>
+
+              <xs:element name="periodiSecondari" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="periodo" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="datazione" minOccurs="0">
+                <xs:complexType>
+                  <xs:attribute name="da" type="tAnnoStorico" use="optional"/>
+                  <xs:attribute name="a" type="tAnnoStorico" use="optional"/>
+                  <xs:attribute name="precisione" type="tPrecisione" use="optional"/>
+                  <xs:attribute name="criterio" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="funzioneOriginaria" type="xs:string" minOccurs="0"/>
+
+              <!-- Una cavita artificiale cambia uso nei secoli: un cunicolo
+                   romano riusato come ricovero antiaereo appartiene a due
+                   epoche, e la scheda deve poterlo dire. -->
+              <xs:element name="funzioniSuccessive" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="funzione" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute name="periodo" type="xs:string" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <xs:element name="contestoTopografico" type="xs:string" minOccurs="0"/>
+              <xs:element name="sintesi" type="xs:string" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="evidenze" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="evidenza" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="tipo" type="tTipoEvidenza"/>
+                    <xs:element name="descrizione" type="xs:string"/>
+                    <xs:element name="zonaCavita" type="xs:string" minOccurs="0"/>
+                    <xs:element name="periodo" type="xs:string" minOccurs="0"/>
+                    <xs:element name="statoConservazione" type="tConservazione" minOccurs="0"/>
+                    <xs:element name="fotoRif" type="tRiferimento" minOccurs="0"/>
+                    <xs:element name="rilievoRif" type="tRiferimento" minOccurs="0"/>
+                    <xs:element name="biblioRif" type="tRiferimento" minOccurs="0"/>
+                  </xs:all>
+                  <xs:attribute name="progressivo" type="tCifre" use="required"/>
+                  <xs:attribute name="sigla" type="xs:string" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="tutela" minOccurs="0">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="vincolo" type="tBooleano" minOccurs="0"/>
+              <xs:element name="tipoVincolo" type="xs:string" minOccurs="0"/>
+              <xs:element name="enteCompetente" type="xs:string" minOccurs="0"/>
+              <xs:element name="riferimentoProvvedimento" type="xs:string" minOccurs="0"/>
+              <xs:element name="dataProvvedimento" type="tData" minOccurs="0"/>
+              <xs:element name="prescrizioni" type="xs:string" minOccurs="0"/>
+              <xs:element name="allegatoRif" type="tRiferimento" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="indagini" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="indagine" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="tipo" type="tTipoIndagine"/>
+                    <xs:element name="data" type="tData" minOccurs="0"/>
+                    <xs:element name="soggetto" type="xs:string" minOccurs="0"/>
+                    <xs:element name="esplorazioneRif" type="tRiferimento" minOccurs="0"/>
+                    <xs:element name="esito" type="xs:string" minOccurs="0"/>
+                    <xs:element name="allegatoRif" type="tRiferimento" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+
+      <xs:attribute name="versioneSchema" type="xs:string" use="required"/>
+      <xs:attribute name="codiceIpogeo" type="tCodiceIpogeo" use="required"/>
+      <xs:attribute name="ultimoProgressivo" type="tCifre" use="required"/>
+    </xs:complexType>
+
+    <xs:unique name="unicitaProgressivoEvidenza">
+      <xs:selector xpath="evidenze/evidenza"/>
+      <xs:field xpath="@progressivo"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

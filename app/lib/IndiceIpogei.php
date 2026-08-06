@@ -302,9 +302,12 @@ final class IndiceIpogei
             'n_serie_misure'  => (string) $conteggi['SC'],
             'ha_kml'          => $conteggi['kml'] ? '1' : '0',
             'ha_3d'           => $conteggi['3d'] ? '1' : '0',
-            'ha_chirotteri'   => $conteggi['BI'] > 0 ? '1' : '0',
+            // "ha_chirotteri" e vero solo se esiste davvero una colonia: la
+            // sezione puo contenere solo osservazioni di invertebrati, e una
+            // ricerca per chirotteri non deve restituirla.
+            'ha_chirotteri'   => Biospeleologia::colonie($codice) !== [] ? '1' : '0',
             'ha_archeologia'  => $conteggi['AR'] > 0 ? '1' : '0',
-            'periodo_arch'    => '',
+            'periodo_arch'    => Archeologia::periodoPrincipale($codice),
             'data_censimento' => (string) $scheda['catasto']['dataCensimento'],
             'ultima_modifica' => (string) $scheda['catasto']['modificaData'],
             'cartella'        => $relativa,
@@ -361,6 +364,19 @@ final class IndiceIpogei
              */
             if ($sigla === 'BB') {
                 $conteggi['BB'] = Bibliografia::conta($codice);
+                continue;
+            }
+
+            // Biospeleologia e archeologia hanno lo stesso problema: le voci
+            // stanno dentro l'indice, non sono file. Con il conteggio a file
+            // "ha_chirotteri" e "ha_archeologia" restavano sempre a zero, e una
+            // ricerca per quelle colonne non avrebbe trovato mai nulla.
+            if ($sigla === 'BI') {
+                $conteggi['BI'] = Biospeleologia::conta($codice);
+                continue;
+            }
+            if ($sigla === 'AR') {
+                $conteggi['AR'] = Archeologia::conta($codice);
                 continue;
             }
 

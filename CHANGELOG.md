@@ -6,6 +6,52 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [0.12.0] — 2026-08-06
+
+Fase 7d: biospeleologia e archeologia. Con questa la **fase 7 e completa**.
+
+### Aggiunto
+- **Osservazioni faunistiche** con taxon, categoria ecologica, stato di
+  protezione, direttiva Habitat e Lista Rossa IUCN. Riusano i punti di misura
+  dei dati scientifici, cosi due osservazioni nello stesso punto restano
+  confrontabili.
+- **Colonie di chirotteri** con ruolo della cavita, consistenza, andamento e un
+  CSV di conteggi per colonia. Il conteggio ammette il numero esatto **oppure**
+  la sola stima minimo-massimo: chi conta in uscita al crepuscolo produce quasi
+  sempre un intervallo, e costringere a un numero secco falserebbe il dato.
+- **Avviso di periodo critico**, ricorrente ogni anno e scritto `MM-GG` perche
+  uno svernamento scavalca il capodanno. Compare nella scheda dell'ipogeo e
+  nelle due pagine di sezione.
+- **Riservatezza propria della colonia**, indipendente da quella dell'ipogeo e
+  prevalente: una cavita pubblica puo ospitare una colonia visibile solo a OPE
+  e ADM. Il valore di riposo e "riservata", non "pubblica".
+- **Archeologia**: inquadramento per periodo con datazioni anche avanti Cristo,
+  periodi secondari e funzioni successive; evidenze con stato di conservazione e
+  rimandi a foto, rilievi e bibliografia; tutela con vincolo, ente e
+  prescrizioni; indagini collegabili a un diario di esplorazione.
+- **Avviso di vincolo**: chi programma un'uscita vede subito che serve
+  un'autorizzazione, informazione che prima viveva nella memoria di chi aveva
+  fatto le pratiche.
+- Barra avvisi unica: i nuovi avvisi entrano in quella gia presente nella
+  scheda, prendendoli dalla stessa funzione che li produce nelle pagine di
+  sezione. Un avviso che compare in due punti su tre e un avviso che non c'e.
+- Schemi `biospeleologia.xsd` e `archeologia.xsd`.
+
+### Modificato
+- **L'avviso di periodo critico compare anche a chi non puo vedere la colonia,
+  ma oscurato**: dice il periodo e la ragione, tace nome, specie e zona. Alla
+  prima prova l'avviso non compariva affatto per le colonie riservate — corretto
+  tecnicamente, sbagliato in pratica: chi programma un'uscita e proprio la
+  persona che deve sapere di non entrare, ed e quasi sempre chi non ha diritto a
+  vedere il roost.
+
+### Corretto
+- **Tre colonne dell'indice erano sempre sbagliate**: `ha_chirotteri` e
+  `ha_archeologia` sempre a zero e `periodo_arch` sempre vuota, per la stessa
+  causa gia trovata con `n_biblio` — il conteggio scorre i file di una cartella,
+  e queste sezioni non hanno file per voce. `ha_chirotteri` e ora vero solo se
+  esiste davvero una colonia, non una qualunque osservazione.
+
 ## [0.11.0] — 2026-08-06
 
 Fase 7c: dati scientifici.

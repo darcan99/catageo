@@ -323,6 +323,7 @@ if ($azione === 'scheda' && $codice !== '') {
     $titolo  = $codiceCorrente . ' — ' . (string) $scheda['identificazione']['nome'];
 
     require_once CATAGEO_ROOT . '/app/view/parti-media.php';
+    require_once CATAGEO_ROOT . '/app/view/parti-avvisi.php';
 
     // La finestra dei media serve sempre nella scheda: foto e video si guardano
     // anche in sola consultazione.
@@ -402,6 +403,20 @@ if ($azione === 'scheda' && $codice !== '') {
     }
     if ((string) $scheda['ubicazione']['riservatezza'] === 'riservata') {
         $avvisi[] = ['secondary', 'bi-shield-lock-fill', 'Ubicazione riservata: non divulgare.'];
+    }
+
+    /*
+     * Avvisi delle sezioni: periodo critico delle colonie e vincoli di tutela.
+     * Vengono dalla stessa funzione che li produce nelle pagine di
+     * biospeleologia e archeologia, e non da una seconda copia della regola:
+     * un avviso che compare in due punti su tre e un avviso che non c'e.
+     */
+    foreach (catageoAvvisiDi($codiceCorrente) as $avviso) {
+        $avvisi[] = [
+            $avviso['livello'],
+            $avviso['livello'] === 'danger' ? 'bi-exclamation-octagon-fill' : 'bi-exclamation-triangle-fill',
+            $avviso['titolo'] . ' — ' . $avviso['testo'],
+        ];
     }
     ?>
     <?php if ($avvisi !== []): ?>
@@ -1018,6 +1033,155 @@ if ($azione === 'scheda' && $codice !== '') {
                     </table>
                   </div>
                 </div>
+              <?php endif; ?>
+            </div>
+            <?php
+            continue;
+        }
+        ?>
+
+        <?php
+        /*
+         * Biospeleologia e archeologia sono anch'esse sezioni di soli metadati:
+         * si presentano con un riepilogo e rimandano alla propria pagina.
+         */
+        if ($sigla === 'BI' || $sigla === 'AR') {
+            $eBio = $sigla === 'BI';
+            $quante = $eBio
+                ? count(Biospeleologia::colonieVisibili($codiceCorrente))
+                    + count(Biospeleologia::osservazioni($codiceCorrente))
+                : Archeologia::conta($codiceCorrente);
+            $urlSezioneMeta = $eBio
+                ? 'index.php?p=biospeleologia&amp;codice=' . urlencode($codiceCorrente)
+                : 'index.php?p=archeologia&amp;codice=' . urlencode($codiceCorrente);
+            ?>
+            <div class="tab-pane fade" id="tabSezione<?= $sigla ?>">
+              <div class="catageo-intestazione mb-3">
+                <div>
+                  <h2 class="h5 mb-0"><?= Testo::esc(Sezioni::etichetta($sigla)) ?></h2>
+                  <p class="text-body-secondary mb-0">
+                    <?= $quante ?> voc<?= $quante === 1 ? 'e' : 'i' ?>
+                  </p>
+                </div>
+                <a class="btn btn-sm <?= $quante === 0 ? 'btn-primary' : 'btn-outline-secondary' ?> catageo-non-stampare"
+                   href="<?= $urlSezioneMeta ?>">
+                  <i class="bi <?= $eBio ? 'bi-bug' : 'bi-bank' ?>"></i>
+                  <?= $quante === 0 ? 'Compila la sezione' : 'Gestisci la sezione' ?>
+                </a>
+              </div>
+
+              <?php if ($eBio): ?>
+                <?php $colonieScheda = Biospeleologia::colonieVisibili($codiceCorrente); ?>
+                <?php if ($colonieScheda !== []): ?>
+                  <div class="card mb-3">
+                    <div class="card-header"><h3 class="h6 mb-0">Colonie di chirotteri</h3></div>
+                    <div class="card-body">
+                      <?php foreach ($colonieScheda as $colonia): ?>
+                        <div class="catageo-voce-biblio">
+                          <span class="catageo-valore"><?= Testo::esc((string) $colonia['id']) ?></span>
+                          <?= Testo::esc((string) $colonia['nome']) ?>
+                          <em><?= Testo::esc((string) $colonia['specie']) ?></em>
+                          <span class="catageo-nota">
+                            · <?= Testo::esc(Biospeleologia::RUOLI_COLONIA[(string) $colonia['ruolo']] ?? '') ?>
+                          </span>
+                          <?php if (Biospeleologia::inPeriodoCritico($colonia)): ?>
+                            <span class="badge text-bg-danger">periodo critico in corso</span>
+                          <?php endif; ?>
+                        </div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                <?php endif; ?>
+
+                <?php $osservazioniScheda = Biospeleologia::osservazioni($codiceCorrente); ?>
+                <?php if ($osservazioniScheda === [] && $colonieScheda === []): ?>
+                  <div class="card">
+                    <div class="card-body d-flex gap-3">
+                      <i class="bi bi-bug fs-3 text-body-secondary" aria-hidden="true"></i>
+                      <div>
+                        <h3 class="h6 mb-1">Nessun dato biologico</h3>
+                        <p class="text-body-secondary mb-0">
+                          Osservazioni faunistiche e colonie di chirotteri, con il
+                          periodo critico da cui dipende l'avviso in cima alla scheda.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                <?php elseif ($osservazioniScheda !== []): ?>
+                  <div class="card">
+                    <div class="card-header"><h3 class="h6 mb-0">Osservazioni</h3></div>
+                    <div class="card-body">
+                      <?php foreach ($osservazioniScheda as $voce): ?>
+                        <div class="catageo-voce-biblio">
+                          <span class="catageo-valore"><?= Testo::esc((string) $voce['id']) ?></span>
+                          <em><?= Testo::esc((string) $voce['nomeScientifico']) ?></em>
+                          <?= Testo::esc((string) $voce['nomeComune']) ?>
+                          <?php if ((string) $voce['specieProtetta'] === '1'): ?>
+                            <span class="badge text-bg-success">protetta</span>
+                          <?php endif; ?>
+                        </div>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                <?php endif; ?>
+
+              <?php else: ?>
+                <?php
+                $inq = Archeologia::inquadramento($codiceCorrente);
+                $evid = Archeologia::evidenze($codiceCorrente);
+                $tut = Archeologia::tutela($codiceCorrente);
+                ?>
+                <?php if ($quante === 0): ?>
+                  <div class="card">
+                    <div class="card-body d-flex gap-3">
+                      <i class="bi bi-bank fs-3 text-body-secondary" aria-hidden="true"></i>
+                      <div>
+                        <h3 class="h6 mb-1">Nessun dato archeologico</h3>
+                        <p class="text-body-secondary mb-0">
+                          Inquadramento per periodo, evidenze, vincoli e indagini.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                <?php else: ?>
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <dl class="row catageo-dl mb-0">
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Periodo principale</dt>
+                        <dd class="col-sm-8">
+                          <?php $vp = Periodi::trova((string) $inq['periodoPrincipale']); ?>
+                          <?= $vp !== null ? Testo::esc(Periodi::etichetta($vp)) : '—' ?>
+                        </dd>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Funzione originaria</dt>
+                        <dd class="col-sm-8"><?= Testo::esc((string) $inq['funzioneOriginaria']) ?: '—' ?></dd>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Vincolo</dt>
+                        <dd class="col-sm-8">
+                          <?= (string) $tut['vincolo'] === '1'
+                              ? '<span class="badge text-bg-warning">si</span> '
+                                . Testo::esc((string) $tut['tipoVincolo'])
+                              : 'no' ?>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+
+                  <?php if ($evid !== []): ?>
+                    <div class="card">
+                      <div class="card-header"><h3 class="h6 mb-0">Evidenze</h3></div>
+                      <div class="card-body">
+                        <?php foreach ($evid as $evidenza): ?>
+                          <div class="catageo-voce-biblio">
+                            <span class="catageo-valore">
+                              <?= Testo::esc(Sezioni::riferimento('AR', (int) $evidenza['progressivo'])) ?>
+                            </span>
+                            <strong><?= Testo::esc(Archeologia::TIPI_EVIDENZA[(string) $evidenza['tipo']] ?? '') ?></strong>
+                            <?= Testo::esc(Testo::estratto((string) $evidenza['descrizione'], 160)) ?>
+                          </div>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
+                <?php endif; ?>
               <?php endif; ?>
             </div>
             <?php

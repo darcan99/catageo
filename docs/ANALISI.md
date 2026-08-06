@@ -1109,6 +1109,14 @@ data;ora;colonia;specie;metodo;numero;stima_min;stima_max;fase;temperatura;rilev
 
 Il conteggio ammette sia il valore esatto sia il solo intervallo `stima_min`/`stima_max`: chi conta pipistrelli in uscita al crepuscolo produce quasi sempre una stima, e costringere a un numero secco falserebbe il dato.
 
+**Scostamenti assunti in fase 7d** (2026-08-06):
+
+- **L'avviso di periodo critico compare anche a chi non puo vedere la colonia, ma oscurato**: dichiara il periodo e la ragione (fauna protetta), e tace nome, specie e zona. Escluderlo del tutto sarebbe stato coerente con la riservatezza e contrario allo scopo: chi programma un'uscita e proprio la persona che deve sapere di non entrare, ed e quasi sempre chi non ha diritto a vedere il roost. L'avviso oscurato porta la stessa informazione di un cartello di chiusura temporanea.
+- **Il valore di riposo della riservatezza di una colonia e `riservata`**, non `pubblica`: quando chi compila non sceglie, il caso predefinito deve essere quello che protegge.
+- **`ha_chirotteri` nell'indice e vero solo in presenza di una colonia**, non di una qualunque osservazione: la sezione puo contenere solo invertebrati, e una ricerca per chirotteri non deve restituirla.
+- **Le osservazioni non hanno riservatezza propria**, come da schema: solo le colonie. Un'osservazione di una specie resta quindi visibile anche quando la colonia di quella specie e riservata. E difendibile — osservare una specie non e localizzare un roost — ma va saputo.
+- **Il numero della colonia coincide col progressivo della sezione**, perche e quello che nomina il suo file di conteggi: due contatori per la stessa cosa finirebbero per divergere. Gli identificativi delle osservazioni, che nessuna sezione cita, si ricavano invece dal massimo presente e possono essere riusati.
+
 **Due funzioni conseguenti, non ovvie ma importanti:**
 
 1. **Avviso di periodo critico**: se un ipogeo ha una colonia con `<periodoCritico>` in corso, la scheda e i risultati di ricerca lo segnalano in evidenza. Serve a evitare che un'uscita programmata disturbi uno svernamento — è il caso d'uso per cui questi dati vengono raccolti.

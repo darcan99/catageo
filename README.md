@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-🚧 **In sviluppo** — versione corrente **0.11.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
+🚧 **In sviluppo** — versione corrente **0.12.0**. Le caratteristiche elencate sopra descrivono il progetto completo, non quello che è già installabile.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -42,7 +42,7 @@
 | 7 | Esplorazioni: diari di uscita, partecipanti anche fuori anagrafica, punti georiferiti, cronologia e filtri | ✅ fatto |
 | 7b | Bibliografia: catalogo generale delle opere, tre forme di voce, citazioni per sigla, export BibTeX | ✅ fatto |
 | 7c | Dati scientifici: punti di misura, serie CSV, import da datalogger, statistiche, grafici SVG lato server | ✅ fatto |
-| 7d | Biospeleologia e archeologia | ⏳ da fare |
+| 7d | Biospeleologia con colonie di chirotteri e avviso di periodo critico; archeologia con evidenze, tutela e indagini | ✅ fatto |
 | 8 | Ricerca testuale, per attributi e geografica; migrazione fra cataloghi | ⏳ da fare |
 | 9–10 | Strumenti di manutenzione, rifinitura, manuale, `v1.0.0` | ⏳ da fare |
 
