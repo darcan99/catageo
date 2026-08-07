@@ -34,7 +34,10 @@ function catageoAvvisiDi(string $codice): array
 {
     $avvisi = array_merge(
         Biospeleologia::avvisi($codice),
-        Archeologia::avvisi($codice)
+        Archeologia::avvisi($codice),
+        // I rischi geologici di livello medio e alto (6.16): chi programma
+        // un'uscita deve vedere subito che una cavita crolla o si allaga.
+        Geologia::avvisi($codice)
     );
 
     // "danger" prima di "warning": se una colonia e in letargo e la cavita e

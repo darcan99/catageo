@@ -23,15 +23,16 @@ dei dati vedi [ANALISI.md](ANALISI.md).
 11. [Dati scientifici](#11-dati-scientifici)
 12. [Biospeleologia](#12-biospeleologia)
 13. [Archeologia](#13-archeologia)
-14. [Mappa](#14-mappa)
-15. [Ricerca ed esportazioni](#15-ricerca-ed-esportazioni)
-16. [Stampa della scheda](#16-stampa-della-scheda)
-17. [Migrazione fra cataloghi](#17-migrazione-fra-cataloghi)
-18. [Importazione da CSV](#18-importazione-da-csv)
-19. [Anagrafiche](#19-anagrafiche)
-20. [Strumenti di manutenzione](#20-strumenti-di-manutenzione)
-21. [Aspetto](#21-aspetto)
-22. [Dove stanno i dati](#22-dove-stanno-i-dati)
+14. [Geologia](#14-geologia)
+15. [Mappa](#15-mappa)
+16. [Ricerca ed esportazioni](#16-ricerca-ed-esportazioni)
+17. [Stampa della scheda](#17-stampa-della-scheda)
+18. [Migrazione fra cataloghi](#18-migrazione-fra-cataloghi)
+19. [Importazione da CSV](#19-importazione-da-csv)
+20. [Anagrafiche](#20-anagrafiche)
+21. [Strumenti di manutenzione](#21-strumenti-di-manutenzione)
+22. [Aspetto](#22-aspetto)
+23. [Dove stanno i dati](#23-dove-stanno-i-dati)
 
 ---
 
@@ -354,15 +355,121 @@ datazioni, con soggetto ed esito.
 
 ---
 
-## 14. Mappa
+## 14. Geologia
+
+Si apre dalla scheda, linguetta **Geologia**, oppure da `index.php?p=geologia`.
+Sette riquadri che si salvano uno per uno: la geologia si compila in più
+riprese — una parte in cavità, una davanti alla carta — e un modulo unico
+farebbe perdere tutto a chi sbaglia un campo in fondo.
+
+**Inquadramento** — litologia, formazione, unità geologica, età, sistema e
+serie cronostratigrafici, foglio geologico. Sotto c'è **come si è ottenuto il
+dato**: osservazione diretta in cavità, lettura manuale della cartografia,
+interrogazione automatica del servizio, bibliografia. Non è un dettaglio
+burocratico. Una litologia osservata sul posto e una dedotta da una carta
+1:100.000 si leggono uguali sulla scheda e valgono diversamente: la prima
+descrive quella cavità, la seconda inquadra la formazione regionale e non
+distingue una lente di dieci metri. Dichiararlo è ciò che rende usabile il
+resto.
+
+**Genesi e assetto strutturale** — tipo di genesi (carsica, vulcanica,
+tettonica, erosiva, glaciale, marina, **antropica**, mista), roccia incassante,
+processo, immersione e inclinazione in gradi, grado di fratturazione.
+
+**Morfologie** — concrezionamento, marmitte, scallops, canali di volta, crolli,
+riempimenti, forme di corrosione e di erosione, **tracce di scavo**. Su una
+cavità artificiale quest'ultima è la morfologia principale, e il vocabolario la
+prevede: gli altri catasti la ignorano perché sono pensati per le sole cavità
+naturali.
+
+**Idrogeologia** — acquifero, permeabilità, ruolo idrogeologico (assorbimento,
+drenaggio, risorgenza). La portata si misura nei dati scientifici e non si
+ridigita qui: si indica la serie di misure collegata.
+
+**Rischi** — crollo, allagamento, sinkhole, subsidenza, gas, sismico, ciascuno
+con un livello. **Solo medio e alto compaiono nella barra avvisi della scheda**:
+un rischio basso segnalato accanto a un vincolo archeologico e a un periodo
+critico dei chirotteri abituerebbe a ignorare la barra, e la barra serve proprio
+per quando conta. Sul foglio da stampare invece compaiono tutti: su un foglio
+che si porta in uscita sapere che c'è anche un rischio basso di gas non costa
+nulla.
+
+**Campioni** — data, tipo, chi ha prelevato, zona, finalità, dove è depositato,
+esito. Il prelievo in cavità può richiedere un'autorizzazione: registrarla è
+parte del dato.
+
+### Compilare dalla cartografia
+
+Se in configurazione ci sono layer WMS interrogabili e la scheda ha coordinate,
+in cima all'inquadramento compare **Compila dalla cartografia**. CATAGEO chiede
+ai servizi cosa riportano sotto il punto della cavità e **propone** i valori
+accanto ai campi, uno per uno, ciascuno con scritto da quale carta viene. Non
+scrive niente da solo: si accettano singolarmente. Accettandone uno, la
+provenienza del dato si porta da sé a «interrogazione automatica», ma solo se
+era ancora vuota — una provenienza già dichiarata da una persona non viene
+sovrascritta.
+
+Una carta non ha visto la cavità: i valori vanno confermati.
+
+**Se la cavità ha coordinate riservate** l'applicativo non chiede niente finché
+non si è scelto cosa può uscire, perché interrogare un servizio significa
+mandare il punto al server dell'ente, che di norma lo registra:
+
+- **punto arrotondato** alla griglia configurata (1000 m predefiniti);
+- **punto esatto**, per decisione esplicita;
+- **non interrogare**, e nessuna richiesta parte.
+
+L'arrotondamento è sempre allo stesso punto, non un errore casuale: un errore
+che cambiasse a ogni richiesta si annullerebbe facendo la media di tre
+richieste, e chi volesse la posizione vera dovrebbe solo chiederla tre volte. A
+1:100.000 mille metri non cambiano la formazione che si legge.
+
+Ogni interrogazione finisce nel registro delle modifiche, comprese quelle
+andate a vuoto, con il modo usato. È l'unico punto in cui una coordinata
+dell'archivio esce verso un server di terzi.
+
+---
+
+## 15. Mappa
 
 Fondo OpenStreetMap, marker raggruppati in cluster, popup con codice, nome e
 tipologia. Si filtra per catalogo, natura, tipologia e stato della scheda.
 
 Si possono aggiungere **layer WMS** dalla configurazione: cartografia tecnica
-regionale, ortofoto, carte geologiche. Le origini dei server aggiunti vanno
-dichiarate in `config.xml`, perché la Content-Security-Policy dell'applicativo
-consente solo quelle elencate.
+regionale, ortofoto, carte geologiche. Basta scriverli in `config.xml`: la
+Content-Security-Policy dell'applicativo si adegua da sé alle origini elencate
+lì, non serve toccare altro.
+
+### Layer già pronti
+
+Un'installazione nuova esce con **26 layer preconfigurati e spenti**, verificati
+uno per uno sul proprio territorio. Si accendono dal pannello dei layer.
+
+| Ambito | Cosa c'è |
+|---|---|
+| Italia | ISPRA: carta geologica 1:100.000, litologia, classi di permeabilità, inventario dei sinkhole, cave, emissioni gassose, geologica 1:1M · catasto dell'Agenzia delle Entrate · aree archeologiche vincolate del Ministero della Cultura |
+| Lazio | geologica 1:25.000, unità idrogeologiche, sorgenti, curve di livello, aree archeologiche PTPR, ortofoto AGEA 2023 |
+| Abruzzo | ortofoto AGEA 2022, CTR 1:5.000, IGM 1:25.000 |
+| Umbria | cave attive, cave dismesse, CTR 1:10.000, ortofoto 2020 |
+| Marche | geologica 1:10.000, CTR 2019, ortofoto AGEA 2022, IGM storico 1892-95 |
+
+Le **emissioni gassose** non sono una curiosità: la CO₂ nei vuoti sotterranei
+uccide, e sapere che si scende dentro un'area di emissione cambia la
+preparazione dell'uscita. L'**IGM storico** serve alle cavità artificiali:
+confrontando una carta di fine Ottocento con l'ortofoto di oggi, quello che
+c'era e non c'è più è quasi sempre un ingresso.
+
+Due avvertenze:
+
+- I layer delle **Marche** sono serviti solo in `http`. In locale funzionano; su
+  un CATAGEO pubblicato in `https` il browser li blocca come contenuto misto e
+  restano bianchi senza spiegare perché. In quel caso vanno tolti.
+- Per il **Molise** non c'è nulla: il geoportale regionale non esiste più (il
+  dominio non risolve). Restano i layer nazionali, che coprono tutta l'Italia.
+
+Su un'installazione **già fatta** questi layer non arrivano da soli:
+`config.xml` viene generato una volta sola all'installazione. Vanno copiati a
+mano da `config.xml.dist`.
 
 I rilievi georiferiti (KML/KMZ) si sovrappongono alla mappa.
 
@@ -372,7 +479,7 @@ non compare affatto.
 
 ---
 
-## 15. Ricerca ed esportazioni
+## 16. Ricerca ed esportazioni
 
 Le modalità si combinano in AND:
 
@@ -391,7 +498,7 @@ della consultazione: quello che non si vede a schermo non finisce nel file.
 
 ---
 
-## 16. Stampa della scheda
+## 17. Stampa della scheda
 
 Dal pulsante **Stampa** della scheda si apre un documento lineare pensato per
 la carta, che si stampa o si salva in PDF con la stampa del browser.
@@ -414,9 +521,19 @@ dipendere dalla rete.
 Delle foto se ne stampano al massimo sei, e il foglio dice quante ne ha
 lasciate fuori.
 
+Fra le sezioni c'è anche la **geologia**, con inquadramento, provenienza del
+dato, genesi e assetto, idrogeologia, morfologie, rischi e campioni. Due
+differenze rispetto a quello che si vede a schermo, entrambe volute:
+
+- la **provenienza si stampa sempre**, anche quando non è dichiarata. Su un
+  foglio che può finire allegato a una relazione, una litologia senza fonte è
+  un'affermazione senza autore, e «non dichiarata» dice più di uno spazio
+  bianco, che si legge come una dimenticanza di stampa;
+- i **rischi ci sono tutti**, non solo quelli che accendono la barra avvisi.
+
 ---
 
-## 17. Migrazione fra cataloghi
+## 18. Migrazione fra cataloghi
 
 Solo ADM. Sposta uno o più ipogei in un altro catalogo, assegnando il codice
 dalla serie di destinazione.
@@ -435,7 +552,7 @@ Fai un backup prima. La pagina lo raccomanda ma non lo impone.
 
 ---
 
-## 18. Importazione da CSV
+## 19. Importazione da CSV
 
 Solo ADM, dalla pagina **Strumenti**. Serve a far entrare un elenco di cavità
 già compilato altrove.
@@ -467,7 +584,7 @@ da un Excel italiano porterebbe dentro accenti sbagliati senza segnalazione.
 
 ---
 
-## 19. Anagrafiche
+## 20. Anagrafiche
 
 Quattro registri condivisi da tutto l'archivio:
 
@@ -483,7 +600,7 @@ cancellare una voce l'applicativo dice chi la sta usando.
 
 ---
 
-## 20. Strumenti di manutenzione
+## 21. Strumenti di manutenzione
 
 Solo ADM.
 
@@ -516,7 +633,7 @@ disponibilità di chiamate HTTP in uscita.
 
 ---
 
-## 21. Aspetto
+## 22. Aspetto
 
 Dal menu con la mezzaluna, in alto a destra: tema chiaro, scuro o automatico, e
 quattro tavolozze per il tema chiaro. La scelta vive nel browser di chi guarda
@@ -525,7 +642,7 @@ non ha scelto.
 
 ---
 
-## 22. Dove stanno i dati
+## 23. Dove stanno i dati
 
 ```
 dati/

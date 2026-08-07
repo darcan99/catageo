@@ -154,7 +154,7 @@ final class VocabolariPredefiniti
                 ['V-ARIA',  'Velocita aria',          'm/s',   '0',    '30',     '2'],
                 ['Q-ARIA',  'Portata d\'aria',        'm3/s',  '0',    '500',    '2'],
             ]],
-            'GAS' => ['nome' => 'Gas e qualita dell\'aria', 'grandezze' => [
+            'GAS' => ['nome' => 'Gas e qualità dell\'aria', 'grandezze' => [
                 ['CO2', 'Anidride carbonica',      'ppm', '0', '100000', '0'],
                 ['O2',  'Ossigeno',                '%',   '0', '25',     '2'],
                 ['CH4', 'Metano',                  'ppm', '0', '50000',  '0'],

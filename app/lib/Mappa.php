@@ -181,7 +181,17 @@ final class Mappa
             'zoomScheda' => self::zoomScheda(),
             'cluster'  => self::cluster(),
             'base'     => self::baseLayers(),
-            'overlay'  => self::overlayLayers(),
+            // La mappatura dei campi non serve al browser: la compilazione
+            // assistita la fa il server (6.16.2). Toglierla evita di ripetere
+            // in ogni pagina un blocco JSON che nessuno legge.
+            'overlay'  => array_map(
+                static function (array $l): array {
+                    unset($l['interroga']);
+
+                    return $l;
+                },
+                self::overlayLayers()
+            ),
             'colori'   => self::COLORI_NATURA,
             // Il browser sceglie l'implementazione da questo valore: se la
             // chiave manca resta 'osm', cosi il ripiego e gia deciso qui e
@@ -271,6 +281,69 @@ final class Mappa
     }
 
     /**
+     * Campi della sezione geologia compilabili da una carta.
+     *
+     * Sono pochi di proposito. Una carta geologica dice di che roccia e fatto
+     * il terreno sopra la cavita; non dice se la cavita e attiva, se prosegue
+     * o quanto e fratturata la volta. Ammettere qui altre chiavi darebbe
+     * l'impressione che il resto della sezione si possa compilare senza
+     * scendere.
+     */
+    public const CAMPI_INTERROGABILI = [
+        'litologia', 'formazione', 'unitaGeologica', 'etaFormazione', 'permeabilita',
+    ];
+
+    /**
+     * Layer che sanno rispondere alla compilazione assistita (6.16.2).
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function layerInterrogabili(): array
+    {
+        $risultato = [];
+        foreach (self::overlayLayers() as $layer) {
+            if (($layer['tipo'] ?? '') === 'wms' && ($layer['interroga'] ?? []) !== []) {
+                $risultato[] = $layer;
+            }
+        }
+
+        return $risultato;
+    }
+
+    /**
+     * Interpreta l'attributo interroga: "litologia:campo,formazione:altro".
+     *
+     * Le chiavi fuori elenco si scartano in silenzio invece di far fallire la
+     * lettura della configurazione: un refuso in un attributo facoltativo non
+     * puo lasciare l'installazione senza mappa.
+     *
+     * @return array<string,string>
+     */
+    private static function mappaturaCampi(string $grezzo): array
+    {
+        $grezzo = trim($grezzo);
+        if ($grezzo === '') {
+            return [];
+        }
+
+        $mappa = [];
+        foreach (explode(',', $grezzo) as $coppia) {
+            $pezzi = explode(':', $coppia, 2);
+            if (count($pezzi) !== 2) {
+                continue;
+            }
+            $nostro = trim($pezzi[0]);
+            $loro   = trim($pezzi[1]);
+            if ($loro === '' || !in_array($nostro, self::CAMPI_INTERROGABILI, true)) {
+                continue;
+            }
+            $mappa[$nostro] = $loro;
+        }
+
+        return $mappa;
+    }
+
+    /**
      * Legge un gruppo di layer da configurazione.
      *
      * @return array<int,array<string,mixed>>
@@ -315,6 +388,7 @@ final class Mappa
                 $voce['formato']     = trim($nodo->getAttribute('formato')) ?: 'image/png';
                 $voce['versione']    = trim($nodo->getAttribute('versione')) ?: '1.3.0';
                 $voce['trasparente'] = strtolower($nodo->getAttribute('trasparente')) !== '0';
+                $voce['interroga']   = self::mappaturaCampi($nodo->getAttribute('interroga'));
                 if ($voce['layers'] === '') {
                     continue;
                 }

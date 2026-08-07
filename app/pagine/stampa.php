@@ -56,7 +56,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -77,6 +77,7 @@ $sezioniDisponibili = [
     'scientifici'   => 'Dati scientifici',
     'biospeleologia' => 'Biospeleologia',
     'archeologia'   => 'Archeologia',
+    'geologia'      => 'Geologia',
     'risorse'       => 'Elenco di allegati, foto, video e rilievi',
     'foto'          => 'Foto (immagini in pagina)',
 ];
@@ -160,6 +161,14 @@ $inquadramento = $sezioni['archeologia'] ? Archeologia::inquadramento($codiceCor
 $evidenze      = $sezioni['archeologia'] ? Archeologia::evidenze($codiceCorrente) : [];
 $tutela        = $sezioni['archeologia'] ? Archeologia::tutela($codiceCorrente) : [];
 $indagini      = $sezioni['archeologia'] ? Archeologia::indagini($codiceCorrente) : [];
+
+$geoInq   = $sezioni['geologia'] ? Geologia::inquadramento($codiceCorrente) : [];
+$geoGen   = $sezioni['geologia'] ? Geologia::genesi($codiceCorrente) : [];
+$geoAss   = $sezioni['geologia'] ? Geologia::assetto($codiceCorrente) : [];
+$geoIdro  = $sezioni['geologia'] ? Geologia::idrogeologia($codiceCorrente) : [];
+$geoMorf  = $sezioni['geologia'] ? Geologia::morfologie($codiceCorrente) : [];
+$geoRisc  = $sezioni['geologia'] ? Geologia::rischi($codiceCorrente) : [];
+$geoCamp  = $sezioni['geologia'] ? Geologia::campioni($codiceCorrente) : [];
 
 /*
  * Foto in pagina: un tetto basso e voluto. Una scheda con ottanta foto
@@ -373,6 +382,20 @@ function catageoStampaGrandezza(string $codice, string $unita): string
     return $etichetta . ' — misurata in ' . $unita;
 }
 
+/**
+ * Un angolo in gradi, o stringa vuota se il campo non e compilato.
+ *
+ * Il simbolo si aggiunge qui e non nell'etichetta: «Immersione 135» su un
+ * foglio si puo leggere come metri, e in una scheda geologica la confusione
+ * fra un azimut e una profondita non e teorica.
+ */
+function catageoGradi(string $valore): string
+{
+    $valore = trim($valore);
+
+    return $valore === '' ? '' : $valore . '°';
+}
+
 /** Blocco di testo lungo, con gli a capo conservati. */
 function catageoStampaTesto(string $testo): void
 {
@@ -527,7 +550,7 @@ header('Content-Type: text/html; charset=utf-8');
     <h3>Coordinate</h3>
     <?php if ($coord['offuscate']): ?>
       <p class="stampa-testo">
-        <strong>Coordinate approssimate.</strong> La posizione esatta di questa cavita
+        <strong>Coordinate approssimate.</strong> La posizione esatta di questa cavità
         e riservata: i valori qui sotto sono arrotondati e servono solo a inquadrare
         la zona. Non sono utilizzabili per raggiungere l'ingresso.
       </p>
@@ -917,6 +940,140 @@ $haArcheologia = $sezioni['archeologia'] && (
               <td><?= catageoStampaValore((string) $indagine['tipo']) ?></td>
               <td><?= catageoStampaValore((string) $indagine['soggetto']) ?></td>
               <td><?= catageoStampaValore((string) $indagine['esito']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+  </div>
+<?php endif; ?>
+
+<?php
+$haGeologia = $sezioni['geologia'] && (
+    trim((string) ($geoInq['litologia'] ?? '')) !== ''
+    || trim((string) ($geoInq['formazione'] ?? '')) !== ''
+    || trim((string) ($geoGen['tipoGenesi'] ?? '')) !== ''
+    || trim((string) ($geoIdro['acquifero'] ?? '')) !== ''
+    || $geoMorf !== [] || $geoRisc !== [] || $geoCamp !== []
+);
+?>
+<?php if ($haGeologia): ?>
+  <div class="stampa-sezione">
+    <h2>Geologia</h2>
+
+    <?php catageoStampaCampi([
+        'Litologia'       => (string) ($geoInq['litologia'] ?? ''),
+        'Formazione'      => (string) ($geoInq['formazione'] ?? ''),
+        'Unità geologica' => (string) ($geoInq['unitaGeologica'] ?? ''),
+        'Età'             => (string) ($geoInq['etaFormazione'] ?? ''),
+        'Sistema'         => (string) ($geoInq['sistemaCrono'] ?? ''),
+        'Serie'           => (string) ($geoInq['serieCrono'] ?? ''),
+        'Foglio geologico' => (string) ($geoInq['foglioGeologico'] ?? ''),
+    ], false); ?>
+
+    <?php
+    /*
+     * La provenienza si stampa sempre, anche quando manca: su un foglio che
+     * puo finire allegato a una relazione, una litologia senza fonte e
+     * un'affermazione senza autore. «Non dichiarata» dice piu di uno spazio
+     * bianco, che si legge come una dimenticanza di stampa.
+     */
+    $modalitaGeo = (string) ($geoInq['fonteModalita'] ?? '');
+    catageoStampaCampi([
+        'Fonte'       => (string) ($geoInq['fonteNome'] ?? ''),
+        'Consultata'  => (string) ($geoInq['fonteData'] ?? ''),
+        'Modo'        => Geologia::MODALITA_FONTE[$modalitaGeo] ?? Geologia::MODALITA_FONTE[''],
+    ], false);
+    ?>
+
+    <?php if (trim((string) ($geoGen['tipoGenesi'] ?? '')) !== ''
+              || trim((string) ($geoGen['processo'] ?? '')) !== ''
+              || trim((string) ($geoAss['fratturazione'] ?? '')) !== ''): ?>
+      <h3>Genesi e assetto</h3>
+      <?php catageoStampaCampi([
+          'Tipo di genesi'    => Geologia::TIPI_GENESI[(string) ($geoGen['tipoGenesi'] ?? '')] ?? '',
+          'Roccia incassante' => (string) ($geoGen['rocciaIncassante'] ?? ''),
+          // Numeri, non voci di vocabolario: catageoStampaGrandezza() cerca il
+          // codice fra le grandezze misurabili e su «135» non troverebbe nulla.
+          'Immersione'        => catageoGradi((string) ($geoAss['immersione'] ?? '')),
+          'Inclinazione'      => catageoGradi((string) ($geoAss['inclinazione'] ?? '')),
+          'Fratturazione'     => Geologia::FRATTURAZIONE[(string) ($geoAss['fratturazione'] ?? '')] ?? '',
+      ], false); ?>
+      <?php catageoStampaTesto((string) ($geoGen['processo'] ?? '')); ?>
+      <?php catageoStampaTesto((string) ($geoAss['note'] ?? '')); ?>
+    <?php endif; ?>
+
+    <?php if (trim((string) ($geoIdro['acquifero'] ?? '')) !== ''
+              || trim((string) ($geoIdro['permeabilita'] ?? '')) !== ''
+              || trim((string) ($geoIdro['ruoloIdrogeologico'] ?? '')) !== ''): ?>
+      <h3>Idrogeologia</h3>
+      <?php catageoStampaCampi([
+          'Acquifero'     => (string) ($geoIdro['acquifero'] ?? ''),
+          'Permeabilità'  => Geologia::PERMEABILITA[(string) ($geoIdro['permeabilita'] ?? '')] ?? '',
+          'Ruolo'         => Geologia::RUOLI_IDRO[(string) ($geoIdro['ruoloIdrogeologico'] ?? '')] ?? '',
+          'Serie di misure' => (string) ($geoIdro['serieMisureRif'] ?? ''),
+      ], false); ?>
+      <?php catageoStampaTesto((string) ($geoIdro['note'] ?? '')); ?>
+    <?php endif; ?>
+
+    <?php if ($geoMorf !== []): ?>
+      <h3>Morfologie (<?= count($geoMorf) ?>)</h3>
+      <table class="stampa-elenco">
+        <thead><tr><th>Tipo</th><th>Descrizione</th><th>Zona</th></tr></thead>
+        <tbody>
+          <?php foreach ($geoMorf as $morfologia): ?>
+            <tr>
+              <td><?= catageoStampaValore(
+                  Geologia::TIPI_MORFOLOGIA[(string) $morfologia['tipo']] ?? (string) $morfologia['tipo']
+              ) ?></td>
+              <td><?= catageoStampaValore((string) $morfologia['descrizione']) ?></td>
+              <td><?= catageoStampaValore((string) $morfologia['zonaCavita']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+
+    <?php if ($geoRisc !== []): ?>
+      <?php
+      /*
+       * I rischi si stampano tutti, non solo quelli che accendono la barra
+       * avvisi. In pagina la barra deve restare leggibile e un rischio basso
+       * la sporcherebbe; su un foglio che si porta in uscita, invece, sapere
+       * che c'e anche un rischio basso di gas non costa nulla e puo servire.
+       */
+      ?>
+      <h3>Rischi (<?= count($geoRisc) ?>)</h3>
+      <table class="stampa-elenco">
+        <thead><tr><th>Tipo</th><th>Livello</th><th>Descrizione</th></tr></thead>
+        <tbody>
+          <?php foreach ($geoRisc as $rischio): ?>
+            <tr>
+              <td><?= catageoStampaValore(
+                  Geologia::TIPI_RISCHIO[(string) $rischio['tipo']] ?? (string) $rischio['tipo']
+              ) ?></td>
+              <td><?= catageoStampaValore(
+                  Geologia::LIVELLI_RISCHIO[(string) $rischio['livello']] ?? (string) $rischio['livello']
+              ) ?></td>
+              <td><?= catageoStampaValore((string) $rischio['descrizione']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+
+    <?php if ($geoCamp !== []): ?>
+      <h3>Campioni (<?= count($geoCamp) ?>)</h3>
+      <table class="stampa-elenco">
+        <thead><tr><th>Data</th><th>Tipo</th><th>Prelevato da</th><th>Depositato presso</th><th>Esito</th></tr></thead>
+        <tbody>
+          <?php foreach ($geoCamp as $campione): ?>
+            <tr>
+              <td><?= catageoStampaValore((string) $campione['data']) ?></td>
+              <td><?= catageoStampaValore((string) $campione['tipo']) ?></td>
+              <td><?= catageoStampaValore((string) $campione['prelevatoDa']) ?></td>
+              <td><?= catageoStampaValore((string) $campione['depositatoPresso']) ?></td>
+              <td><?= catageoStampaValore((string) $campione['esitoAnalisi']) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

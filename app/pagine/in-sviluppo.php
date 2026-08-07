@@ -46,7 +46,7 @@ $fase = $fasiPreviste[$richiesta] ?? 'Fase da definire';
             <strong><?= Testo::esc($fase) ?></strong>.
           </p>
           <p class="catageo-nota mb-3">
-            Il dettaglio di quanto verra realizzato, con il modello dati e le
+            Il dettaglio di quanto verrà realizzato, con il modello dati e le
             funzioni previste, e nel documento di analisi.
           </p>
           <div class="d-flex flex-wrap gap-2">

@@ -90,13 +90,54 @@ final class Visibilita
             return ['lat' => $latitudine, 'lon' => $longitudine, 'offuscate' => false];
         }
 
-        $metri = max(100, Config::intero('sicurezza.offuscamentoCoordinate', 1000));
+        $griglia = self::griglia((float) $latitudine, (float) $longitudine);
+
+        return [
+            'lat'       => $griglia['lat'],
+            'lon'       => $griglia['lon'],
+            'offuscate' => true,
+        ];
+    }
+
+    /**
+     * Se il livello di riservatezza protegge la posizione.
+     *
+     * Vale sia per "riservata" sia per "coordinate_offuscate": in entrambi i
+     * casi chi ha deciso quel livello non vuole che il punto esatto giri, e
+     * mandarlo al server di un ente sarebbe farlo girare. Non dipende dai
+     * permessi di chi guarda: l'operatore che le coordinate esatte le vede
+     * eccome resta comunque tenuto a scegliere se farle uscire (6.16.2).
+     */
+    public static function coordinateRiservate(string $riservatezza): bool
+    {
+        return $riservatezza === 'riservata' || $riservatezza === 'coordinate_offuscate';
+    }
+
+    /**
+     * Aggancia una coordinata alla griglia di offuscamento configurata.
+     *
+     * Arrotondamento, non errore casuale. La differenza conta: un errore che
+     * cambia a ogni chiamata si annulla facendo la media di tre richieste, e
+     * chi volesse la posizione vera dovrebbe solo chiederla tre volte.
+     * L'arrotondamento restituisce sempre lo stesso punto, quante volte lo si
+     * chieda, e a 1:50.000 non toglie nulla: mille metri sono due millimetri
+     * di carta.
+     *
+     * Niente controllo dei permessi qui dentro: serve anche a chi le
+     * coordinate esatte le vede, quando quelle coordinate stanno per uscire
+     * verso il server di qualcun altro (6.16.2).
+     *
+     * @return array{lat:string,lon:string,metri:int}
+     */
+    public static function griglia(float $latitudine, float $longitudine, ?int $metri = null): array
+    {
+        $metri = max(100, $metri ?? Config::intero('sicurezza.offuscamentoCoordinate', 1000));
         $passo = $metri / 111000.0;   // gradi di latitudine equivalenti
 
         return [
-            'lat'       => number_format(round((float) $latitudine / $passo) * $passo, 4, '.', ''),
-            'lon'       => number_format(round((float) $longitudine / $passo) * $passo, 4, '.', ''),
-            'offuscate' => true,
+            'lat'   => number_format(round($latitudine / $passo) * $passo, 4, '.', ''),
+            'lon'   => number_format(round($longitudine / $passo) * $passo, 4, '.', ''),
+            'metri' => $metri,
         ];
     }
 

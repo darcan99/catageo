@@ -158,7 +158,7 @@ $misura = static function (float $valore): string {
                 ?>
                 <div class="catageo-nota">
                   Facoltativo e libero: <strong>non</strong> e un codice catastale e non
-                  consuma progressivi del catalogo. Serve a chi ha gia una propria
+                  consuma progressivi del catalogo. Serve a chi ha già una propria
                   numerazione dei complessi.
                 </div>
               </div>
@@ -175,7 +175,7 @@ $misura = static function (float $valore): string {
                   <?php endforeach; ?>
                 </select>
                 <div class="catageo-nota">
-                  «Misto» non e un ripiego: una cava che intercetta un sistema
+                  «Misto» non è un ripiego: una cava che intercetta un sistema
                   carsico e il caso in cui le due nature coesistono davvero.
                 </div>
               </div>
@@ -198,10 +198,10 @@ $misura = static function (float $valore): string {
               <div class="col-12">
                 <div class="alert alert-light border mb-0 catageo-nota">
                   <strong>Sviluppo e dislivello non si scrivono qui</strong>: si sommano
-                  dalle cavita che fanno parte del complesso. Un totale digitato a mano
+                  dalle cavità che fanno parte del complesso. Un totale digitato a mano
                   divergerebbe dalla somma al primo aggiornamento di una scheda, e da
-                  quel momento non si saprebbe piu a quale numero credere.
-                  L'appartenenza si dichiara sulla scheda della cavita.
+                  quel momento non si saprebbe più a quale numero credere.
+                  L'appartenenza si dichiara sulla scheda della cavità.
                 </div>
               </div>
 
@@ -234,7 +234,7 @@ $misura = static function (float $valore): string {
       <i class="bi bi-diagram-2 fs-1 text-body-tertiary" aria-hidden="true"></i>
       <p class="mt-3 mb-1 text-body-secondary">Nessun complesso censito.</p>
       <p class="catageo-nota mb-3">
-        Un complesso raggruppa le cavita che formano un sistema unico e ha un nome
+        Un complesso raggruppa le cavità che formano un sistema unico e ha un nome
         proprio: e la cosa di cui si parla in letteratura, mentre le schede sono
         il modo in cui il catasto la registra.
       </p>
@@ -254,7 +254,7 @@ $misura = static function (float $valore): string {
             <th scope="col">Codice</th>
             <th scope="col">Nome</th>
             <th scope="col">Natura</th>
-            <th scope="col">Cavita</th>
+            <th scope="col">Cavità</th>
             <th scope="col">Sviluppo</th>
             <th scope="col">Dislivello</th>
             <th scope="col">Stato</th>
@@ -315,8 +315,8 @@ $misura = static function (float $valore): string {
     </div>
     <div class="card-footer catageo-nota">
       Sviluppo e dislivello sono <strong>sommati dalle schede visibili</strong>, non
-      digitati. Un utente che non vede le cavita riservate vede totali piu bassi:
-      e voluto, perche la differenza direbbe quante ne esistono che non puo vedere.
+      digitati. Un utente che non vede le cavità riservate vede totali più bassi:
+      e voluto, perché la differenza direbbe quante ne esistono che non può vedere.
     </div>
   </div>
 

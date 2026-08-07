@@ -204,15 +204,15 @@ final class Cataloghi
 
         self::validaSigla($sigla);
         if ($nome === '') {
-            throw new CatalogoEccezione('Il nome del catalogo e obbligatorio.');
+            throw new CatalogoEccezione('Il nome del catalogo è obbligatorio.');
         }
         if (self::trova($sigla) !== null) {
-            throw new CatalogoEccezione("Esiste gia un catalogo con sigla \"{$sigla}\".");
+            throw new CatalogoEccezione("Esiste già un catalogo con sigla \"{$sigla}\".");
         }
 
         $cartella = Percorsi::cataloghi(self::nomeCartella($sigla, $nome));
         if (is_dir($cartella)) {
-            throw new CatalogoEccezione('Esiste gia una cartella con questo nome nell\'archivio.');
+            throw new CatalogoEccezione('Esiste già una cartella con questo nome nell\'archivio.');
         }
 
         // La serie iniziale e obbligatoria: un catalogo senza serie non
@@ -282,7 +282,7 @@ final class Cataloghi
 
         $nome = trim((string) ($dati['nome'] ?? ''));
         if ($nome === '') {
-            throw new CatalogoEccezione('Il nome del catalogo e obbligatorio.');
+            throw new CatalogoEccezione('Il nome del catalogo è obbligatorio.');
         }
 
         $descrittore = self::descrittore($sigla);
@@ -370,7 +370,7 @@ final class Cataloghi
             }
             throw new CatalogoEccezione(
                 'Cancellazione rifiutata: la cartella del catalogo contiene "' . $voce . '", '
-                . 'che non e stato creato dall\'applicativo. Rimuoverlo a mano se non serve.'
+                . 'che non è stato creato dall\'applicativo. Rimuoverlo a mano se non serve.'
             );
         }
 
@@ -379,7 +379,7 @@ final class Cataloghi
         @rmdir(Percorsi::unisci($cartella, 'ipogei'));
 
         if (!@rmdir($cartella)) {
-            throw new CatalogoEccezione('La cartella del catalogo non e stata rimossa: verificarne il contenuto.');
+            throw new CatalogoEccezione('La cartella del catalogo non è stata rimossa: verificarne il contenuto.');
         }
 
         self::invalidaCache();
@@ -410,7 +410,7 @@ final class Cataloghi
         }
         foreach ($catalogo['serie'] as $serie) {
             if (strcasecmp((string) $serie['prefisso'], $prefisso) === 0) {
-                throw new CatalogoEccezione("Il prefisso \"{$prefisso}\" e gia usato da un'altra serie di questo catalogo.");
+                throw new CatalogoEccezione("Il prefisso \"{$prefisso}\" è già usato da un'altra serie di questo catalogo.");
             }
         }
 
@@ -756,11 +756,11 @@ final class Cataloghi
         $a  = Percorsi::cataloghi($nuovaCartella);
 
         if (is_dir($a)) {
-            throw new CatalogoEccezione('Esiste gia una cartella "' . $nuovaCartella . '" nell\'archivio.');
+            throw new CatalogoEccezione('Esiste già una cartella "' . $nuovaCartella . '" nell\'archivio.');
         }
         if (!@rename($da, $a)) {
             throw new CatalogoEccezione(
-                'Il nome del catalogo e stato salvato, ma la cartella non e stata rinominata: '
+                'Il nome del catalogo è stato salvato, ma la cartella non è stata rinominata: '
                 . 'verificare che non sia aperta da un altro programma.'
             );
         }
@@ -778,7 +778,7 @@ final class Cataloghi
     private static function validaSigla(string $sigla): void
     {
         if ($sigla === '') {
-            throw new CatalogoEccezione('La sigla del catalogo e obbligatoria.');
+            throw new CatalogoEccezione('La sigla del catalogo è obbligatoria.');
         }
         // Nessun limite di lunghezza imposto dal dominio: il vincolo e solo
         // quello dei nomi di file, perche la sigla compare nella cartella.

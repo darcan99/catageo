@@ -89,7 +89,7 @@ $fasi = [
   <div>
     <h1><?= Testo::esc(Config::testo('catasto.nome', 'CATAGEO')) ?></h1>
     <p class="text-body-secondary mb-0">
-      Catasto degli ipogei — cavita artificiali e naturali
+      Catasto degli ipogei — cavità artificiali e naturali
     </p>
   </div>
   <span class="badge text-bg-warning">Versione <?= Testo::esc(CATAGEO_VERSIONE) ?> — in sviluppo</span>

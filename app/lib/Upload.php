@@ -137,7 +137,7 @@ final class Upload
 
         $dimensione = (int) ($file['size'] ?? 0);
         if ($dimensione <= 0) {
-            throw new UploadEccezione('Il file "' . $nome . '" e vuoto.');
+            throw new UploadEccezione('Il file "' . $nome . '" è vuoto.');
         }
 
         $massimo = Config::dimensioneMaxUpload();
@@ -254,11 +254,11 @@ final class Upload
                                      . ini_get('upload_max_filesize') . ')',
             UPLOAD_ERR_FORM_SIZE  => 'supera il limite dichiarato dal modulo',
             UPLOAD_ERR_PARTIAL    => 'e arrivato solo in parte: trasferimento interrotto',
-            UPLOAD_ERR_NO_FILE    => 'non e stato selezionato',
+            UPLOAD_ERR_NO_FILE    => 'non è stato selezionato',
             UPLOAD_ERR_NO_TMP_DIR => 'non ha una cartella temporanea sul server',
-            UPLOAD_ERR_CANT_WRITE => 'non e stato scritto su disco dal server',
-            UPLOAD_ERR_EXTENSION  => 'e stato bloccato da un modulo di PHP',
-            default               => 'non e stato caricato (errore ' . $errore . ')',
+            UPLOAD_ERR_CANT_WRITE => 'non è stato scritto su disco dal server',
+            UPLOAD_ERR_EXTENSION  => 'è stato bloccato da un modulo di PHP',
+            default               => 'non è stato caricato (errore ' . $errore . ')',
         };
 
         throw new UploadEccezione('Il file "' . $nome . '" ' . $messaggio . '.');
@@ -272,7 +272,7 @@ final class Upload
         if (in_array($mime, self::MIME_VIETATI, true)) {
             throw new UploadEccezione(
                 'Il contenuto di "' . $nome . '" e di tipo ' . $mime
-                . ', che non e ammesso a prescindere dall\'estensione.'
+                . ', che non è ammesso a prescindere dall\'estensione.'
             );
         }
 
@@ -287,7 +287,7 @@ final class Upload
 
         throw new UploadEccezione(
             'Il file "' . $nome . '" si presenta come .' . $estensione
-            . ' ma il suo contenuto e di tipo ' . $mime . '. Il file non e quello che dichiara di essere.'
+            . ' ma il suo contenuto e di tipo ' . $mime . '. Il file non è quello che dichiara di essere.'
         );
     }
 }

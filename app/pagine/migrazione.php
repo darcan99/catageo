@@ -143,7 +143,7 @@ $tracciato = Migrazione::tracciato(30);
   <div>
     <h1>Migrazione fra cataloghi</h1>
     <p class="text-body-secondary mb-0">
-      Sposta uno o piu ipogei in un altro catalogo assegnando i codici della sua
+      Sposta uno o più ipogei in un altro catalogo assegnando i codici della sua
       serie. Il codice di origine resta risolvibile.
     </p>
   </div>
@@ -296,7 +296,7 @@ $tracciato = Migrazione::tracciato(30);
 <!-- ======================================================== tracciato -->
 <div class="card">
   <div class="card-header">
-    <h2 class="h6 mb-0">Migrazioni gia eseguite</h2>
+    <h2 class="h6 mb-0">Migrazioni già eseguite</h2>
   </div>
   <?php if ($tracciato === []): ?>
     <div class="card-body">

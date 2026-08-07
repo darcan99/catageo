@@ -72,7 +72,7 @@ if ($prog > 0) {
         $errore(404, 'Rilievo non trovato.');
     }
     if (!Tracciato::convertibile((string) $risorsa['file'])) {
-        $errore(400, 'Questo rilievo non e in un formato sovrapponibile alla mappa.');
+        $errore(400, 'Questo rilievo non è in un formato sovrapponibile alla mappa.');
     }
     $daConvertire = [$risorsa];
 } else {

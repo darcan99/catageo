@@ -83,6 +83,7 @@ final class Ricerca
         'ha_3d'           => 'Modello 3D',
         'ha_chirotteri'   => 'Colonie di chirotteri',
         'ha_archeologia'  => 'Dati archeologici',
+        'ha_geologia'     => 'Dati geologici',
     ];
 
     /** Criteri accettati, col valore di riposo. */
@@ -93,6 +94,8 @@ final class Ricerca
         'statoAccesso' => '', 'statoScheda' => '',
         // Percorribilita strutturata (9.17.7).
         'grado' => '', 'gradoIdrico' => '', 'armo' => '',
+        // Geologia (6.16).
+        'litologia' => '', 'genesi' => '',
         // Stato esplorativo (9.17.1): e la ricerca per cui quei campi esistono.
         'esplorata' => '', 'prosegue' => '',
         // Verifica sul campo (9.17.2): 'si', 'no', oppure gli anni trascorsi.
@@ -322,13 +325,23 @@ final class Ricerca
                   'sottotipologia' => 'sottotipologia', 'stato' => 'stato',
                   'regione' => 'regione', 'provincia' => 'provincia', 'area' => 'area', 'complesso' => 'complesso',
                   'statoAccesso' => 'stato_accesso', 'statoScheda' => 'stato_scheda',
-                  'grado' => 'grado', 'gradoIdrico' => 'grado_idrico', 'armo' => 'armo'] as $criterio => $colonna) {
+                  'grado' => 'grado', 'gradoIdrico' => 'grado_idrico', 'armo' => 'armo',
+                  'genesi' => 'genesi'] as $criterio => $colonna) {
             if ((string) $c[$criterio] === '') {
                 continue;
             }
             if (strcasecmp((string) ($riga[$colonna] ?? ''), (string) $c[$criterio]) !== 0) {
                 return false;
             }
+        }
+
+        // La litologia si cerca per contenuto: chi scrive "calcare" deve
+        // trovare anche "Calcare massiccio a rudiste", che e come i nomi
+        // litologici compaiono davvero sulle carte.
+        if ((string) $c['litologia'] !== ''
+            && !str_contains(Testo::normalizzaRicerca((string) ($riga['litologia'] ?? '')),
+                             Testo::normalizzaRicerca((string) $c['litologia']))) {
+            return false;
         }
 
         // Il comune si cerca per contenuto e non per uguaglianza: chi scrive

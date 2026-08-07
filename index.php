@@ -48,7 +48,7 @@ if (!Config::caricata()) {
         exit;
     }
     http_response_code(503);
-    echo 'CATAGEO non e configurato e installa.php non e presente. '
+    echo 'CATAGEO non è configurato e installa.php non è presente. '
        . 'Copiare config.xml.dist in config.xml.';
     exit;
 }
@@ -91,6 +91,8 @@ $pagine = [
     'serie-csv'    => ['file' => 'serie-csv.php',    'permesso' => 'esporta',            'titolo' => 'Serie CSV', 'grezza' => true],
     'biospeleologia' => ['file' => 'biospeleologia.php', 'permesso' => 'consulta',        'titolo' => 'Biospeleologia'],
     'archeologia'  => ['file' => 'archeologia.php',  'permesso' => 'consulta',           'titolo' => 'Archeologia'],
+    'geologia'     => ['file' => 'geologia.php',     'permesso' => 'consulta',           'titolo' => 'Geologia'],
+    'geo-interroga' => ['file' => 'geo-interroga.php', 'permesso' => 'compila_sezioni',  'titolo' => 'Interrogazione cartografica', 'grezza' => true],
     'anagrafiche'  => ['file' => 'anagrafiche.php',  'permesso' => 'anagrafiche',        'titolo' => 'Anagrafiche'],
     'gruppi'       => ['file' => 'gruppi.php',       'permesso' => 'anagrafiche',        'titolo' => 'Gruppi speleologici'],
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
@@ -166,7 +168,7 @@ if (!empty($pagina['grezza'])) {
         }
         echo json_encode(['errore' => Config::booleano('sistema.debug', false)
             ? $e->getMessage()
-            : 'Richiesta non completata. L\'errore e stato registrato nel log.']);
+            : 'Richiesta non completata. L\'errore è stato registrato nel log.']);
     }
     exit;
 }
@@ -188,11 +190,11 @@ try {
 
     $dettaglio = Config::booleano('sistema.debug', false)
         ? $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')'
-        : 'L\'errore e stato registrato nel log dell\'archivio. Se il problema persiste, '
+        : 'L\'errore è stato registrato nel log dell\'archivio. Se il problema persiste, '
           . 'attivare il debug in configurazione per vedere il dettaglio.';
 
     $titolo    = 'Errore';
-    $contenuto = vistaErrore('Si e verificato un errore', $dettaglio, 'bi-exclamation-octagon');
+    $contenuto = vistaErrore('Si è verificato un errore', $dettaglio, 'bi-exclamation-octagon');
 }
 
 require __DIR__ . '/app/view/layout.php';

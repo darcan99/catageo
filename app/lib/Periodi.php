@@ -98,7 +98,7 @@ final class Periodi extends Anagrafica
         $nome   = trim((string) ($dati['nome'] ?? ''));
 
         if ($codice === '') {
-            throw new AnagraficaEccezione('Il codice del periodo e obbligatorio.');
+            throw new AnagraficaEccezione('Il codice del periodo è obbligatorio.');
         }
         if (!preg_match('/^[A-Z0-9\-]{2,20}$/', $codice)) {
             throw new AnagraficaEccezione(
@@ -106,18 +106,18 @@ final class Periodi extends Anagrafica
             );
         }
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome del periodo e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome del periodo è obbligatorio.');
         }
 
         // In creazione il codice non deve esistere; in modifica non e cambiabile
         // (e la chiave usata nei riferimenti delle schede).
         if ($idEsistente === null) {
             if (static::trova($codice) !== null) {
-                throw new AnagraficaEccezione("Esiste gia un periodo con codice \"{$codice}\".");
+                throw new AnagraficaEccezione("Esiste già un periodo con codice \"{$codice}\".");
             }
         } elseif ($codice !== $idEsistente) {
             throw new AnagraficaEccezione(
-                'Il codice di un periodo non e modificabile: e il riferimento usato dalle schede. '
+                'Il codice di un periodo non è modificabile: e il riferimento usato dalle schede. '
                 . 'Creare un nuovo periodo e disattivare quello vecchio.'
             );
         }
@@ -131,7 +131,7 @@ final class Periodi extends Anagrafica
             }
         }
         if ($da !== '' && $a !== '' && (int) $a < (int) $da) {
-            throw new AnagraficaEccezione('L\'anno finale non puo precedere quello iniziale.');
+            throw new AnagraficaEccezione('L\'anno finale non può precedere quello iniziale.');
         }
     }
 

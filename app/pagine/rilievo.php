@@ -50,7 +50,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -122,7 +122,7 @@ if ($inMappa) {
     <i class="bi bi-exclamation-triangle-fill mt-1" aria-hidden="true"></i>
     <div>
       Il file <span class="catageo-valore"><?= Testo::esc((string) $rilievo['file']) ?></span>
-      e registrato nell'indice ma non e presente nella cartella dell'archivio.
+      e registrato nell'indice ma non è presente nella cartella dell'archivio.
     </div>
   </div>
 

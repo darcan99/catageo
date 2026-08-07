@@ -423,7 +423,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
                        value="<?= Testo::esc($serieMod !== null ? (string) $serieMod['prefisso'] : '') ?>"
                        <?= $serieMod !== null ? 'readonly' : '' ?>>
                 <?php if ($serieMod !== null): ?>
-                  <div class="catageo-nota">Non modificabile: compare nei codici gia assegnati.</div>
+                  <div class="catageo-nota">Non modificabile: compare nei codici già assegnati.</div>
                 <?php endif; ?>
               </div>
               <div class="col-5">
@@ -436,7 +436,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
               <div class="col-12">
                 <label for="nome_serie" class="form-label">Descrizione della serie</label>
                 <input type="text" class="form-control" id="nome_serie" name="nome_serie" maxlength="120"
-                       placeholder="Lazio — cavita artificiali"
+                       placeholder="Lazio — cavità artificiali"
                        value="<?= Testo::esc($serieMod !== null ? (string) $serieMod['nome'] : '') ?>">
               </div>
 
@@ -475,7 +475,7 @@ $siglaAttiva = Cataloghi::siglaAttiva();
             <hr class="my-3">
             <h3 class="h6">Criteri</h3>
             <p class="catageo-nota">
-              Lasciare vuoto un criterio significa "qualsiasi". Piu valori si
+              Lasciare vuoto un criterio significa "qualsiasi". Più valori si
               separano con la barra verticale, es. <span class="catageo-valore">Lazio|Umbria</span>.
               Una serie senza criteri combacia sempre.
             </p>

@@ -44,7 +44,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -211,7 +211,7 @@ if ($azione === 'evidenza' && $puoCompilare) {
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label for="zonaCavita" class="form-label">Zona della cavita</label>
+                  <label for="zonaCavita" class="form-label">Zona della cavità</label>
                   <input type="text" class="form-control" id="zonaCavita" name="zonaCavita"
                          value="<?= $v('zonaCavita') ?>" placeholder="Primo tratto, 0-24 m">
                 </div>
@@ -713,7 +713,7 @@ $secondari = array_values(array_filter(
               <input class="form-check-input" type="checkbox" id="vincolo" name="vincolo" value="1"
                      <?= (string) $tutela['vincolo'] === '1' ? 'checked' : '' ?>>
               <label class="form-check-label" for="vincolo">
-                Cavita sottoposta a vincolo
+                Cavità sottoposta a vincolo
               </label>
               <div class="catageo-nota">
                 Se spuntato compare un avviso in cima alla scheda.

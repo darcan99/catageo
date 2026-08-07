@@ -268,7 +268,7 @@ function classeEsito(string $esito): string
 
         <div class="alert alert-warning">
           <strong>Da fare adesso:</strong> eliminare <span class="catageo-valore">installa.php</span> dal
-          server. Il file si e già autodisabilitato creando
+          server. Il file si è già autodisabilitato creando
           <span class="catageo-valore">installato.txt</span>, ma rimuoverlo del
           tutto è la scelta più prudente su un'installazione pubblica.
         </div>

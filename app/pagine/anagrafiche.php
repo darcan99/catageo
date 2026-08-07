@@ -46,7 +46,7 @@ $schede = [
         'url'         => 'index.php?p=aree',
         'titolo'      => 'Aree speleologiche',
         'icona'       => 'bi-bounding-box',
-        'descrizione' => 'Raggruppamenti geografici con un nome, indipendenti dai confini amministrativi: e il modo in cui uno speleologo colloca una cavita.',
+        'descrizione' => 'Raggruppamenti geografici con un nome, indipendenti dai confini amministrativi: e il modo in cui uno speleologo colloca una cavità.',
         'conteggio'   => Aree::conta(),
         'attive'      => Aree::conta(true),
     ],
@@ -54,7 +54,7 @@ $schede = [
         'url'         => 'index.php?p=complessi',
         'titolo'      => 'Complessi',
         'icona'       => 'bi-diagram-2',
-        'descrizione' => 'Insiemi di cavita che formano un sistema unico e hanno un nome proprio. Sviluppo e dislivello si sommano dalle schede, non si digitano.',
+        'descrizione' => 'Insiemi di cavità che formano un sistema unico e hanno un nome proprio. Sviluppo e dislivello si sommano dalle schede, non si digitano.',
         'conteggio'   => Complessi::conta(),
         'attive'      => Complessi::conta(true),
     ],
@@ -62,7 +62,7 @@ $schede = [
         'url'         => 'index.php?p=opere',
         'titolo'      => 'Catalogo delle opere',
         'icona'       => 'bi-journals',
-        'descrizione' => 'Opere citabili da piu schede: si censiscono una volta e si correggono in un posto solo.',
+        'descrizione' => 'Opere citabili da più schede: si censiscono una volta e si correggono in un posto solo.',
         'conteggio'   => Opere::conta(),
         'attive'      => Opere::conta(true),
     ],
@@ -78,7 +78,7 @@ $schede = [
         'url'         => 'index.php?p=vocabolari&amp;voc=grandezze',
         'titolo'      => 'Grandezze misurabili',
         'icona'       => 'bi-thermometer-half',
-        'descrizione' => 'Cosa si misura in cavita, con unita e intervalli di plausibilita.',
+        'descrizione' => 'Cosa si misura in cavità, con unità e intervalli di plausibilità.',
         'conteggio'   => Grandezze::conta(),
         'attive'      => Grandezze::conta(true),
     ],
@@ -105,7 +105,7 @@ $schede = [
 <div class="alert alert-info d-flex align-items-start gap-2">
   <i class="bi bi-info-circle-fill mt-1" aria-hidden="true"></i>
   <div>
-    Una voce referenziata da qualche parte non si puo cancellare, ma si puo
+    Una voce referenziata da qualche parte non si può cancellare, ma si può
     <strong>disattivare</strong>: sparisce dalle scelte per i nuovi inserimenti e
     resta valida nei riferimenti storici. E la via da preferire quasi sempre.
   </div>

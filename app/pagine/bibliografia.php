@@ -45,7 +45,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -232,7 +232,7 @@ if (($azione === 'nuova' || ($azione === 'modifica' && $prog > 0)) && $puoCompil
                     </select>
                   </div>
                   <div class="col-md-6">
-                    <label for="pagineRif" class="form-label">Pagine di questa cavita</label>
+                    <label for="pagineRif" class="form-label">Pagine di questa cavità</label>
                     <input type="text" class="form-control" id="pagineRif" name="pagine"
                            value="<?= $v('pagine') ?>" placeholder="112-130">
                     <div class="catageo-nota">Le pagine che parlano di questo ipogeo, non l'estensione dell'opera.</div>
@@ -361,8 +361,8 @@ if (($azione === 'nuova' || ($azione === 'modifica' && $prog > 0)) && $puoCompil
                     <?php endforeach; ?>
                   </select>
                   <div class="catageo-nota">
-                    I collegamenti si rompono in pochi anni e un catasto vive piu a lungo:
-                    di cio che conta conviene archiviare una copia.
+                    I collegamenti si rompono in pochi anni e un catasto vive più a lungo:
+                    di ciò che conta conviene archiviare una copia.
                   </div>
                 </div>
               </div>
@@ -389,7 +389,7 @@ if (($azione === 'nuova' || ($azione === 'modifica' && $prog > 0)) && $puoCompil
                   <?php endforeach; ?>
                 </select>
                 <div class="catageo-nota">
-                  Distingue la pubblicazione che ha fatto conoscere la cavita da
+                  Distingue la pubblicazione che ha fatto conoscere la cavità da
                   quella che la nomina di sfuggita.
                 </div>
               </div>
@@ -534,7 +534,7 @@ foreach ($voci as $voce) {
                         <i class="bi bi-file-earmark-text"></i> <?= Testo::esc((string) $voce['allegatoRif']) ?>
                       </a>
                     <?php else: ?>
-                      <span class="text-danger" title="L'allegato citato non c'e piu">
+                      <span class="text-danger" title="L'allegato citato non c'è più">
                         <i class="bi bi-exclamation-triangle"></i> <?= Testo::esc((string) $voce['allegatoRif']) ?>
                       </span>
                     <?php endif; ?>

@@ -190,7 +190,7 @@ final class PerimetroArea
             throw new AnagraficaEccezione(
                 'Il perimetro ha ' . number_format($vertici, 0, ',', '.') . ' vertici e supera il limite di '
                 . number_format(self::LIMITE_VERTICI, 0, ',', '.') . '. Semplificalo prima di caricarlo: '
-                . 'non lo faccio io, perche una semplificazione automatica sposterebbe '
+                . 'non lo faccio io, perché una semplificazione automatica sposterebbe '
                 . 'un confine che potrebbe essere catastale.'
             );
         }

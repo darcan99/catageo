@@ -18,7 +18,9 @@
   ============================================================================
 
    NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
-   i separatori usano punti al posto della riga di trattini.
+   i separatori usano punti o segni di uguale al posto della riga di trattini.
+   Un separatore scritto con i trattini rende il file illeggibile per il parser
+   e l'installazione si ferma con un errore che non nomina la vera causa.
 -->
 <catageo versioneSchema="1.0">
 
@@ -65,11 +67,6 @@
     </baseLayers>
 
     <!-- Layer tematici sovrapponibili (WMS del territorio, catasti, geologia).
-         Vuoto di proposito: gli endpoint dei servizi pubblici cambiano nel tempo
-         e ognuno ha le sue condizioni d'uso, quindi vanno verificati uno per uno
-         prima di scriverli qui (vedi ANALISI.md 6.16.1 e la fase 6b del piano).
-         Scriverne di inventati significherebbe consegnare un'installazione che
-         si collega a indirizzi che non esistono o che non e autorizzata a usare.
 
          La forma di una voce WMS e questa:
 
@@ -78,11 +75,258 @@
                 layers="nome_del_layer_sul_servizio"
                 formato="image/png" versione="1.3.0" trasparente="1"
                 attribuzione="Fonte: nome dell'ente"
-                opacita="0.6" attivo="0"/>
+                opacita="0.6" attivo="0"
+                interroga="litologia:campo_del_servizio,formazione:altro_campo"/>
 
          Gli host che compaiono qui vengono aggiunti automaticamente alla
-         Content-Security-Policy: non serve toccare altro. -->
-    <overlayLayers/>
+         Content-Security-Policy: non serve toccare altro.
+
+         L'attributo interroga collega i campi del servizio a quelli della
+         sezione geologia (6.16.2): serve alla compilazione assistita, e i nomi
+         a destra sono quelli veri del servizio, non quelli che uno si
+         aspetterebbe. Chiavi riconosciute a sinistra: litologia, formazione,
+         unitaGeologica, etaFormazione, permeabilita.
+
+         ================================================================
+         VERIFICATI UNO PER UNO IL 2026-08-07 (fase 6b).
+         Di ciascuno e stato chiesto un GetCapabilities e poi una vera
+         immagine (GetMap) su un riquadro dentro il territorio di
+         competenza: un servizio che risponde ma non disegna niente
+         sarebbe peggio di un layer assente, perche chi lo accende non
+         sa se ha sbagliato lui o se e giu il server dell'ente.
+
+         Tutti partono con attivo="0": si accendono dal pannello dei
+         layer quando servono. Un'installazione fuori dall'Italia
+         centrale puo cancellare i blocchi regionali che non le servono.
+
+         Gli endpoint pubblici cambiano nel tempo e ognuno ha le sue
+         condizioni d'uso: le attribuzioni qui sotto non sono decorative.
+         ================================================================ -->
+    <overlayLayers>
+
+      <!-- =========================================== Italia, ovunque -->
+
+      <layer id="ispra-geologica-100k" nome="Italia &#183; Carta geologica 1:100.000 (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core6/wms"
+             layers="CARTA_GEOLOGICA_100K"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             opacita="0.65" attivo="0"
+             interroga="formazione:nome_ulf,etaFormazione:eta_geol"/>
+
+      <layer id="ispra-litologia" nome="Italia &#183; Litologia 1:100.000 (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core8/wms"
+             layers="litologia100k"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             opacita="0.65" attivo="0"
+             interroga="litologia:litologia,formazione:nome_ulf,etaFormazione:eta_geol"/>
+
+      <!-- La permeabilita e l'unico campo della sezione idrogeologia che si puo
+           ricavare da una carta: il resto va osservato in cavita. -->
+      <layer id="ispra-permeabilita" nome="Italia &#183; Classi di permeabilit&#224; (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core11/wms"
+             layers="classi_permeabilita"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             opacita="0.6" attivo="0"
+             interroga="permeabilita:k_100k_des"/>
+
+      <!-- Inventario nazionale degli sprofondamenti: layer puntuale e rado, a
+           scala regionale la maggior parte dei riquadri e vuota. -->
+      <layer id="ispra-sinkhole" nome="Italia &#183; Sinkhole (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core5/wms"
+             layers="Sinkhole"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             attivo="0"/>
+
+      <layer id="ispra-cave-100k" nome="Italia &#183; Cave 1:100.000 (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core6/wms"
+             layers="cave_100K"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             attivo="0"/>
+
+      <!-- Non e un vezzo geologico: la CO2 nei vuoti sotterranei uccide, e
+           sapere che si scende dentro un'area di emissione cambia la
+           preparazione dell'uscita. -->
+      <layer id="ispra-emissioni-gassose" nome="Italia &#183; Emissioni gassose (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core6/wms"
+             layers="emissioni_gassose_100K"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             attivo="0"/>
+
+      <layer id="ispra-geologica-1m" nome="Italia &#183; Carta geologica 1:1.000.000 (ISPRA)"
+             tipo="wms" url="https://sgi2.isprambiente.it/geoserver/ge-core7/wms"
+             layers="CARTA_GEOLOGICA_1M"
+             attribuzione="ISPRA &#8211; Servizio Geologico d'Italia"
+             opacita="0.65" attivo="0"/>
+
+      <!-- Il layer INSPIRE CP.CadastralParcel dello stesso servizio rifiuta
+           EPSG:3857 con InvalidFormat: dichiara solo i sistemi ETRS89. Questo
+           invece si proietta, ed e quello che serve. -->
+      <layer id="catasto-particelle" nome="Italia &#183; Cartografia catastale (Agenzia delle Entrate)"
+             tipo="wms" url="https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php"
+             layers="Cartografia_Catastale"
+             attribuzione="Agenzia delle Entrate &#8211; Cartografia catastale"
+             opacita="0.7" attivo="0"/>
+
+      <layer id="vincoli-archeologici" nome="Italia &#183; Aree archeologiche vincolate (MiC)"
+             tipo="wms" url="https://vincoliinrete.beniculturali.it/geoserver/wms"
+             layers="wms_public:geo_aree_archeol_vincolate"
+             attribuzione="Ministero della Cultura &#8211; Vincoli in Rete"
+             opacita="0.55" attivo="0"/>
+
+      <!-- ===================================================== Lazio -->
+
+      <layer id="lazio-geologica" nome="Lazio &#183; Carta geologica 1:25.000"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:carta_geologica_wgs84"
+             attribuzione="Regione Lazio &#8211; GeoPortale"
+             opacita="0.65" attivo="0"
+             interroga="litologia:litologia,formazione:descriz_1,unitaGeologica:unit&#224;,etaFormazione:et&#224;"/>
+
+      <layer id="lazio-idrogeologia" nome="Lazio &#183; Unit&#224; idrogeologiche"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:carta_idrogeologica_unita_idrogeologiche"
+             attribuzione="Regione Lazio &#8211; GeoPortale"
+             opacita="0.55" attivo="0"
+             interroga="unitaGeologica:unit_idrog"/>
+
+      <layer id="lazio-sorgenti" nome="Lazio &#183; Sorgenti puntuali"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:carta_idrogeologica_sorgenti_puntuali"
+             attribuzione="Regione Lazio &#8211; GeoPortale"
+             attivo="0"/>
+
+      <layer id="lazio-curve-livello" nome="Lazio &#183; Curve di livello"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:curve_livello"
+             attribuzione="Regione Lazio &#8211; GeoPortale"
+             opacita="0.7" attivo="0"/>
+
+      <layer id="lazio-aree-archeologiche" nome="Lazio &#183; Aree archeologiche (PTPR tav. B)"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:aree_archeologiche"
+             attribuzione="Regione Lazio &#8211; GeoPortale"
+             opacita="0.55" attivo="0"/>
+
+      <layer id="lazio-ortofoto" nome="Lazio &#183; Ortofoto AGEA 2023"
+             tipo="wms" url="https://geoportale.regione.lazio.it/geoserver/wms"
+             layers="geonode:2023_AGEA_25833_COG"
+             attribuzione="Regione Lazio &#8211; GeoPortale (AGEA 2023)"
+             attivo="0"/>
+
+      <!-- Il GeoPortale del Lazio pubblica anche
+             geonode:catasto_delle_cavita_naturali
+             geonode:PTP_15_12_cavit_sotterranee_probabili
+           che sarebbero i due layer piu interessanti di tutto l'elenco. Non
+           sono qui perche non disegnano: rispondono 200 con un PNG di 6727
+           byte, cioe l'immagine vuota di GeoServer, sia su un riquadro di 100
+           km sia su uno di 10 km (un layer inesistente invece risponde
+           LayerNotDefined, quindi esistono davvero e sono solo vuoti o
+           protetti). Verificato il 2026-08-07: se un giorno si popolano,
+           bastera togliere il commento. -->
+
+      <!-- =================================================== Abruzzo -->
+      <!-- Mosaici raster ECW, senza vettoriale geologico: il geoportale
+           regionale non ne espone uno pubblico. La geologia dell'Abruzzo si
+           legge dai layer ISPRA qui sopra. -->
+
+      <layer id="abruzzo-ortofoto" nome="Abruzzo &#183; Ortofoto AGEA 2022"
+             tipo="wms" url="https://geocatalogo.regione.abruzzo.it/erdas-iws/ogc/wms/"
+             layers="Mosaici_UTM-WGS84_Ortofoto_2022_AGEA_RGB.ecw"
+             attribuzione="Regione Abruzzo &#8211; GeoCatalogo"
+             attivo="0"/>
+
+      <layer id="abruzzo-ctr" nome="Abruzzo &#183; CTR 1:5.000"
+             tipo="wms" url="https://geocatalogo.regione.abruzzo.it/erdas-iws/ogc/wms/"
+             layers="Mosaici_UTM-WGS84_CTR_5K_2007.ecw"
+             attribuzione="Regione Abruzzo &#8211; GeoCatalogo"
+             attivo="0"/>
+
+      <layer id="abruzzo-igm-25k" nome="Abruzzo &#183; IGM 1:25.000"
+             tipo="wms" url="https://geocatalogo.regione.abruzzo.it/erdas-iws/ogc/wms/"
+             layers="Mosaici_UTM-WGS84_IGM25k_WGS84.ecw"
+             attribuzione="Regione Abruzzo &#8211; GeoCatalogo (base IGM)"
+             attivo="0"/>
+
+      <!-- ==================================================== Umbria -->
+      <!-- Servizi ArcGIS: nel GetCapabilities dichiarano CRS:84, EPSG:4326 e
+           EPSG:25833, non EPSG:3857. Le richieste in 3857 vengono comunque
+           servite (riproiettate dal server) e le immagini tornano corrette,
+           ma e una tolleranza, non un impegno: se un aggiornamento la togliesse
+           questi layer smetterebbero di disegnare. -->
+
+      <layer id="umbria-cave-attive" nome="Umbria &#183; Cave attive"
+             tipo="wms" url="https://siat.regione.umbria.it/arcgis/services/public/CAVE_ETRS89/MapServer/WMSServer"
+             layers="Cave attive"
+             attribuzione="Regione Umbria &#8211; UmbriaGeo"
+             attivo="0"/>
+
+      <layer id="umbria-cave-dismesse" nome="Umbria &#183; Cave dismesse"
+             tipo="wms" url="https://siat.regione.umbria.it/arcgis/services/public/CAVE_ETRS89/MapServer/WMSServer"
+             layers="Cave dismesse"
+             attribuzione="Regione Umbria &#8211; UmbriaGeo"
+             attivo="0"/>
+
+      <layer id="umbria-ctr" nome="Umbria &#183; CTR 1:10.000"
+             tipo="wms" url="https://siat.regione.umbria.it/arcgis/services/public/CTR_10K_ETRF2000_UTM33N/MapServer/WMSServer"
+             layers="0"
+             attribuzione="Regione Umbria &#8211; UmbriaGeo"
+             attivo="0"/>
+
+      <layer id="umbria-ortofoto" nome="Umbria &#183; Ortofoto 2020"
+             tipo="wms" url="https://siat.regione.umbria.it/arcgis/services/public/ORTOFOTO_2020_ETRF2000_UTM33N/MapServer/WMSServer"
+             layers="0"
+             attribuzione="Regione Umbria &#8211; UmbriaGeo"
+             attivo="0"/>
+
+      <!-- ==================================================== Marche -->
+      <!-- ATTENZIONE: solo http. Su https://wms.cartografia.marche.it la
+           catena di certificati non si stabilisce. Su un CATAGEO servito in
+           https il browser blocca queste immagini come contenuto misto e i
+           layer restano bianchi senza dire perche. In quel caso vanno tolti,
+           oppure serve un proxy sul proprio server. In locale funzionano. -->
+
+      <!-- Senza interroga: e una carta raster, non vettoriale. Un
+           GetFeatureInfo su Frasassi risponde RED_BAND/GREEN_BAND/BLUE_BAND,
+           cioe il colore del pixel, non la formazione. Si guarda, non si
+           interroga: per la compilazione assistita nelle Marche restano i
+           layer ISPRA. -->
+      <layer id="marche-geologica" nome="Marche &#183; Carta geologica 1:10.000"
+             tipo="wms" url="http://wms.cartografia.marche.it/geoserver/wms"
+             layers="Geologia:CartaGeologica"
+             attribuzione="Regione Marche &#8211; Cartografia"
+             opacita="0.65" attivo="0"/>
+
+      <layer id="marche-ctr" nome="Marche &#183; CTR 2019"
+             tipo="wms" url="http://wms.cartografia.marche.it/geoserver/wms"
+             layers="CTR:CTR2019color"
+             attribuzione="Regione Marche &#8211; Cartografia"
+             attivo="0"/>
+
+      <layer id="marche-ortofoto" nome="Marche &#183; Ortofoto AGEA 2022"
+             tipo="wms" url="http://wms.cartografia.marche.it/geoserver/wms"
+             layers="AGEA2022:Marche"
+             attribuzione="Regione Marche &#8211; Cartografia (AGEA 2022)"
+             attivo="0"/>
+
+      <!-- Le cavita artificiali si trovano spesso confrontando una carta di
+           fine Ottocento con l'ortofoto di oggi: quello che c'era e non c'e
+           piu e quasi sempre un ingresso. -->
+      <layer id="marche-igm-1895" nome="Marche &#183; IGM storico 1892-95"
+             tipo="wms" url="http://wms.cartografia.marche.it/geoserver/wms"
+             layers="IGMI:IGMIStorico1895"
+             attribuzione="Regione Marche &#8211; Cartografia (base IGM storica)"
+             attivo="0"/>
+
+      <!-- ==================================================== Molise -->
+      <!-- Nessun layer. Il geoportale regionale (geo.regione.molise.it e
+           servizi.geo.regione.molise.it, citati dalla documentazione ufficiale
+           e dal catalogo geodati.gov.it) non risolve piu in DNS: il dominio e
+           sparito, non e un servizio momentaneamente giu. Verificato il
+           2026-08-07. Per il Molise restano i layer nazionali qui sopra
+           (geologia ISPRA, catasto, vincoli archeologici), che coprono tutto
+           il territorio italiano. -->
+
+    </overlayLayers>
   </mappa>
 
   <upload>

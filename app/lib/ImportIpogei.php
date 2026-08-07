@@ -163,7 +163,7 @@ final class ImportIpogei
 
                 if (isset($vistiNelFile[$codice])) {
                     $voce['esito'] = 'saltata';
-                    $voce['motivo'] = 'Codice ripetuto nel file, gia alla riga '
+                    $voce['motivo'] = 'Codice ripetuto nel file, già alla riga '
                         . $vistiNelFile[$codice] . '.';
                     $saltate++;
                     $righe[] = $voce;
@@ -171,7 +171,7 @@ final class ImportIpogei
                 }
                 if (IndiceCodici::esiste($codice) || CodiceCatastale::cartellaEsistente($codice)) {
                     $voce['esito'] = 'saltata';
-                    $voce['motivo'] = 'Codice gia presente in archivio: la scheda esistente '
+                    $voce['motivo'] = 'Codice già presente in archivio: la scheda esistente '
                         . 'non viene toccata.';
                     $saltate++;
                     $righe[] = $voce;
@@ -393,7 +393,7 @@ final class ImportIpogei
         if ($codiceDalFile) {
             $codice = trim((string) ($valori['codice'] ?? ''));
             if ($codice === '') {
-                return 'Il codice e vuoto, ma si e scelto di prenderlo dal file.';
+                return 'Il codice è vuoto, ma si è scelto di prenderlo dal file.';
             }
             if (!CodiceCatastale::formaValida($codice)) {
                 return 'Codice con caratteri non ammessi: ' . $codice;

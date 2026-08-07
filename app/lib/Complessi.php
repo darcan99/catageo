@@ -98,7 +98,7 @@ final class Complessi extends Anagrafica
     {
         $nome = trim((string) ($dati['nome'] ?? ''));
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome del complesso e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome del complesso è obbligatorio.');
         }
 
         $codice = trim((string) ($dati['codice'] ?? ''));
@@ -118,12 +118,12 @@ final class Complessi extends Anagrafica
             }
             if (strcasecmp(trim((string) $voce['nome']), $nome) === 0) {
                 throw new AnagraficaEccezione(
-                    'Esiste gia un complesso con questo nome: ' . (string) $voce['nome'] . '.'
+                    'Esiste già un complesso con questo nome: ' . (string) $voce['nome'] . '.'
                 );
             }
             if ($codice !== '' && strcasecmp(trim((string) $voce['codice']), $codice) === 0) {
                 throw new AnagraficaEccezione(
-                    'Il codice "' . $codice . '" e gia usato dal complesso '
+                    'Il codice "' . $codice . '" è già usato dal complesso '
                     . (string) $voce['nome'] . '.'
                 );
             }

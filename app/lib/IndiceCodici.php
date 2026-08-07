@@ -109,7 +109,7 @@ final class IndiceCodici
             throw new CatalogoEccezione('Codice vuoto: non registrabile.');
         }
         if (self::esiste($codice)) {
-            throw new CatalogoEccezione("Il codice \"{$codice}\" e gia registrato nell'indice.");
+            throw new CatalogoEccezione("Il codice \"{$codice}\" è già registrato nell'indice.");
         }
 
         self::assicuraFile();
@@ -143,7 +143,7 @@ final class IndiceCodici
             return;
         }
         if (self::esiste($codiceNuovo)) {
-            throw new CatalogoEccezione("Il codice \"{$codiceNuovo}\" e gia registrato nell'indice.");
+            throw new CatalogoEccezione("Il codice \"{$codiceNuovo}\" è già registrato nell'indice.");
         }
 
         self::assicuraFile();

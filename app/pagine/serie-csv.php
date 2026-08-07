@@ -73,7 +73,7 @@ if (!Visibilita::livelloVisibile((string) $serie['riservatezza'])) {
 
 $percorso = Scientifici::percorsoCsv($codice, $serie);
 if ($percorso === null || !is_file($percorso)) {
-    $nega(404, 'Il file della serie non e presente sul disco.');
+    $nega(404, 'Il file della serie non è presente sul disco.');
     return;
 }
 

@@ -46,7 +46,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Esplorazioni::elimina($codice, (int) ($_POST['progressivo'] ?? 0));
             IndiceIpogei::aggiorna($codice);
             Auth::messaggio('successo',
-                'Diario rimosso. Il file e stato spostato in "' . $codice . ' - '
+                'Diario rimosso. Il file è stato spostato in "' . $codice . ' - '
                 . Risorse::CARTELLA_RIMOSSI . '" e resta recuperabile.');
             header('Location: ' . $ritorno);
             exit;
@@ -276,7 +276,7 @@ if ($azione === 'vedi' && $prog > 0) {
                           <?php if ($foto === null): ?>
                             <div class="col-auto">
                               <span class="badge text-bg-light border text-danger"
-                                    title="Riferimento a una foto non piu presente">
+                                    title="Riferimento a una foto non più presente">
                                 <i class="bi bi-exclamation-triangle"></i> <?= Testo::esc($riferimento) ?>
                               </span>
                             </div>
@@ -417,7 +417,7 @@ if ($azione === 'vedi' && $prog > 0) {
                   <li>
                     <span class="catageo-valore"><?= Testo::esc((string) $voce['riferimento']) ?></span>
                     <?php if ($risorsa === null): ?>
-                      <span class="text-danger catageo-nota">non piu presente</span>
+                      <span class="text-danger catageo-nota">non più presente</span>
                     <?php elseif ($voce['sigla'] === 'RI'): ?>
                       <a href="index.php?p=rilievo&amp;codice=<?= urlencode($codice) ?>&amp;prog=<?= (int) $risorsa['progressivo'] ?>">
                         <?= Testo::esc((string) $risorsa['titolo']) ?>
@@ -566,7 +566,7 @@ if (($azione === 'nuovo' || ($azione === 'modifica' && $prog > 0)) && $puoRedige
                   <label for="dataFine" class="form-label">Data di fine</label>
                   <input type="date" class="form-control" id="dataFine" name="dataFine"
                          value="<?= Testo::esc((string) $diario['dataFine']) ?>">
-                  <div class="catageo-nota">Solo se l'uscita e durata piu giorni.</div>
+                  <div class="catageo-nota">Solo se l'uscita e durata più giorni.</div>
                 </div>
                 <div class="col-md-3">
                   <label for="oraFine" class="form-label">Ora di uscita</label>
@@ -766,7 +766,7 @@ if (($azione === 'nuovo' || ($azione === 'modifica' && $prog > 0)) && $puoRedige
                 <?php endforeach; ?>
               </div>
               <div class="catageo-nota">
-                Chi non e in anagrafica si registra scrivendo il nome: un ospite di
+                Chi non è in anagrafica si registra scrivendo il nome: un ospite di
                 una sola uscita non deve costringere a creare una scheda.
               </div>
             </div>
@@ -801,7 +801,7 @@ if (($azione === 'nuovo' || ($azione === 'modifica' && $prog > 0)) && $puoRedige
                     </option>
                   <?php endforeach; ?>
                 </select>
-                <div class="catageo-nota">Cio che questa uscita ha prodotto, gia caricato nelle sezioni.</div>
+                <div class="catageo-nota">Ciò che questa uscita ha prodotto, già caricato nelle sezioni.</div>
               <?php endif; ?>
             </div>
           </div>

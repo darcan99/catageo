@@ -6,7 +6,10 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
-Fase 4b: provider cartografico Google Maps, alternativo a OpenStreetMap.
+## [1.2.0] — 2026-08-07
+
+Fasi 4b e 6b: provider cartografico Google Maps, sezione geologica, geoportali
+dell'Italia centrale e compilazione assistita dalla cartografia.
 
 ### Aggiunto
 - **Astrazione del provider cartografico** (`catageo-mappa-api.js`), con due
@@ -21,6 +24,27 @@ Fase 4b: provider cartografico Google Maps, alternativo a OpenStreetMap.
   chiave in `mappa.chiaveApi`. WMS e tile server diventano ImageMapType con
   le GetMap costruite per tile; il pannello dei layer, che Google non ha, e
   ricostruito con le stesse voci del selettore di Leaflet.
+- **Sezione geologica** (`GE`), con schema, pagina, indice e ricerca:
+  inquadramento litostratigrafico, genesi, assetto strutturale, morfologie,
+  idrogeologia, rischi e campioni prelevati. Sette moduli che si salvano uno
+  per uno, perche la geologia si compila in piu riprese — una parte in cavita,
+  una davanti alla carta — e un modulo unico farebbe perdere tutto a chi
+  sbaglia un campo in fondo.
+- **26 layer WMS preconfigurati** per l'Italia centrale in `config.xml.dist`,
+  tutti spenti: ISPRA (geologica 1:100.000, litologia, permeabilita, sinkhole,
+  cave, emissioni gassose), catasto dell'Agenzia delle Entrate, aree
+  archeologiche vincolate del Ministero della Cultura, piu Lazio, Abruzzo,
+  Umbria e Marche.
+- **Compilazione assistita della geologia dalla cartografia** (`Geoservizi`):
+  interroga i layer WMS con GetFeatureInfo sul punto della cavita e **propone**
+  litologia, formazione, unita geologica, eta e permeabilita, ciascuna con il
+  layer da cui viene. Si accettano una per una: un campo riempito senza che
+  nessuno lo abbia guardato e un dato falso che sembra vero.
+- **Scelta a tre vie sulle coordinate riservate** prima di interrogare un
+  servizio esterno: punto arrotondato, punto esatto, oppure nessuna richiesta.
+  Ogni interrogazione finisce nel registro delle modifiche, anche quella andata
+  a vuoto.
+- **Sezione geologia sulla scheda da stampare**, escludibile come le altre.
 
 ### Note di progetto
 - **Senza chiave si resta su OpenStreetMap.** L'API di Google senza chiave
@@ -45,12 +69,72 @@ Fase 4b: provider cartografico Google Maps, alternativo a OpenStreetMap.
   lettura coordinate risultano registrate nei suoi controlli e non innestate
   nel DOM. La resa visiva resta da confermare.
 
+- **L'arrotondamento delle coordinate e deterministico, non casuale.** Era
+  stato proposto un errore randomico di 200-300 m: non regge. Un errore che
+  cambia a ogni chiamata si annulla facendo la media di tre richieste, quindi
+  chi volesse il punto vero dovrebbe solo chiederlo tre volte. `Visibilita::griglia()`
+  restituisce sempre lo stesso punto, e a 1:100.000 mille metri non cambiano la
+  formazione che si legge.
+- **L'interrogazione la fa il server, non il browser.** La politica sulle
+  coordinate riservate deve stare dove non si aggira con la console; i servizi
+  degli enti non mandano gli header CORS; la CSP non va allargata a
+  `connect-src` per host che servono immagini.
+- **Solo cinque campi sono compilabili da una carta.** Una carta dice di che
+  roccia e fatto il terreno sopra la cavita; non dice se prosegue, se e attiva,
+  quanto e fratturata la volta. Ammettere altre chiavi darebbe l'impressione
+  che il resto della sezione si compili senza scendere.
+- **Solo i rischi medio e alto accendono la barra avvisi** della scheda. Un
+  rischio basso segnalato accanto a un vincolo archeologico e a un periodo
+  critico dei chirotteri abituerebbe a ignorare la barra. Sul foglio da
+  stampare invece compaiono tutti.
+- **Il declassamento del modo «puntuale» oggi non puo scattare**, e va detto
+  invece di contarlo fra le difese attive: `compila_sezioni` e `vedi_riservati`
+  chiedono entrambi OPE. Resta scritto perche la matrice dei permessi e un
+  unico array, e una prova ne verifica l'accoppiamento: se un giorno i due
+  permessi venissero separati, senza quella riga si aprirebbe una via d'uscita
+  silenziosa.
+- **Ogni endpoint e stato verificato due volte** prima di finire in
+  `config.xml.dist`: un GetCapabilities e poi una vera immagine su un riquadro
+  dentro il territorio di competenza. Un layer che risponde ma non disegna e
+  peggio di un layer assente, perche chi lo accende non sa se ha sbagliato lui
+  o se e giu il server dell'ente. Cio che la verifica ha trovato:
+  - il GeoPortale del Lazio pubblica `catasto_delle_cavita_naturali` e
+    `PTP_cavita_sotterranee_probabili` — i due layer piu interessanti
+    dell'elenco — e **non disegnano**: rispondono con il PNG vuoto di GeoServer
+    su qualunque scala. Restano commentati;
+  - **il Molise non ha piu un geoportale**: i domini citati dalla
+    documentazione ufficiale non risolvono in DNS;
+  - **le Marche servono solo in http**, quindi su un CATAGEO in https il
+    browser li blocca come contenuto misto;
+  - **la carta geologica delle Marche e raster**: un GetFeatureInfo risponde
+    con il colore del pixel, non con la formazione;
+  - il layer INSPIRE `CP.CadastralParcel` dell'Agenzia delle Entrate rifiuta
+    EPSG:3857; si usa `Cartografia_Catastale`;
+  - l'Umbria non dichiara EPSG:3857 ma lo serve comunque.
+
 ### Corretto
 - **Su Google il pannello dei layer non veniva creato** con un solo sfondo, e
   in quel caso i perimetri delle aree sarebbero arrivati in mappa senza un
   modo per spegnerli, mentre su Leaflet il controllo c'e. Due provider che si
   comportano diverso sulla stessa pagina sono un difetto, non una differenza
   di libreria.
+- **La linguetta Geologia della scheda mostrava i dati dell'archeologia.**
+  Geologia, biospeleologia e archeologia condividono il ramo delle sezioni di
+  soli metadati, e la geologia cadeva nel ramo «altrimenti», che e quello
+  archeologico: la scheda mostrava periodo e vincoli al posto della litologia.
+- **La pagina della sezione geologia andava in errore 500** a ogni apertura:
+  la barra avvisi veniva chiamata con il codice dell'ipogeo invece che con
+  l'elenco degli avvisi. Non era emerso prima perche la prova a riga di comando
+  esercitava la classe, non la pagina.
+- **Ortografia del testo dell'interfaccia**: 97 blocchi in 29 pagine
+  scrivevano «cavita», «unita», «puo», «piu», «perche», «non e». La correzione
+  e automatica ma passa dal tokenizzatore di PHP e tocca solo il testo che
+  l'utente legge: le chiavi dei vocabolari (`per porosita`) stanno scritte
+  nell'XML delle schede gia salvate, e correggerne l'ortografia orfanerebbe i
+  dati.
+- **`rocciaEncassante` era scritto male** ed e diventato `rocciaIncassante`.
+  Corretto ora che nessun archivio lo contiene: dopo il rilascio sarebbe stata
+  una migrazione.
 
 ## [1.1.0] — 2026-08-07
 

@@ -84,7 +84,7 @@ final class Aree extends Anagrafica
     {
         $nome = trim((string) ($dati['nome'] ?? ''));
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome dell\'area e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome dell\'area è obbligatorio.');
         }
 
         /*
@@ -98,7 +98,7 @@ final class Aree extends Anagrafica
             }
             if (strcasecmp(trim((string) $area['nome']), $nome) === 0) {
                 throw new AnagraficaEccezione(
-                    'Esiste gia un\'area con questo nome: ' . (string) $area['nome'] . '.'
+                    'Esiste già un\'area con questo nome: ' . (string) $area['nome'] . '.'
                 );
             }
         }

@@ -111,10 +111,10 @@ final class Esploratori extends Anagrafica
         $nome    = trim((string) ($dati['nome'] ?? ''));
 
         if ($cognome === '') {
-            throw new AnagraficaEccezione('Il cognome e obbligatorio.');
+            throw new AnagraficaEccezione('Il cognome è obbligatorio.');
         }
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome è obbligatorio.');
         }
 
         $email = trim((string) ($dati['email'] ?? ''));
@@ -138,7 +138,7 @@ final class Esploratori extends Anagrafica
         }
         if ($stessoNome && trim((string) ($dati['soprannome'] ?? '')) === '') {
             throw new AnagraficaEccezione(
-                "Esiste gia un esploratore con nome \"{$nome} {$cognome}\". "
+                "Esiste già un esploratore con nome \"{$nome} {$cognome}\". "
                 . 'Se sono due persone diverse, indicare un soprannome per distinguerle negli elenchi.'
             );
         }
@@ -155,7 +155,7 @@ final class Esploratori extends Anagrafica
             }
             if ($appartenenza['dal'] !== '' && $appartenenza['al'] !== ''
                 && (int) $appartenenza['al'] < (int) $appartenenza['dal']) {
-                throw new AnagraficaEccezione('In un\'appartenenza l\'anno finale non puo precedere quello iniziale.');
+                throw new AnagraficaEccezione('In un\'appartenenza l\'anno finale non può precedere quello iniziale.');
             }
         }
 
@@ -199,7 +199,7 @@ final class Esploratori extends Anagrafica
                         throw new AnagraficaEccezione(
                             "Due periodi di appartenenza al gruppo {$etichetta} si sovrappongono ("
                             . self::periodoLeggibile($periodi[$i]) . ' e ' . self::periodoLeggibile($periodi[$j])
-                            . '). Lo stesso gruppo puo ricorrere piu volte, ma i periodi devono essere distinti.'
+                            . '). Lo stesso gruppo può ricorrere più volte, ma i periodi devono essere distinti.'
                         );
                     }
                 }

@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Auth::esigi('elimina_ipogeo');
                 $daEliminare = trim((string) ($_POST['codice'] ?? ''));
                 $destinazione = Ipogeo::elimina($daEliminare);
-                Auth::messaggio('successo', 'Ipogeo rimosso dal catalogo. L\'archivio e stato conservato in '
+                Auth::messaggio('successo', 'Ipogeo rimosso dal catalogo. L\'archivio è stato conservato in '
                     . Ipogeo::CARTELLA_ELIMINATI . '/' . basename($destinazione) . '.');
                 break;
 
@@ -331,7 +331,7 @@ if ($azione === 'scheda' && $codice !== '') {
 
     $scheda = $risoluzione['scheda'];
     if (!schedaVisibile((string) $scheda['ubicazione']['riservatezza'], (string) $scheda['catasto']['statoScheda'])) {
-        Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+        Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
         header('Location: index.php?p=ipogei');
         exit;
     }
@@ -368,7 +368,7 @@ if ($azione === 'scheda' && $codice !== '') {
       <div class="alert alert-info d-flex align-items-start gap-2">
         <i class="bi bi-signpost-split-fill mt-1" aria-hidden="true"></i>
         <div>
-          Il codice <span class="catageo-codice"><?= Testo::esc($codice) ?></span> non e piu quello corrente:
+          Il codice <span class="catageo-codice"><?= Testo::esc($codice) ?></span> non è più quello corrente:
           questo ipogeo e ora <span class="catageo-codice"><?= Testo::esc($codiceCorrente) ?></span>.
           I riferimenti al vecchio codice continuano a funzionare.
         </div>
@@ -580,7 +580,7 @@ if ($azione === 'scheda' && $codice !== '') {
                           $totali = Complessi::totali($id);
                           $etichetta = Complessi::etichetta($voce);
                           if ($totali['ipogei'] > 1) {
-                              $etichetta .= ' · ' . $totali['ipogei'] . ' cavita';
+                              $etichetta .= ' · ' . $totali['ipogei'] . ' cavità';
                               if ($totali['sviluppo'] > 0) {
                                   $etichetta .= ', ' . number_format($totali['sviluppo'], 0, ',', '.') . ' m';
                               }
@@ -1243,15 +1243,15 @@ if ($azione === 'scheda' && $codice !== '') {
          * Biospeleologia e archeologia sono anch'esse sezioni di soli metadati:
          * si presentano con un riepilogo e rimandano alla propria pagina.
          */
-        if ($sigla === 'BI' || $sigla === 'AR') {
+        if ($sigla === 'BI' || $sigla === 'AR' || $sigla === 'GE') {
             $eBio = $sigla === 'BI';
+            $eGeo = $sigla === 'GE';
             $quante = $eBio
                 ? count(Biospeleologia::colonieVisibili($codiceCorrente))
                     + count(Biospeleologia::osservazioni($codiceCorrente))
-                : Archeologia::conta($codiceCorrente);
-            $urlSezioneMeta = $eBio
-                ? 'index.php?p=biospeleologia&amp;codice=' . urlencode($codiceCorrente)
-                : 'index.php?p=archeologia&amp;codice=' . urlencode($codiceCorrente);
+                : ($eGeo ? Geologia::conta($codiceCorrente) : Archeologia::conta($codiceCorrente));
+            $paginaSezione = $eBio ? 'biospeleologia' : ($eGeo ? 'geologia' : 'archeologia');
+            $urlSezioneMeta = 'index.php?p=' . $paginaSezione . '&amp;codice=' . urlencode($codiceCorrente);
             ?>
             <div class="tab-pane fade" id="tabSezione<?= $sigla ?>">
               <div class="catageo-intestazione mb-3">
@@ -1263,7 +1263,7 @@ if ($azione === 'scheda' && $codice !== '') {
                 </div>
                 <a class="btn btn-sm <?= $quante === 0 ? 'btn-primary' : 'btn-outline-secondary' ?> catageo-non-stampare"
                    href="<?= $urlSezioneMeta ?>">
-                  <i class="bi <?= $eBio ? 'bi-bug' : 'bi-bank' ?>"></i>
+                  <i class="bi <?= $eBio ? 'bi-bug' : ($eGeo ? 'bi-layers' : 'bi-bank') ?>"></i>
                   <?= $quante === 0 ? 'Compila la sezione' : 'Gestisci la sezione' ?>
                 </a>
               </div>
@@ -1321,6 +1321,80 @@ if ($azione === 'scheda' && $codice !== '') {
                       <?php endforeach; ?>
                     </div>
                   </div>
+                <?php endif; ?>
+
+              <?php elseif ($eGeo): ?>
+                <?php
+                $inqGeo = Geologia::inquadramento($codiceCorrente);
+                $genGeo = Geologia::genesi($codiceCorrente);
+                $rischi = Geologia::rischi($codiceCorrente);
+                ?>
+                <?php if ($quante === 0): ?>
+                  <div class="card">
+                    <div class="card-body d-flex gap-3">
+                      <i class="bi bi-layers fs-3 text-body-secondary" aria-hidden="true"></i>
+                      <div>
+                        <h3 class="h6 mb-1">Nessun dato geologico</h3>
+                        <p class="text-body-secondary mb-0">
+                          Litologia, genesi, assetto strutturale, idrogeologia,
+                          morfologie, rischi e campioni prelevati.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                <?php else: ?>
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <dl class="row catageo-dl mb-0">
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Litologia</dt>
+                        <dd class="col-sm-8"><?= Testo::esc((string) $inqGeo['litologia']) ?: '—' ?></dd>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Formazione</dt>
+                        <dd class="col-sm-8"><?= Testo::esc((string) $inqGeo['formazione']) ?: '—' ?></dd>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Et&agrave;</dt>
+                        <dd class="col-sm-8"><?= Testo::esc((string) $inqGeo['etaFormazione']) ?: '—' ?></dd>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Genesi</dt>
+                        <dd class="col-sm-8">
+                          <?= Testo::esc(Geologia::TIPI_GENESI[(string) $genGeo['tipoGenesi']] ?? '—') ?>
+                        </dd>
+                        <?php
+                        /*
+                         * La provenienza sta nel riepilogo e non solo nella pagina
+                         * della sezione: una litologia osservata in cavita e una
+                         * dedotta da una carta 1:100.000 si leggono uguali, e chi
+                         * programma un'uscita sulla seconda deve saperlo.
+                         */
+                        $modGeo = (string) $inqGeo['fonteModalita'];
+                        ?>
+                        <dt class="col-sm-4 fw-normal text-body-secondary">Fonte</dt>
+                        <dd class="col-sm-8">
+                          <?= Testo::esc((string) $inqGeo['fonteNome']) ?: '—' ?>
+                          <?php if ($modGeo !== ''): ?>
+                            <span class="catageo-nota">
+                              &middot; <?= Testo::esc(Geologia::MODALITA_FONTE[$modGeo] ?? $modGeo) ?>
+                            </span>
+                          <?php endif; ?>
+                        </dd>
+                      </dl>
+                    </div>
+                  </div>
+
+                  <?php if ($rischi !== []): ?>
+                    <div class="card">
+                      <div class="card-header"><h3 class="h6 mb-0">Rischi geologici</h3></div>
+                      <div class="card-body">
+                        <?php foreach ($rischi as $rischio): ?>
+                          <?php $liv = (string) $rischio['livello']; ?>
+                          <div class="catageo-voce-biblio">
+                            <strong><?= Testo::esc(Geologia::TIPI_RISCHIO[(string) $rischio['tipo']] ?? '') ?></strong>
+                            <span class="badge text-bg-<?= $liv === 'alto' ? 'danger' : ($liv === 'medio' ? 'warning' : 'secondary') ?>">
+                              <?= Testo::esc(Geologia::LIVELLI_RISCHIO[$liv] ?? $liv) ?>
+                            </span>
+                            <?= Testo::esc(Testo::estratto((string) $rischio['descrizione'], 160)) ?>
+                          </div>
+                        <?php endforeach; ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
                 <?php endif; ?>
 
               <?php else: ?>
@@ -1438,7 +1512,7 @@ if ($azione === 'scheda' && $codice !== '') {
                     <p class="text-body-secondary mb-2">
                       La cartella
                       <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codiceCorrente, $sigla)) ?></span>
-                      esiste gia nell'archivio: la gestione dei contenuti di questa
+                      esiste già nell'archivio: la gestione dei contenuti di questa
                       sezione arriva in una fase successiva del piano.
                     </p>
                     <p class="catageo-nota mb-0">
@@ -1555,7 +1629,7 @@ if ($azione === 'scheda' && $codice !== '') {
           <?php if ($storico === []): ?>
             <div class="card-body">
               <p class="text-body-secondary mb-0">
-                Nessuna revisione precedente: la scheda non e ancora stata modificata
+                Nessuna revisione precedente: la scheda non è ancora stata modificata
                 dopo il censimento.
               </p>
             </div>
@@ -1626,7 +1700,7 @@ if ($azione === 'scheda' && $codice !== '') {
                   <div class="catageo-nota mt-1">
                     Nessuna cancellazione: l'albero viene spostato in
                     <span class="catageo-valore"><?= Ipogeo::CARTELLA_ELIMINATI ?></span>
-                    e resta recuperabile a mano. Il codice non verra mai riassegnato.
+                    e resta recuperabile a mano. Il codice non verrà mai riassegnato.
                   </div>
                 </form>
               <?php endif; ?>
@@ -1850,7 +1924,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                     <?php endforeach; ?>
                   </select>
                   <div class="catageo-nota">
-                    Il sistema di cui questa cavita fa parte. Diverso dai
+                    Il sistema di cui questa cavità fa parte. Diverso dai
                     collegamenti, che dicono con quali altre comunica.
                   </div>
                 </div>
@@ -1900,7 +1974,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                 </div>
 
                 <div class="col-md-6">
-                  <label for="localita" class="form-label">Localita</label>
+                  <label for="localita" class="form-label">Località</label>
                   <input type="text" class="form-control" id="localita" name="localita" maxlength="120"
                          value="<?= $v('localita', $s['ubicazione']['localita']) ?>">
                 </div>
@@ -1918,7 +1992,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </select>
                   <div class="catageo-nota">
                     Si gestiscono dalle anagrafiche. Non sostituisce comune e
-                    provincia: e il modo in cui la cavita si colloca fra speleologi.
+                    provincia: e il modo in cui la cavità si colloca fra speleologi.
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -2017,9 +2091,9 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                          placeholder="5"
                          value="<?= $v('precisione', $s['ubicazione']['coordinate']['precisione']) ?>">
                   <div class="catageo-nota">
-                    Incertezza della posizione: quanto raggio dovra battere chi va
+                    Incertezza della posizione: quanto raggio dovrà battere chi va
                     a cercarla. GPS in bosco 5-10, punto su carta 1:25.000 circa 25,
-                    posizione dedotta da una descrizione 100 o piu.
+                    posizione dedotta da una descrizione 100 o più.
                   </div>
                 </div>
 
@@ -2093,7 +2167,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                     <?php endforeach; ?>
                   </select>
                   <div class="catageo-nota">
-                    Chi c'e stato, non chi ha compilato la scheda.
+                    Chi c'è stato, non chi ha compilato la scheda.
                   </div>
                 </div>
 
@@ -2120,7 +2194,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label for="proprieta" class="form-label">Proprieta</label>
+                  <label for="proprieta" class="form-label">Proprietà</label>
                   <input type="text" class="form-control" id="proprieta" name="proprieta" maxlength="120"
                          value="<?= $v('proprieta', $s['ubicazione']['accesso']['proprieta']) ?>">
                 </div>
@@ -2167,7 +2241,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </select>
                 </div>
                 <div class="col-md-4">
-                  <label for="gradoIdrico" class="form-label">Difficolta idriche</label>
+                  <label for="gradoIdrico" class="form-label">Difficoltà idriche</label>
                   <select class="form-select" id="gradoIdrico" name="gradoIdrico">
                     <?php $scelta('gradoIdrico', Ipogeo::GRADI_IDRICI, 'non indicate'); ?>
                   </select>
@@ -2183,7 +2257,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <label for="necessitaArmo" class="form-label">Necessita armo</label>
+                  <label for="necessitaArmo" class="form-label">Necessità armo</label>
                   <select class="form-select" id="necessitaArmo" name="necessitaArmo">
                     <?php $scelta('necessitaArmo', ['si' => 'si', 'no' => 'no'], 'non si sa'); ?>
                   </select>
@@ -2197,7 +2271,7 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                 <div class="col-12"><hr class="my-1"></div>
 
                 <div class="col-md-6">
-                  <label for="difficolta" class="form-label">Difficolta</label>
+                  <label for="difficolta" class="form-label">Difficoltà</label>
                   <input type="text" class="form-control" id="difficolta" name="difficolta" maxlength="60"
                          value="<?= $v('difficolta', $s['caratteristiche']['percorribilita']['difficolta']) ?>">
                 </div>
@@ -2340,8 +2414,8 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                */
               ?>
               <p class="catageo-nota">
-                Tutti i campi sono facoltativi. Su una cavita con un ingresso solo
-                si puo lasciare la tabella vuota: le coordinate della scheda bastano.
+                Tutti i campi sono facoltativi. Su una cavità con un ingresso solo
+                si può lasciare la tabella vuota: le coordinate della scheda bastano.
                 Gli ingressi con coordinate proprie compaiono distinti sulla mappa.
               </p>
               <div class="table-responsive">
@@ -2407,10 +2481,10 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                 </table>
               </div>
               <div class="catageo-nota">
-                <strong>Progressiva</strong>: distanza dall'imbocco lungo la cavita.
-                Su un acquedotto e cio che mette gli accessi in sequenza, che e il
+                <strong>Progressiva</strong>: distanza dall'imbocco lungo la cavità.
+                Su un acquedotto e ciò che mette gli accessi in sequenza, che e il
                 modo in cui li si percorre e li si ritrova.
-                <strong>Tombato</strong> non e come <strong>crollato</strong>: il
+                <strong>Tombato</strong> non è come <strong>crollato</strong>: il
                 primo resta un possibile accesso, e la distinzione serve a chi
                 progetta una riapertura.
               </div>
@@ -2598,7 +2672,7 @@ $righe  = IndiceIpogei::elenco($filtro, IPOGEI_PER_PAGINA, ($pagina - 1) * IPOGE
   <div class="col-md-5">
     <label for="cerca" class="form-label">Cerca</label>
     <input type="search" class="form-control" id="cerca" name="cerca"
-           placeholder="codice, nome, comune, localita" value="<?= Testo::esc($cerca) ?>">
+           placeholder="codice, nome, comune, località" value="<?= Testo::esc($cerca) ?>">
   </div>
   <div class="col-md-4">
     <label for="filtroCatalogo" class="form-label">Catalogo</label>

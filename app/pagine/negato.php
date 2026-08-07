@@ -32,7 +32,7 @@ defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
           <p class="text-body-secondary mb-3">
             L'utenza in uso ha livello
             <strong><?= Testo::esc(Utenti::ETICHETTE_LIVELLO[Auth::livello()] ?? Auth::livello()) ?></strong>
-            e non e autorizzata a questa sezione.
+            e non è autorizzata a questa sezione.
           </p>
           <a class="btn btn-sm btn-outline-secondary" href="index.php">
             <i class="bi bi-house"></i> Torna alla pagina iniziale

@@ -99,7 +99,7 @@ krsort($perAnno);
             </option>
           <?php endforeach; ?>
         </select>
-        <div class="catageo-nota">Richiede di aprire i diari: piu lento degli altri filtri.</div>
+        <div class="catageo-nota">Richiede di aprire i diari: più lento degli altri filtri.</div>
       </div>
 
       <div class="col-md-2">

@@ -362,7 +362,7 @@ final class Scientifici
 
         $nome = trim((string) ($dati['nome'] ?? ''));
         if ($nome === '') {
-            throw new ScientificiEccezione('Il nome del punto di misura e obbligatorio.');
+            throw new ScientificiEccezione('Il nome del punto di misura è obbligatorio.');
         }
 
         foreach (['latitudine' => 90.0, 'longitudine' => 180.0] as $campo => $massimo) {
@@ -611,7 +611,7 @@ final class Scientifici
 
         $riga = self::componiRiga($serie, $lettura);
         if ($riga['data'] === '') {
-            throw new ScientificiEccezione('La data della lettura e obbligatoria.');
+            throw new ScientificiEccezione('La data della lettura è obbligatoria.');
         }
 
         Csv::accoda($csv, self::COLONNE, $riga);
@@ -1058,7 +1058,7 @@ final class Scientifici
     private static function validaSerie(string $codice, array $dati): void
     {
         if (trim((string) ($dati['titolo'] ?? '')) === '') {
-            throw new ScientificiEccezione('Il titolo della serie e obbligatorio: compare nel nome del file.');
+            throw new ScientificiEccezione('Il titolo della serie è obbligatorio: compare nel nome del file.');
         }
 
         $grandezza = trim((string) ($dati['grandezza'] ?? ''));

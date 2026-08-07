@@ -40,7 +40,7 @@ final class IndiceIpogei
         'sviluppo', 'dislivello', 'stato_accesso', 'riservatezza', 'stato_scheda',
         'n_allegati', 'n_foto', 'n_video', 'n_rilievi', 'n_esplorazioni', 'n_biblio',
         'n_serie_misure', 'ha_kml', 'ha_3d', 'ha_chirotteri', 'ha_archeologia',
-        'periodo_arch', 'esplorata', 'prosegue', 'pos_verificata', 'data_verifica',
+        'periodo_arch', 'ha_geologia', 'litologia', 'genesi', 'esplorata', 'prosegue', 'pos_verificata', 'data_verifica',
         'grado', 'grado_idrico', 'armo',
         'data_censimento', 'ultima_modifica', 'cartella',
     ];
@@ -314,6 +314,11 @@ final class IndiceIpogei
             'ha_chirotteri'   => Biospeleologia::colonie($codice) !== [] ? '1' : '0',
             'ha_archeologia'  => $conteggi['AR'] > 0 ? '1' : '0',
             'periodo_arch'    => Archeologia::periodoPrincipale($codice),
+            // Geologia (6.16). Litologia e genesi sono i due criteri con cui
+            // si cerca: il resto della sezione resta in scheda.
+            'ha_geologia'     => $conteggi['GE'] > 0 ? '1' : '0',
+            'litologia'       => Geologia::litologia($codice),
+            'genesi'          => Geologia::tipoGenesi($codice),
             // Stato esplorativo e verifica sul campo (9.17): stanno
             // nell'indice perche sono criteri di ricerca, ed e la ricerca
             // il motivo per cui esistono. Tre stati, quindi si scrive il
@@ -398,6 +403,12 @@ final class IndiceIpogei
             }
             if ($sigla === 'AR') {
                 $conteggi['AR'] = Archeologia::conta($codice);
+                continue;
+            }
+            // Stesso caso per la geologia: senza questa riga "ha_geologia"
+            // resterebbe sempre a zero, ed e il difetto gia visto tre volte.
+            if ($sigla === 'GE') {
+                $conteggi['GE'] = Geologia::conta($codice);
                 continue;
             }
 

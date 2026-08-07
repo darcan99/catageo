@@ -79,7 +79,7 @@ final class Miniature
 
         $info = @getimagesize($origine);
         if ($info === false) {
-            $motivo = 'non e un\'immagine leggibile';
+            $motivo = 'non è un\'immagine leggibile';
             return false;
         }
 

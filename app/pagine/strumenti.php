@@ -129,7 +129,7 @@ $cataloghi = Cataloghi::elenco();
       <div class="card-body">
         <p class="text-body-secondary">
           Gli indici sono una <strong>cache</strong>: si rigenerano interamente
-          dagli XML, che restano la sola fonte di verita. Ricostruirli e
+          dagli XML, che restano la sola fonte di verità. Ricostruirli e
           l'operazione da fare dopo un ripristino da backup, o dopo aver
           modificato dei file a mano.
         </p>
@@ -147,10 +147,10 @@ $cataloghi = Cataloghi::elenco();
   <!-- ================================================= integrita -->
   <div class="col-lg-6">
     <div class="card h-100">
-      <div class="card-header"><h2 class="h6 mb-0">Integrita dell'archivio</h2></div>
+      <div class="card-header"><h2 class="h6 mb-0">Integrità dell'archivio</h2></div>
       <div class="card-body">
         <p class="text-body-secondary">
-          Cerca cio che l'uso normale non fa emergere: XML non validi,
+          Cerca ciò che l'uso normale non fa emergere: XML non validi,
           riferimenti rotti, codici duplicati, contatori disallineati, file
           orfani. <strong>Non corregge nulla</strong>: segnala, e dice cosa fare.
         </p>
@@ -167,10 +167,10 @@ $cataloghi = Cataloghi::elenco();
       <div class="card-header"><h2 class="h6 mb-0">Completezza delle schede</h2></div>
       <div class="card-body">
         <p class="text-body-secondary">
-          L'integrita dice se l'archivio e <strong>corretto</strong>; questo dice
+          L'integrità dice se l'archivio e <strong>corretto</strong>; questo dice
           se e <strong>finito</strong>. Quali schede sono senza coordinate, senza
           rilievo, senza foto, e quali non hanno mai risposto alla domanda se
-          la cavita prosegua.
+          la cavità prosegua.
         </p>
         <form method="get" action="index.php" class="d-flex flex-wrap gap-2 align-items-end">
           <input type="hidden" name="p" value="strumenti">
@@ -211,8 +211,8 @@ $cataloghi = Cataloghi::elenco();
       <div class="card-body">
         <?php if (!extension_loaded('zip')): ?>
           <div class="alert alert-warning mb-3">
-            L'estensione <span class="catageo-valore">zip</span> di PHP non e
-            disponibile: il backup non si puo creare da qui. Copiare a mano la
+            L'estensione <span class="catageo-valore">zip</span> di PHP non è
+            disponibile: il backup non si può creare da qui. Copiare a mano la
             cartella dell'archivio.
           </div>
         <?php else: ?>
@@ -298,7 +298,7 @@ $cataloghi = Cataloghi::elenco();
       <div class="card-body">
         <p class="text-body-secondary">
           Crea molte schede in una volta da un file esterno, con mappatura
-          delle colonne e anteprima riga per riga. Una scheda gia presente
+          delle colonne e anteprima riga per riga. Una scheda già presente
           <strong>non viene mai sovrascritta</strong>.
         </p>
         <a class="btn btn-primary" href="index.php?p=importa">
@@ -323,7 +323,7 @@ $cataloghi = Cataloghi::elenco();
         <?php if (!VerificaLink::possibile()): ?>
           <div class="alert alert-warning mb-0">
             Le chiamate HTTP in uscita non sono disponibili su questo hosting:
-            la verifica non si puo eseguire. Gli esiti gia registrati restano
+            la verifica non si può eseguire. Gli esiti già registrati restano
             invariati.
           </div>
         <?php else: ?>
@@ -442,7 +442,7 @@ $cataloghi = Cataloghi::elenco();
 
         <?php if (count($completezza['righe']) > count($mostrate)): ?>
           <p class="catageo-nota mt-2 mb-0">
-            Mostrate le <?= count($mostrate) ?> schede piu incomplete delle
+            Mostrate le <?= count($mostrate) ?> schede più incomplete delle
             <?= count($completezza['righe']) ?> esaminate. Il CSV le contiene tutte.
           </p>
         <?php endif; ?>

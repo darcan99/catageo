@@ -102,10 +102,10 @@ final class Gruppi extends Anagrafica
         $sigla = strtoupper(trim((string) ($dati['sigla'] ?? '')));
 
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome del gruppo e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome del gruppo è obbligatorio.');
         }
         if ($sigla === '') {
-            throw new AnagraficaEccezione('La sigla del gruppo e obbligatoria: e quella che compare negli elenchi compatti.');
+            throw new AnagraficaEccezione('La sigla del gruppo è obbligatoria: e quella che compare negli elenchi compatti.');
         }
         if (!preg_match('/^[A-Z0-9.\-]{1,20}$/', $sigla)) {
             throw new AnagraficaEccezione('Sigla non valida: fino a 20 caratteri fra lettere, cifre, punto e trattino.');
@@ -145,7 +145,7 @@ final class Gruppi extends Anagrafica
                 continue;
             }
             if (strcasecmp((string) $voce['sigla'], $sigla) === 0) {
-                throw new AnagraficaEccezione("La sigla \"{$sigla}\" e gia usata dal gruppo \"{$voce['nome']}\".");
+                throw new AnagraficaEccezione("La sigla \"{$sigla}\" è già usata dal gruppo \"{$voce['nome']}\".");
             }
         }
     }

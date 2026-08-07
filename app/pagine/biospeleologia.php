@@ -44,7 +44,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Biospeleologia::eliminaColonia($codice, (string) ($_POST['id'] ?? ''));
                 IndiceIpogei::aggiorna($codice);
                 Auth::messaggio('successo',
-                    'Colonia rimossa. Il file dei conteggi e stato spostato in "'
+                    'Colonia rimossa. Il file dei conteggi è stato spostato in "'
                     . $codice . ' - ' . Risorse::CARTELLA_RIMOSSI . '".');
                 break;
 
@@ -154,7 +154,7 @@ if ($azione === 'colonia' && $id !== '') {
     // critico resta comunque visibile in scheda, oscurato.
     if (!Visibilita::livelloVisibile((string) $colonia['riservatezza'])) {
         Auth::messaggio('errore',
-            'Colonia riservata: il dettaglio non e consultabile con il livello di utenza in uso.');
+            'Colonia riservata: il dettaglio non è consultabile con il livello di utenza in uso.');
         header('Location: ' . $ritorno);
         exit;
     }
@@ -525,7 +525,7 @@ if ($azione === 'osservazione' && $puoCompilare) {
                   <input type="time" class="form-control" id="ora" name="ora" value="<?= $v('ora') ?>">
                 </div>
                 <div class="col-md-4">
-                  <label for="zonaCavita" class="form-label">Zona della cavita</label>
+                  <label for="zonaCavita" class="form-label">Zona della cavità</label>
                   <input type="text" class="form-control" id="zonaCavita" name="zonaCavita"
                          value="<?= $v('zonaCavita') ?>">
                 </div>
@@ -688,7 +688,7 @@ if ($azione === 'modificaColonia' && $puoCompilare) {
                          value="<?= $v('nome') ?>" placeholder="Colonia della sala grande">
                 </div>
                 <div class="col-md-5">
-                  <label for="ruolo" class="form-label">Ruolo della cavita</label>
+                  <label for="ruolo" class="form-label">Ruolo della cavità</label>
                   <select class="form-select" id="ruolo" name="ruolo">
                     <?php foreach (Biospeleologia::RUOLI_COLONIA as $valore => $etichetta): ?>
                       <option value="<?= Testo::esc($valore) ?>"
@@ -712,7 +712,7 @@ if ($azione === 'modificaColonia' && $puoCompilare) {
                 </div>
 
                 <div class="col-md-6">
-                  <label for="zonaCavita" class="form-label">Zona della cavita</label>
+                  <label for="zonaCavita" class="form-label">Zona della cavità</label>
                   <input type="text" class="form-control" id="zonaCavita" name="zonaCavita"
                          value="<?= $v('zonaCavita') ?>">
                 </div>
@@ -754,7 +754,7 @@ if ($azione === 'modificaColonia' && $puoCompilare) {
                 </div>
                 <div class="col-md-6 d-flex align-items-end">
                   <div class="catageo-nota">
-                    Senza anno, perche il periodo si ripete ogni stagione. Puo
+                    Senza anno, perché il periodo si ripete ogni stagione. Può
                     scavalcare il capodanno: 11-01 → 03-31 e uno svernamento.
                   </div>
                 </div>
@@ -802,7 +802,7 @@ if ($azione === 'modificaColonia' && $puoCompilare) {
               </select>
               <div class="catageo-nota mt-2">
                 Indipendente da quella dell'ipogeo e prevalente su di essa: una
-                cavita pubblica puo ospitare una colonia visibile solo a OPE e ADM.
+                cavità pubblica può ospitare una colonia visibile solo a OPE e ADM.
                 L'avviso di periodo critico compare comunque a tutti, ma senza
                 nome, specie e zona.
               </div>

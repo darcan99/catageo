@@ -195,7 +195,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
                     <option value="<?= Testo::esc($suggerita) ?>"></option>
                   <?php endforeach; ?>
                 </datalist>
-                <div class="catageo-nota">Separate da virgola. Il campo e libero: i suggerimenti sono solo le piu comuni.</div>
+                <div class="catageo-nota">Separate da virgola. Il campo e libero: i suggerimenti sono solo le più comuni.</div>
               </div>
 
               <div class="col-12">

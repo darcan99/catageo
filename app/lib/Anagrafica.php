@@ -275,7 +275,7 @@ abstract class Anagrafica
             }
             throw new AnagraficaEccezione(
                 'Cancellazione rifiutata: la voce e referenziata da ' . implode(', ', $dettaglio) . '. '
-                . 'Se non serve piu, disattivarla: resta nei riferimenti storici senza comparire nelle scelte.'
+                . 'Se non serve più, disattivarla: resta nei riferimenti storici senza comparire nelle scelte.'
             );
         }
 

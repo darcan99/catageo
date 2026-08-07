@@ -61,7 +61,7 @@ final class Backup
     {
         if (!class_exists('ZipArchive')) {
             throw new BackupEccezione(
-                'L\'estensione zip di PHP non e disponibile: il backup ZIP non si puo creare. '
+                'L\'estensione zip di PHP non è disponibile: il backup ZIP non si può creare. '
                 . 'Copiare a mano la cartella dell\'archivio.');
         }
 

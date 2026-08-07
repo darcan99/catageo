@@ -146,7 +146,7 @@ final class Bibliografia
         if ($tipo === 'riferimento') {
             $opera = $voce['opera'] ?? null;
             if (!is_array($opera)) {
-                return 'Opera ' . (string) $voce['operaId'] . ' non piu presente nel catalogo generale.';
+                return 'Opera ' . (string) $voce['operaId'] . ' non più presente nel catalogo generale.';
             }
 
             return Opere::citazione($opera, (string) $voce['pagine']);
@@ -582,13 +582,13 @@ final class Bibliografia
         }
 
         if (trim((string) ($dati['titolo'] ?? '')) === '') {
-            throw new BibliografiaEccezione('Il titolo e obbligatorio.');
+            throw new BibliografiaEccezione('Il titolo è obbligatorio.');
         }
 
         if ($tipo === 'link') {
             $url = trim((string) ($dati['url'] ?? ''));
             if ($url === '') {
-                throw new BibliografiaEccezione('L\'indirizzo del collegamento e obbligatorio.');
+                throw new BibliografiaEccezione('L\'indirizzo del collegamento è obbligatorio.');
             }
             if (!filter_var($url, FILTER_VALIDATE_URL)) {
                 throw new BibliografiaEccezione('Indirizzo non valido: indicarlo per esteso, con http:// o https://.');

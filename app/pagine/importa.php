@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sosta = $_SESSION[$chiaveSosta] ?? null;
             if (!is_array($sosta) || !is_file((string) $sosta['percorso'])) {
                 throw new IpogeoEccezione(
-                    'Il file caricato non e piu disponibile: ricaricarlo e rifare l\'anteprima.');
+                    'Il file caricato non è più disponibile: ricaricarlo e rifare l\'anteprima.');
             }
 
             /*
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if ($esito['saltate'] > 0) {
                 Auth::messaggio('info', $esito['saltate']
-                    . ' righe saltate perche il codice era gia presente: le schede '
+                    . ' righe saltate perché il codice era già presente: le schede '
                     . 'esistenti non sono state toccate.');
             }
             if ($esito['rifiutate'] > 0) {
@@ -285,7 +285,7 @@ if ($azione === 'mappa' && is_array($sosta) && is_file((string) $sosta['percorso
                   <div class="catageo-nota">
                     Serve a importare un catasto esistente conservandone la
                     numerazione. Senza la spunta i codici li assegna la serie del
-                    catalogo. In entrambi i casi una scheda gia presente
+                    catalogo. In entrambi i casi una scheda già presente
                     <strong>non viene mai sovrascritta</strong>.
                   </div>
                 </label>
@@ -488,7 +488,7 @@ if ($azione === 'mappa' && is_array($sosta) && is_file((string) $sosta['percorso
         </p>
         <div class="catageo-nota">
           Un CSV <a href="index.php?p=ricerca">esportato dalla ricerca</a> si
-          reimporta senza modifiche: e il modo piu semplice per travasare dati
+          reimporta senza modifiche: e il modo più semplice per travasare dati
           fra due installazioni.
         </div>
       </div>

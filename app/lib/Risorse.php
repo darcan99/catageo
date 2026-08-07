@@ -278,7 +278,7 @@ final class Risorse
             // un file esistente sarebbe la reazione peggiore.
             if (file_exists($destinazione)) {
                 throw new RisorsaEccezione(
-                    'Esiste gia un file con il nome "' . $nomeFile . '". '
+                    'Esiste già un file con il nome "' . $nomeFile . '". '
                     . 'L\'indice della sezione e disallineato rispetto alla cartella.'
                 );
             }

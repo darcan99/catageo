@@ -281,7 +281,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
                 <label class="form-check-label" for="attivo">Voce attiva</label>
               </div>
               <div class="catageo-nota mb-3">
-                Il codice non e modificabile: e il riferimento memorizzato nelle schede.
+                Il codice non è modificabile: e il riferimento memorizzato nelle schede.
               </div>
               <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-check-lg"></i> Salva</button>
               <a class="btn btn-outline-secondary btn-sm" href="index.php?p=vocabolari&amp;voc=tipologie">Annulla</a>
@@ -369,7 +369,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
                 <tr>
                   <th scope="col">Codice</th>
                   <th scope="col">Grandezza</th>
-                  <th scope="col">Unita</th>
+                  <th scope="col">Unità</th>
                   <th scope="col">Intervallo atteso</th>
                   <th scope="col">Dec.</th>
                   <th scope="col" class="text-end">Azioni</th>
@@ -436,7 +436,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
               </div>
               <div class="row g-2 mb-3">
                 <div class="col-6">
-                  <label for="unita" class="form-label">Unita</label>
+                  <label for="unita" class="form-label">Unità</label>
                   <input type="text" class="form-control catageo-valore" id="unita" name="unita" maxlength="20"
                          value="<?= Testo::esc($inMod['unita']) ?>">
                 </div>
@@ -494,7 +494,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
               </div>
               <div class="row g-2 mb-3">
                 <div class="col-6">
-                  <label for="unitaG" class="form-label">Unita</label>
+                  <label for="unitaG" class="form-label">Unità</label>
                   <input type="text" class="form-control catageo-valore" id="unitaG" name="unita" maxlength="20">
                 </div>
                 <div class="col-6">

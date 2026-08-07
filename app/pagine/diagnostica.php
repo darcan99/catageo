@@ -52,7 +52,7 @@ foreach ($verifiche as $voce) {
     <i class="bi bi-exclamation-octagon-fill mt-1" aria-hidden="true"></i>
     <div>
       Ci sono verifiche in errore: alcune funzioni non saranno disponibili
-      finche non vengono risolte. Il dettaglio e nella colonna delle note.
+      finché non vengono risolte. Il dettaglio e nella colonna delle note.
     </div>
   </div>
 <?php endif; ?>

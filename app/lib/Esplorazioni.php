@@ -782,11 +782,11 @@ final class Esplorazioni
     private static function valida(array $dati): void
     {
         if (trim((string) ($dati['titolo'] ?? '')) === '') {
-            throw new EsplorazioneEccezione('Il titolo dell\'esplorazione e obbligatorio.');
+            throw new EsplorazioneEccezione('Il titolo dell\'esplorazione è obbligatorio.');
         }
 
         if (trim((string) ($dati['dataInizio'] ?? '')) === '') {
-            throw new EsplorazioneEccezione('La data dell\'uscita e obbligatoria.');
+            throw new EsplorazioneEccezione('La data dell\'uscita è obbligatoria.');
         }
 
         $tipo = (string) ($dati['tipo'] ?? '');

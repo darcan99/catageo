@@ -183,10 +183,10 @@ final class Grandezze
 
         self::validaCodice($codice);
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome della categoria e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome della categoria è obbligatorio.');
         }
         if (self::categoriaEsiste($codice) || self::trova($codice) !== null) {
-            throw new AnagraficaEccezione("Il codice \"{$codice}\" e gia usato.");
+            throw new AnagraficaEccezione("Il codice \"{$codice}\" è già usato.");
         }
 
         Xml::conLock(self::percorso(), static function () use ($codice, $nome): void {
@@ -220,7 +220,7 @@ final class Grandezze
             throw new AnagraficaEccezione('Categoria non trovata.');
         }
         if (self::trova($codice) !== null || self::categoriaEsiste($codice)) {
-            throw new AnagraficaEccezione("Il codice \"{$codice}\" e gia usato.");
+            throw new AnagraficaEccezione("Il codice \"{$codice}\" è già usato.");
         }
 
         Xml::conLock(self::percorso(), static function () use ($categoria, $codice, $dati): void {
@@ -284,7 +284,7 @@ final class Grandezze
     {
         $nome = trim($nome);
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome della categoria e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome della categoria è obbligatorio.');
         }
 
         Xml::conLock(self::percorso(), static function () use ($codice, $nome, $attivo): void {
@@ -458,7 +458,7 @@ final class Grandezze
     private static function validaCodice(string $codice): void
     {
         if ($codice === '') {
-            throw new AnagraficaEccezione('Il codice e obbligatorio.');
+            throw new AnagraficaEccezione('Il codice è obbligatorio.');
         }
         if (!preg_match('/^[A-Z0-9\-]{1,30}$/', $codice)) {
             throw new AnagraficaEccezione(
@@ -476,7 +476,7 @@ final class Grandezze
         self::validaCodice($codice);
 
         if (trim((string) ($dati['nome'] ?? '')) === '') {
-            throw new AnagraficaEccezione('Il nome della grandezza e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome della grandezza è obbligatorio.');
         }
 
         $min = trim((string) ($dati['min'] ?? ''));

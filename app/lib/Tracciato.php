@@ -117,7 +117,7 @@ final class Tracciato
     {
         if (!class_exists('ZipArchive')) {
             throw new TracciatoEccezione(
-                'I file KMZ richiedono l\'estensione zip di PHP, che non e disponibile. '
+                'I file KMZ richiedono l\'estensione zip di PHP, che non è disponibile. '
                 . 'Caricare il rilievo come KML per vederlo in mappa.'
             );
         }
@@ -182,7 +182,7 @@ final class Tracciato
 
         if (!$ok) {
             $primo = $errori === [] ? 'XML non valido' : trim($errori[0]->message);
-            throw new TracciatoEccezione('Il file non e un XML leggibile: ' . $primo);
+            throw new TracciatoEccezione('Il file non è un XML leggibile: ' . $primo);
         }
 
         return $doc;

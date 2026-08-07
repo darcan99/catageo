@@ -23,6 +23,14 @@ Le estensioni opzionali mancanti non impediscono l'installazione: le funzioni
 che le usano si degradano e lo dicono. Senza `zip` non si fanno backup dalla
 pagina degli strumenti, senza `gd` le foto si mostrano a dimensione piena.
 
+**Connessioni in uscita.** Servono a due cose sole, entrambe facoltative: la
+verifica dei collegamenti bibliografici e la compilazione assistita della
+sezione geologia, che interroga i servizi cartografici. Richiedono
+`allow_url_fopen` attivo e che l'hosting lasci uscire le richieste HTTPS —
+diversi piani economici le bloccano. Se non passano, le due funzioni lo dicono
+e tutto il resto continua a funzionare: i layer WMS in mappa **non** ne hanno
+bisogno, perché li scarica il browser, non il server.
+
 La pagina **Diagnostica** (menu utente, solo amministratori) elenca tutto
 quello che è presente e tutto quello che manca, con i limiti di caricamento
 effettivi dell'hosting. È la prima pagina da guardare quando qualcosa non va.
@@ -121,6 +129,13 @@ due viene toccato da un aggiornamento**, che riguarda solo il codice.
 Confronta `config.xml.dist` con il tuo `config.xml`: le chiavi nuove non
 compaiono da sole, e l'applicativo usa il valore predefinito finché non le
 aggiungi.
+
+Lo stesso vale per i **layer cartografici**. Dalla 1.2.0 `config.xml.dist`
+contiene 26 layer WMS già pronti (geologia ISPRA, catasto, vincoli
+archeologici, geoportali di Lazio, Abruzzo, Umbria e Marche), ma
+un'installazione esistente non li riceve: vanno copiati a mano dentro
+`<overlayLayers>` del proprio `config.xml`. Sono tutti `attivo="0"`, quindi
+incollarli non cambia l'aspetto della mappa finché non se ne accende uno.
 
 ---
 

@@ -177,7 +177,7 @@ final class Migrazione
         if (count($codici) > self::LIMITE_LOTTO) {
             throw new IpogeoEccezione(
                 'Si possono spostare al massimo ' . self::LIMITE_LOTTO . ' ipogei per volta: '
-                . 'un elenco piu lungo non lo si controlla davvero prima di confermare.');
+                . 'un elenco più lungo non lo si controlla davvero prima di confermare.');
         }
 
         $migrati = [];

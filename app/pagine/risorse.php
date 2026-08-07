@@ -53,7 +53,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -221,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Risorse::elimina($codice, $sigla, $prog);
                 IndiceIpogei::aggiorna($codice);
                 Auth::messaggio('successo',
-                    'Risorsa rimossa dalla sezione. Il file e stato spostato in "'
+                    'Risorsa rimossa dalla sezione. Il file è stato spostato in "'
                     . $codice . ' - ' . Risorse::CARTELLA_RIMOSSI . '" e resta recuperabile.');
                 break;
 
@@ -277,7 +277,7 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
     <i class="bi bi-info-circle-fill mt-1" aria-hidden="true"></i>
     <div>
       La gestione dei contenuti di <strong><?= Testo::esc($etichetta) ?></strong> arriva
-      in una fase successiva del piano. I file gia presenti nella cartella
+      in una fase successiva del piano. I file già presenti nella cartella
       <span class="catageo-valore"><?= Testo::esc(Sezioni::nomeCartella($codice, $sigla)) ?></span>
       vengono comunque elencati qui sotto se sono registrati nell'indice di sezione.
     </div>
@@ -302,7 +302,7 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
               Ammessi: <?= Testo::esc(implode(', ', $ammesse)) ?>.
             <?php endif; ?>
             Dimensione massima per file: <?= Testo::esc(Testo::dimensione($maxUpload)) ?>.
-            Si possono selezionare piu file insieme.
+            Si possono selezionare più file insieme.
           </div>
         </div>
 
@@ -310,7 +310,7 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
           <label for="titolo" class="form-label">Titolo</label>
           <input type="text" class="form-control" id="titolo" name="titolo" maxlength="200">
           <div class="catageo-nota">
-            Se vuoto viene usato il nome del file. Caricando piu file insieme
+            Se vuoto viene usato il nome del file. Caricando più file insieme
             viene ignorato: ognuno prende il proprio nome.
           </div>
         </div>
@@ -370,7 +370,7 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
       <?php if ($anteprima === 'immagine' && !Miniature::disponibile()): ?>
         <div class="alert alert-warning mt-3 mb-0 py-2">
           <i class="bi bi-exclamation-triangle-fill"></i>
-          L'estensione <span class="catageo-valore">gd</span> non e disponibile: le miniature
+          L'estensione <span class="catageo-valore">gd</span> non è disponibile: le miniature
           non vengono generate e la galleria mostra le immagini originali rimpicciolite dal
           browser. Le foto restano archiviate correttamente.
         </div>
@@ -663,7 +663,7 @@ $inModifica   = $daModificare > 0 && $puoGestire
             <input type="url" class="form-control" id="mUrl" name="urlEsterno" maxlength="500"
                    value="<?= Testo::esc((string) $inModifica['urlEsterno']) ?>">
             <div class="catageo-nota">
-              Per i filmati ospitati altrove, cosi da non consumare lo spazio dell'hosting.
+              Per i filmati ospitati altrove, così da non consumare lo spazio dell'hosting.
             </div>
           </div>
         <?php endif; ?>
@@ -760,7 +760,7 @@ $inModifica   = $daModificare > 0 && $puoGestire
                 </label>
               </div>
               <div class="catageo-nota">
-                Da spegnere quando un ipogeo ha piu rilievi dello stesso ramo e mostrarli
+                Da spegnere quando un ipogeo ha più rilievi dello stesso ramo e mostrarli
                 tutti insieme renderebbe la mappa illeggibile.
               </div>
             </div>

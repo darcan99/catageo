@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Un amministratore non deve poter eliminare la propria utenza
                 // mentre la sta usando: resterebbe fuori a meta operazione.
                 if ($id === (string) (Auth::utente()['id'] ?? '')) {
-                    throw new UtenteEccezione('Non e possibile eliminare l\'utenza con cui si e effettuato l\'accesso.');
+                    throw new UtenteEccezione('Non è possibile eliminare l\'utenza con cui si è effettuato l\'accesso.');
                 }
 
                 Utenti::elimina($id);
@@ -157,7 +157,7 @@ $idCorrente = (string) (Auth::utente()['id'] ?? '');
                   <input type="text" class="form-control" id="username"
                          value="<?= Testo::esc((string) $inModifica['username']) ?>" disabled>
                   <div class="catageo-nota">
-                    Lo username non e modificabile: comparirebbe nei log storici
+                    Lo username non è modificabile: comparirebbe nei log storici
                     con due valori diversi per la stessa persona.
                   </div>
                 <?php else: ?>
@@ -226,7 +226,7 @@ $idCorrente = (string) (Auth::utente()['id'] ?? '');
                   <label class="form-check-label" for="attivo">Utenza attiva</label>
                 </div>
                 <div class="catageo-nota">
-                  Un'utenza disattivata non puo accedere ma resta nei log e nei
+                  Un'utenza disattivata non può accedere ma resta nei log e nei
                   riferimenti storici: e preferibile alla cancellazione.
                 </div>
               </div>

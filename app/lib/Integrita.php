@@ -90,7 +90,7 @@ final class Integrita
         if ($cataloghi === []) {
             $aggiungi(self::ERRORE, 'Cataloghi', 'archivio',
                 'Nessun catalogo presente.',
-                'Crearne uno da Cataloghi: senza, non si puo censire nulla.');
+                'Crearne uno da Cataloghi: senza, non si può censire nulla.');
         }
 
         foreach ($cataloghi as $catalogo) {
@@ -99,7 +99,7 @@ final class Integrita
             if ($catalogo['serie'] === []) {
                 $aggiungi(self::ERRORE, 'Cataloghi', $sigla,
                     'Il catalogo non ha nessuna serie di codifica.',
-                    'Aggiungere una serie: senza, il catalogo non puo assegnare codici.');
+                    'Aggiungere una serie: senza, il catalogo non può assegnare codici.');
             }
 
             $cartella = Percorsi::cataloghi((string) $catalogo['cartella']);
@@ -176,8 +176,8 @@ final class Integrita
                     self::verificaIpogeo($codice, $percorso, $catalogo, $aggiungi, $esaminati);
                 } catch (Throwable $e) {
                     $aggiungi(self::ERRORE, 'Schede', $codice,
-                        'La verifica di questo ipogeo si e interrotta: ' . $e->getMessage(),
-                        'Aprire i file dell\'ipogeo e correggerli: finche non sono leggibili, '
+                        'La verifica di questo ipogeo si è interrotta: ' . $e->getMessage(),
+                        'Aprire i file dell\'ipogeo e correggerli: finché non sono leggibili, '
                         . 'i controlli successivi su questa scheda non si possono fare.');
                 }
             }
@@ -189,7 +189,7 @@ final class Integrita
             if (!isset($codiciSuDisco[$codice])) {
                 $aggiungi(self::ERRORE, 'Indice', (string) $riga['codice'],
                     'Presente nell\'indice ma non sul disco.',
-                    'Ricostruire l\'indice: se l\'ipogeo e stato eliminato, la riga sparira.');
+                    'Ricostruire l\'indice: se l\'ipogeo è stato eliminato, la riga sparira.');
             }
         }
 
@@ -229,11 +229,11 @@ final class Integrita
                 if ($massimo >= $prossimo) {
                     $aggiungi(self::ERRORE, 'Contatori',
                         (string) $catalogo['sigla'] . ' / ' . $prefisso,
-                        'Il contatore e a ' . $prossimo . ' ma esiste gia il codice numero '
+                        'Il contatore e a ' . $prossimo . ' ma esiste già il codice numero '
                         . $massimo . '.',
                         'Allineare il contatore ad almeno ' . ($massimo + 1)
-                        . ' da Cataloghi: cosi com\'e, il prossimo censimento tenterebbe '
-                        . 'un codice gia usato.');
+                        . ' da Cataloghi: così com\'è, il prossimo censimento tenterebbe '
+                        . 'un codice già usato.');
                 }
             }
         }
@@ -275,9 +275,9 @@ final class Integrita
         $errori = Xml::valida(self::caricaSilenzioso($dati), Percorsi::schema('ipogeo.xsd'));
         if ($errori !== []) {
             $aggiungi(self::ERRORE, 'Schede', $codice,
-                'La scheda non e valida secondo lo schema: ' . implode('; ', array_slice($errori, 0, 3)),
-                'Aprire il file e correggerlo: e leggibile a mano. '
-                . 'Finche non e valido, ogni salvataggio da interfaccia verra rifiutato.');
+                'La scheda non è valida secondo lo schema: ' . implode('; ', array_slice($errori, 0, 3)),
+                'Aprire il file e correggerlo: è leggibile a mano. '
+                . 'Finché non è valido, ogni salvataggio da interfaccia verra rifiutato.');
         }
 
         /*
@@ -291,7 +291,7 @@ final class Integrita
             $scheda = Ipogeo::trova($codice);
         } catch (Throwable $e) {
             $aggiungi(self::ERRORE, 'Schede', $codice,
-                'La scheda non e leggibile: ' . $e->getMessage(),
+                'La scheda non è leggibile: ' . $e->getMessage(),
                 'Correggere il file, oppure ripristinarlo dallo storico della scheda '
                 . 'o da un backup.');
             return;
@@ -335,8 +335,8 @@ final class Integrita
             self::verificaRiferimenti($codice, $aggiungi);
         } catch (Throwable $e) {
             $aggiungi(self::ERRORE, 'Riferimenti', $codice,
-                'Il controllo dei riferimenti si e interrotto: ' . $e->getMessage(),
-                'Di solito significa che un indice di sezione o un\x27anagrafica non e '
+                'Il controllo dei riferimenti si è interrotto: ' . $e->getMessage(),
+                'Di solito significa che un indice di sezione o un\x27anagrafica non è '
                 . 'leggibile: correggerlo e rieseguire la verifica.');
         }
     }
@@ -456,7 +456,7 @@ final class Integrita
                 $aggiungi(self::ERRORE, 'Riferimenti',
                     $codice . ' / ' . Sezioni::riferimento('BB', (int) $fonte['progressivo']),
                     'La voce cita l\'opera ' . (string) $fonte['operaId']
-                    . ', che non e nel catalogo generale.',
+                    . ', che non è nel catalogo generale.',
                     'Ricensire l\'opera con quell\'identificativo, oppure convertire '
                     . 'la voce in una fonte propria dell\'ipogeo.');
             }
@@ -487,7 +487,7 @@ final class Integrita
                     $aggiungi(self::ATTENZIONE, 'Serie di misure', $codice,
                         'CSV senza descrittore: ' . $voce,
                         'Creare la serie corrispondente, oppure spostare il file: '
-                        . 'cosi com\'e non e raggiungibile dall\'interfaccia.');
+                        . 'così com\'è non è raggiungibile dall\'interfaccia.');
                 }
             }
         }

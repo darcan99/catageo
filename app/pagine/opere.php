@@ -114,11 +114,11 @@ if ($azione === 'citazioni' && $idRichiesto !== '') {
       <div class="card-body">
         <?php if ($citazioni === []): ?>
           <p class="text-body-secondary mb-0">
-            Nessuna scheda cita quest'opera. Puo essere eliminata dal catalogo.
+            Nessuna scheda cita quest'opera. Può essere eliminata dal catalogo.
           </p>
         <?php else: ?>
           <p class="catageo-nota">
-            L'elenco non e memorizzato: viene ricavato ora scorrendo le sezioni
+            L'elenco non è memorizzato: viene ricavato ora scorrendo le sezioni
             bibliografiche di tutti gli ipogei.
           </p>
           <ul class="list-unstyled mb-0">
@@ -321,7 +321,7 @@ $titolo = 'Catalogo delle opere';
                 Proponibile nelle nuove citazioni
               </label>
               <div class="catageo-nota">
-                Un'opera disattivata resta nelle citazioni gia fatte: si smette di
+                Un'opera disattivata resta nelle citazioni già fatte: si smette di
                 proporla, non la si nasconde.
               </div>
             </div>
@@ -360,7 +360,7 @@ $titolo = 'Catalogo delle opere';
             <?php if ($filtro !== ''): ?>
               Nessuna opera corrisponde alla ricerca.
             <?php else: ?>
-              Qui si censiscono una volta sola le opere che descrivono piu cavita.
+              Qui si censiscono una volta sola le opere che descrivono più cavità.
               Una monografia citata da quaranta schede si corregge in un posto solo.
             <?php endif; ?>
           </p>

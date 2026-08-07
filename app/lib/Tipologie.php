@@ -205,7 +205,7 @@ final class Tipologie
     {
         $nome = trim($nome);
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome è obbligatorio.');
         }
 
         Xml::conLock(self::percorso(), static function () use ($codice, $nome, $note, $attivo): void {
@@ -360,7 +360,7 @@ final class Tipologie
             throw new AnagraficaEccezione('Livello non valido.');
         }
         if ($codice === '') {
-            throw new AnagraficaEccezione('Il codice e obbligatorio.');
+            throw new AnagraficaEccezione('Il codice è obbligatorio.');
         }
         if (!preg_match('/^[A-Z0-9\-]{2,30}$/', $codice)) {
             throw new AnagraficaEccezione(
@@ -368,10 +368,10 @@ final class Tipologie
             );
         }
         if ($nome === '') {
-            throw new AnagraficaEccezione('Il nome e obbligatorio.');
+            throw new AnagraficaEccezione('Il nome è obbligatorio.');
         }
         if (self::trova($codice) !== null) {
-            throw new AnagraficaEccezione("Il codice \"{$codice}\" e gia usato nella tassonomia.");
+            throw new AnagraficaEccezione("Il codice \"{$codice}\" è già usato nella tassonomia.");
         }
 
         if ($livello === 'natura') {

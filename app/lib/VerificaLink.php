@@ -62,7 +62,7 @@ final class VerificaLink
                 'verificati' => [], 'totale' => $totale, 'restanti' => $totale,
                 'possibile' => false,
                 'messaggio' => 'Le chiamate HTTP in uscita non sono disponibili su questo '
-                    . 'hosting: la verifica non si puo eseguire. Gli esiti gia registrati '
+                    . 'hosting: la verifica non si può eseguire. Gli esiti già registrati '
                     . 'restano invariati — segnarli tutti come irraggiungibili sarebbe '
                     . 'peggio che non verificarli.',
             ];
@@ -116,7 +116,7 @@ final class VerificaLink
     private static function interroga(string $url): array
     {
         if (!preg_match('~^https?://~i', $url)) {
-            return ['non verificato', 'Non e un indirizzo http o https.'];
+            return ['non verificato', 'Non è un indirizzo http o https.'];
         }
 
         $contesto = stream_context_create([

@@ -87,7 +87,7 @@ final class Auth
         if ($ultima > 0 && (time() - $ultima) > $durataMinuti * 60) {
             self::chiudi();
             session_start();
-            self::messaggio('avviso', 'Sessione scaduta per inattivita: e necessario accedere di nuovo.');
+            self::messaggio('avviso', 'Sessione scaduta per inattivita: è necessario accedere di nuovo.');
         }
         $_SESSION[self::K_ULTIMA] = time();
     }

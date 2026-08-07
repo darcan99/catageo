@@ -187,7 +187,7 @@ final class CodiceCatastale
 
         $messaggio = '';
         if (IndiceCodici::esiste($codice)) {
-            $messaggio = 'Attenzione: il codice risultante e gia presente in archivio. '
+            $messaggio = 'Attenzione: il codice risultante è già presente in archivio. '
                        . 'Il contatore della serie va allineato.';
         }
 
@@ -270,7 +270,7 @@ final class CodiceCatastale
             return $esito;
         }
         if (IndiceCodici::esiste($codice) || self::cartellaEsistente($codice)) {
-            $esito['messaggio'] = 'Il codice e gia presente in archivio.';
+            $esito['messaggio'] = 'Il codice è già presente in archivio.';
             return $esito;
         }
 
@@ -319,7 +319,7 @@ final class CodiceCatastale
     public static function validaPrefisso(string $prefisso): void
     {
         if ($prefisso === '') {
-            throw new CatalogoEccezione('Il prefisso della serie e obbligatorio.');
+            throw new CatalogoEccezione('Il prefisso della serie è obbligatorio.');
         }
         if (!preg_match('/^[A-Z0-9.\-_]{1,30}$/', $prefisso)) {
             throw new CatalogoEccezione(

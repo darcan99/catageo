@@ -100,7 +100,7 @@ final class Diagnostica
                 $estensione,
                 $presente ? self::OK : self::ATTENZIONE,
                 $presente ? 'presente' : 'assente',
-                $presente ? '' : 'Senza questa estensione non e disponibile: ' . $funzione . '. Il resto funziona.'
+                $presente ? '' : 'Senza questa estensione non è disponibile: ' . $funzione . '. Il resto funziona.'
             );
         }
 
@@ -151,7 +151,7 @@ final class Diagnostica
             $reteInUscita ? 'disponibili' : 'non disponibili',
             $reteInUscita
                 ? ''
-                : 'Senza chiamate in uscita non e disponibile la compilazione assistita della sezione geologica; la mappa e tutto il resto funzionano.'
+                : 'Senza chiamate in uscita non è disponibile la compilazione assistita della sezione geologica; la mappa e tutto il resto funzionano.'
         );
 
         // ------------------------------------------------- configurazione
@@ -217,7 +217,7 @@ final class Diagnostica
                     'Amministratori attivi',
                     $adm >= 1 ? self::OK : self::ERRORE,
                     (string) $adm,
-                    $adm >= 1 ? '' : 'Nessun amministratore attivo: la configurazione non e piu modificabile dall\'interfaccia.'
+                    $adm >= 1 ? '' : 'Nessun amministratore attivo: la configurazione non è più modificabile dall\'interfaccia.'
                 );
             }
 
@@ -232,7 +232,7 @@ final class Diagnostica
                 $fuoriWebroot ? 'archivio fuori dal webroot' : (is_file($htaccess) ? '.htaccess presente' : 'nessuna protezione'),
                 $fuoriWebroot
                     ? ''
-                    : 'La protezione piu solida e spostare l\'archivio fuori dal webroot e indicarne il percorso in percorsi/dati. Il .htaccess non ha effetto se il server ha AllowOverride None o non e Apache.'
+                    : 'La protezione più solida è spostare l\'archivio fuori dal webroot e indicarne il percorso in percorsi/dati. Il .htaccess non ha effetto se il server ha AllowOverride None o non è Apache.'
             );
 
             $spazio = @disk_free_space(Percorsi::dati());

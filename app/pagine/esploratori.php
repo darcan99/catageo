@@ -199,9 +199,9 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
               cambiato. Lasciare vuoto l'anno finale se l'appartenenza e in corso.
             </p>
             <p class="catageo-nota mb-3">
-              <strong>Lo stesso gruppo puo comparire piu volte</strong>, con periodi
+              <strong>Lo stesso gruppo può comparire più volte</strong>, con periodi
               diversi: chi lascia un gruppo e vi rientra dopo qualche anno ha due
-              periodi distinti. Ed e normale essere iscritti a piu gruppi
+              periodi distinti. Ed e normale essere iscritti a più gruppi
               contemporaneamente, quindi i periodi di gruppi diversi possono
               sovrapporsi liberamente. L'unico caso rifiutato e l'accavallamento
               di due periodi dello <em>stesso</em> gruppo, che sarebbe

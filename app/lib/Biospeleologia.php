@@ -341,8 +341,8 @@ final class Biospeleologia
                     $testo .= ' ' . (string) $colonia['prescrizioni'];
                 }
             } else {
-                $testo = 'La cavita ospita fauna protetta in periodo critico, ' . $periodo . '. '
-                    . 'Il dettaglio non e consultabile con il livello di utenza in uso.';
+                $testo = 'La cavità ospita fauna protetta in periodo critico, ' . $periodo . '. '
+                    . 'Il dettaglio non è consultabile con il livello di utenza in uso.';
             }
 
             $avvisi[] = [
@@ -565,7 +565,7 @@ final class Biospeleologia
 
         $data = Scientifici::normalizzaData((string) ($conteggio['data'] ?? ''));
         if ($data === '') {
-            throw new BiospeleologiaEccezione('La data del conteggio e obbligatoria.');
+            throw new BiospeleologiaEccezione('La data del conteggio è obbligatoria.');
         }
 
         $numero = trim((string) ($conteggio['numero'] ?? ''));
@@ -854,12 +854,12 @@ final class Biospeleologia
     private static function validaColonia(array $dati): void
     {
         if (trim((string) ($dati['nome'] ?? '')) === '') {
-            throw new BiospeleologiaEccezione('Il nome della colonia e obbligatorio.');
+            throw new BiospeleologiaEccezione('Il nome della colonia è obbligatorio.');
         }
 
         $ruolo = trim((string) ($dati['ruolo'] ?? ''));
         if ($ruolo !== '' && !isset(self::RUOLI_COLONIA[$ruolo])) {
-            throw new BiospeleologiaEccezione('Ruolo della cavita non riconosciuto: ' . $ruolo);
+            throw new BiospeleologiaEccezione('Ruolo della cavità non riconosciuto: ' . $ruolo);
         }
 
         foreach (['periodoCriticoDal', 'periodoCriticoAl'] as $campo) {

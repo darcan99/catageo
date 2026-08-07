@@ -15,7 +15,9 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
- *  1.2.0  2026-08-07  D.Candela  script-src e font-src allargati solo quando
+ *  1.2.0  2026-08-07  D.Candela  Fasi 4b e 6b: geologia, geoportali,
+ *                                compilazione assistita. script-src e font-src
+ *                                allargati solo quando
  *                                il provider Google e attivo (fase 4b).
  *  1.1.0  2026-08-07  D.Candela  Fase 12: estensioni del modello.
  *  1.0.0  2026-08-07  D.Candela  Prima release: fase 10 conclusa.
@@ -45,7 +47,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '1.1.0');
+define('CATAGEO_VERSIONE', '1.2.0');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');
@@ -105,7 +107,7 @@ if (is_file(CATAGEO_CONFIG)) {
         echo '<!doctype html><meta charset="utf-8"><title>CATAGEO — errore di configurazione</title>';
         echo '<div style="font-family:system-ui,sans-serif;max-width:44rem;margin:3rem auto;line-height:1.6">';
         echo '<h1 style="font-size:1.4rem">Errore di configurazione</h1>';
-        echo '<p>Il file <code>config.xml</code> esiste ma non e leggibile come XML valido.</p>';
+        echo '<p>Il file <code>config.xml</code> esiste ma non è leggibile come XML valido.</p>';
         echo '<p style="background:#fff3cd;border:1px solid #ffe69c;padding:.75rem;border-radius:.375rem">'
            . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</p>';
         echo '<p>Correggere il file oppure ripartire da <code>config.xml.dist</code>.</p></div>';

@@ -90,7 +90,7 @@ if ($soloTesto && empty($_GET['nosalto'])) {
         if ($visibile) {
             if ($risolto['storico']) {
                 Auth::messaggio('info',
-                    'Il codice "' . trim((string) $criteri['testo']) . '" e stato dismesso: '
+                    'Il codice "' . trim((string) $criteri['testo']) . '" è stato dismesso: '
                     . 'la scheda corrente e ' . $risolto['codice'] . '.');
             }
             header('Location: index.php?p=ipogei&azione=scheda&codice=' . urlencode($risolto['codice']));
@@ -173,7 +173,7 @@ if ($vista === 'mappa' && $righe !== []) {
         <label for="testo" class="form-label">Testo</label>
         <input type="search" class="form-control form-control-lg" id="testo" name="testo"
                value="<?= Testo::esc((string) $criteri['testo']) ?>"
-               placeholder="Nome, codice anche storico, comune, localita">
+               placeholder="Nome, codice anche storico, comune, località">
       </div>
       <div class="col-md-4 d-flex align-items-end">
         <div class="form-check">
@@ -182,7 +182,7 @@ if ($vista === 'mappa' && $righe !== []) {
                  <?= (string) $criteri['nelleDescrizioni'] === '1' ? 'checked' : '' ?>>
           <label class="form-check-label" for="nelleDescrizioni">
             Cerca anche nelle descrizioni
-            <div class="catageo-nota">Piu lenta: apre le schede una per una.</div>
+            <div class="catageo-nota">Più lenta: apre le schede una per una.</div>
           </label>
         </div>
       </div>
@@ -372,7 +372,7 @@ if ($vista === 'mappa' && $righe !== []) {
                 </select>
               </div>
               <div class="col-md-3">
-                <label for="gradoIdrico" class="form-label">Difficolta idriche</label>
+                <label for="gradoIdrico" class="form-label">Difficoltà idriche</label>
                 <select class="form-select" id="gradoIdrico" name="gradoIdrico">
                   <option value="">Qualunque</option>
                   <?php foreach (Ipogeo::GRADI_IDRICI as $valore => $etichetta): ?>
@@ -384,7 +384,7 @@ if ($vista === 'mappa' && $righe !== []) {
                 </select>
               </div>
               <div class="col-md-3">
-                <label for="armo" class="form-label">Necessita armo</label>
+                <label for="armo" class="form-label">Necessità armo</label>
                 <select class="form-select" id="armo" name="armo">
                   <option value="">Qualunque</option>
                   <option value="si" <?= (string) $criteri['armo'] === 'si' ? 'selected' : '' ?>>si</option>
@@ -398,7 +398,7 @@ if ($vista === 'mappa' && $righe !== []) {
                        name="nonVerificataDaAnni" min="0" max="200" step="1"
                        value="<?= Testo::esc((string) $criteri['nonVerificataDaAnni']) ?>">
                 <div class="catageo-nota">
-                  Le mai verificate rientrano sempre: sono il caso piu vecchio.
+                  Le mai verificate rientrano sempre: sono il caso più vecchio.
                 </div>
               </div>
             </div>
@@ -557,7 +557,7 @@ if ($vista === 'mappa' && $righe !== []) {
                          name="conVincolo" value="1"
                          <?= (string) $criteri['conVincolo'] === '1' ? 'checked' : '' ?>>
                   <label class="form-check-label" for="conVincolo">
-                    Solo cavita sottoposte a vincolo
+                    Solo cavità sottoposte a vincolo
                   </label>
                 </div>
               </div>

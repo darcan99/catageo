@@ -458,7 +458,7 @@ final class Proiezione
 
         throw new ProiezioneEccezione(sprintf(
             'Il punto dista %.1f gradi dal meridiano centrale del sistema, oltre il limite di %.0f gradi entro cui '
-            . 'la conversione resta accurata. Quasi sempre significa che il fuso indicato non e quello del punto.%s',
+            . 'la conversione resta accurata. Quasi sempre significa che il fuso indicato non è quello del punto.%s',
             $scostamento, self::LIMITE_SCOSTAMENTO_GRADI, $suggerimento
         ));
     }

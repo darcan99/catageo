@@ -1222,7 +1222,7 @@ Su questa sezione la tua nota era *"sarebbe utile ma non so che dati potremmo re
     <tipoGenesi>antropica</tipoGenesi>
     <!-- carsica|vulcanica|tettonica|erosiva|glaciale|marina|antropica|mista -->
     <processo><![CDATA[Scavo in tufo con successivo allargamento per crollo…]]></processo>
-    <rocciaEncassante>Tufo litoide a matrice cineritica</rocciaEncassante>
+    <rocciaIncassante>Tufo litoide a matrice cineritica</rocciaIncassante>
   </genesi>
 
   <assettoStrutturale>
@@ -1297,6 +1297,36 @@ Due avvertenze che ne condizionano la realizzazione, per cui la funzione è opzi
 
 - Richiede chiamate HTTP in uscita dal server (`curl` o `allow_url_fopen`), che diversi hosting economici bloccano. Se non disponibili, la funzione si disattiva da sé e resta la compilazione manuale con il layer WMS a video.
 - Il dato così ottenuto ha la precisione della scala di origine: il 1:50.000 inquadra correttamente la formazione regionale, non distingue una lente di materiale diverso di dieci metri. Va trattato come inquadramento, non come rilevamento in cavità — ed è la ragione per cui `<fonte>` è un campo obbligatorio e non un dettaglio.
+
+#### 6.16.2 Compilazione assistita — come è stata realizzata (fase 6b)
+
+Realizzata in `Geoservizi` + `app/pagine/geo-interroga.php` + `assets/js/catageo-geologia.js`.
+
+**Propone, non scrive.** I valori trovati compaiono accanto ai campi con il nome del layer da cui vengono, e ciascuno si accetta singolarmente. Un campo riempito senza che nessuno lo abbia guardato è un dato falso che sembra vero, e in una scheda di catasto sopravvive a chi l'ha inserito. Accettare una proposta porta `<fonte modalita>` a `GetFeatureInfo`, ma **solo se era ancora vuota**: una provenienza già dichiarata da una persona non si sovrascrive.
+
+**L'interrogazione la fa il server**, non il browser. Tre motivi, in ordine di importanza: la politica sulle coordinate riservate deve stare dove l'utente non la può aggirare con la console; i servizi degli enti non mandano gli header CORS e il browser non potrebbe leggere la risposta; la CSP non va allargata a `connect-src` per host che servono immagini.
+
+**Quali campi.** Solo `litologia`, `formazione`, `unitaGeologica`, `etaFormazione`, `permeabilita` (`Mappa::CAMPI_INTERROGABILI`). Una carta dice di che roccia è fatto il terreno sopra la cavità; non dice se prosegue, se è attiva, quanto è fratturata la volta. Ammettere altre chiavi darebbe l'impressione che il resto della sezione si compili senza scendere.
+
+**La mappatura la scrive chi configura**, nell'attributo `interroga` del layer (§7.2.2): `interroga="litologia:litologia,formazione:nome_ulf"`. I nomi a destra sono quelli veri del servizio e non seguono nessuna regola — nello stesso GeoServer convivono `nome_ulf`, `ETAINF` e `Shape_Area` — quindi il confronto ignora le maiuscole. Vince il primo layer che risponde: l'ordine in `config.xml` è l'ordine di fiducia, e in genere mette la carta regionale di dettaglio prima di quella nazionale.
+
+##### Coordinate riservate: la scelta a tre vie
+
+Interrogare un servizio significa mandare il punto al server di un ente, che di norma lo registra. Su una cavità con riservatezza `riservata` o `coordinate_offuscate` non si chiede nulla finché l'operatore non ha scelto:
+
+| Scelta | Cosa esce da CATAGEO |
+|---|---|
+| **Punto arrotondato** | la coordinata agganciata alla griglia di `sicurezza.offuscamentoCoordinate` (1000 m predefiniti) |
+| **Punto esatto** | la coordinata vera, per decisione esplicita di chi compila |
+| **Non interrogare** | niente: nessuna richiesta parte |
+
+**Arrotondamento, non errore casuale.** Era stato proposto un errore randomico di 200-300 m: non regge. Un errore che cambia a ogni chiamata si annulla facendo la media di tre richieste, quindi chi volesse il punto vero dovrebbe solo chiederlo tre volte. `Visibilita::griglia()` restituisce sempre lo stesso punto, quante volte lo si chieda, e a 1:100.000 mille metri non cambiano la formazione che si legge. La prova verifica proprio questo: tre interrogazioni della stessa cavità devono dare la stessa coordinata.
+
+Il modo lo decide il **server**: un valore non riconosciuto su una scheda riservata diventa `niente`, non «manda tutto». Su una scheda pubblica il modo offuscato viene ignorato — la coordinata esatta è già pubblica e arrotondarla peggiorerebbe solo il risultato.
+
+Esiste anche un declassamento per chi non è autorizzato a vedere il punto esatto. **Oggi non può scattare**, ed è giusto dirlo invece di contarlo fra le difese attive: nella matrice dei permessi `compila_sezioni` e `vedi_riservati` chiedono entrambi OPE, e i livelli sono tre. Resta scritto perché la matrice è un unico array in `Auth`: se un giorno si separassero i due permessi — un livello che compila le sezioni ma non vede i riservati è una richiesta ragionevole — senza quella riga si aprirebbe una via d'uscita silenziosa. La suite verifica l'accoppiamento, così il cambiamento non passa inosservato.
+
+**Ogni interrogazione finisce nel registro delle modifiche**, comprese quelle andate a vuoto, con il modo usato e l'arrotondamento applicato. È l'unico punto in cui una coordinata di questo archivio esce verso un server di terzi: se un domani qualcuno chiede se è successo, la risposta deve stare scritta.
 
 ---
 
@@ -1382,8 +1412,36 @@ Ogni layer è un elemento `<layer>` sotto `<baseLayers>` (sfondi, mutuamente esc
 | `formato` | `wms` | default `image/png` |
 | `versione` | `wms` | default `1.3.0` |
 | `trasparente` | `wms` | `0` per un WMS opaco; altrimenti trasparente |
+| `interroga` | `wms` | mappatura per la compilazione assistita della sezione geologia (§6.16.2): `nostroCampo:campoDelServizio`, separati da virgola. Le chiavi fuori da `Mappa::CAMPI_INTERROGABILI` si scartano in silenzio: un refuso in un attributo facoltativo non può lasciare l'installazione senza mappa. Non viene passato al browser |
 
 Le origini dei layer alimentano la **Content-Security-Policy** emessa da `bootstrap.php`: aggiungere un servizio in `config.xml` è sufficiente, la policy si adegua da sé. Il segnaposto `{s}` diventa un carattere jolly di sottodominio. Se la lettura della configurazione cartografica fallisce, la policy resta quella restrittiva e il guasto viene registrato nel log: il sintomo altrimenti sarebbe soltanto una mappa senza sfondo.
+
+#### 7.2.3 Layer preconfigurati per l'Italia centrale (fase 6b)
+
+`config.xml.dist` esce con **26 layer già scritti e tutti spenti** (`attivo="0"`): nazionali, più Lazio, Abruzzo, Umbria e Marche. Si accendono dal pannello dei layer quando servono; un'installazione fuori dall'Italia centrale cancella i blocchi regionali che non le servono.
+
+Ciascuno è stato verificato due volte il **2026-08-07**: un `GetCapabilities` per l'esistenza e poi una vera immagine (`GetMap`) su un riquadro **dentro il territorio di competenza**. Provarli tutti sullo stesso punto avrebbe detto solo che il server risponde. Un layer che risponde ma non disegna è peggio di un layer assente, perché chi lo accende non sa se ha sbagliato lui o se è giù il server dell'ente.
+
+| Ambito | Layer |
+|---|---|
+| Italia | ISPRA: geologica 1:100.000, litologia, classi di permeabilità, inventario sinkhole, cave, emissioni gassose, geologica 1:1M · Agenzia delle Entrate: cartografia catastale · MiC Vincoli in Rete: aree archeologiche vincolate |
+| Lazio | geologica 1:25.000, unità idrogeologiche, sorgenti puntuali, curve di livello, aree archeologiche PTPR, ortofoto AGEA 2023 |
+| Abruzzo | ortofoto AGEA 2022, CTR 1:5.000, IGM 1:25.000 |
+| Umbria | cave attive, cave dismesse, CTR 1:10.000, ortofoto 2020 |
+| Marche | geologica 1:10.000, CTR 2019, ortofoto AGEA 2022, IGM storico 1892-95 |
+
+Le emissioni gassose non sono un vezzo geologico: la CO₂ nei vuoti sotterranei uccide, e sapere che si scende dentro un'area di emissione cambia la preparazione dell'uscita. L'IGM storico serve alle cavità artificiali: quello che c'era nell'Ottocento e non c'è più nell'ortofoto di oggi è quasi sempre un ingresso.
+
+**Sei cose emerse dalla verifica**, ciascuna annotata anche accanto al layer in `config.xml.dist`:
+
+1. Il GeoPortale del Lazio pubblica `catasto_delle_cavita_naturali` e `PTP_cavità_sotterranee_probabili` — i due layer più interessanti dell'elenco. **Non disegnano**: rispondono 200 con il PNG vuoto di GeoServer (6727 byte esatti) sia su 100 km sia su 10. Un layer inesistente risponde `LayerNotDefined`, quindi esistono e sono vuoti o protetti. Restano commentati, pronti se un giorno si popolano.
+2. **Il Molise non ha più un geoportale.** `geo.regione.molise.it` e `servizi.geo.regione.molise.it`, citati dalla documentazione ufficiale e da geodati.gov.it, non risolvono in DNS: il dominio è sparito, non è un servizio giù. Per il Molise restano i layer nazionali.
+3. Le Marche servono **solo in http**: su `https://wms.cartografia.marche.it` la catena di certificati non si stabilisce. Su un CATAGEO servito in https il browser li blocca come contenuto misto e restano bianchi senza dire perché.
+4. La carta geologica delle Marche è **raster**: un `GetFeatureInfo` risponde `RED_BAND`/`GREEN_BAND`/`BLUE_BAND`, cioè il colore del pixel. Si guarda, non si interroga.
+5. Il layer INSPIRE `CP.CadastralParcel` dell'Agenzia delle Entrate **rifiuta EPSG:3857** con `InvalidFormat` (dichiara solo sistemi ETRS89). Si usa `Cartografia_Catastale`, che si proietta.
+6. L'Umbria **non dichiara EPSG:3857** nel capabilities ma lo serve comunque, riproiettando. Funziona, ma è tolleranza del server, non un impegno.
+
+Le installazioni già fatte non ricevono questi layer: `config.xml` si genera una volta sola all'installazione. Vanno incollati a mano.
 
 ### 7.3 KML sui rilievi
 
@@ -1825,10 +1883,10 @@ Altre convenzioni:
 | **2b** | Cataloghi: `catalogo.xml`, scoperta automatica, serie di codifica, anteprima del codice, selettore di catalogo attivo | Due cataloghi coesistenti con contatori indipendenti |
 | **3** | Ipogei: template scheda, CRUD, assegnazione codice dalle serie, indice CSV, `codici.csv`, storico | Censimento di un ipogeo end-to-end nel catalogo scelto |
 | **4** | Mappa: astrazione `CatageoMappa`, implementazione Leaflet/OSM, marker, cluster, base layer, overlay WMS, mappa di scheda | Tutti gli ipogei visibili e filtrabili su mappa |
-| **4b** | Implementazione provider Google Maps sulla stessa interfaccia + selettore in configurazione | Commutazione del provider senza altre modifiche — **fatta** |
+| **4b** | Implementazione provider Google Maps sulla stessa interfaccia + selettore in configurazione | Commutazione del provider senza altre modifiche — **fatta**, `v1.2.0` |
 | **5** | Risorse: allegati, foto (+miniature), video, download mediato | Upload e consultazione dei media |
 | **6** | Rilievi: 2D, KML→GeoJSON su mappa, viewer 3D three.js | Un rilievo KML visibile su mappa e un PLY nel viewer |
-| **6b** | Geologia: sezione dedicata, layer cartografici preconfigurati, compilazione assistita `GetFeatureInfo` con degradazione se l'hosting blocca le chiamate in uscita | Inquadramento geologico compilato dalla mappa |
+| **6b** | Geologia: sezione dedicata, layer cartografici preconfigurati, compilazione assistita `GetFeatureInfo` con degradazione se l'hosting blocca le chiamate in uscita | Inquadramento geologico compilato dalla mappa — **fatta**, `v1.2.0` |
 | **7** | Esplorazioni: diari, partecipanti, voci con coordinate e foto, viste per gruppo/esploratore | Diario completo pubblicato su scheda |
 | **7b** | Bibliografia: catalogo generale, tre tipi di voce, citazioni per sigla, export BibTeX, verifica link | Voce condivisa fra due ipogei e citata da una evidenza |
 | **7c** | Dati scientifici: punti di misura, serie CSV, import da datalogger, statistiche, grafici SVG server-side | Serie da datalogger importata e graficata |
@@ -1841,7 +1899,7 @@ Altre convenzioni:
 | **12** | *(post-1.0.0)* Estensioni del modello (§9.17): stato esplorativo, verifica sul campo, ingressi come scheda, complessi, aree con perimetro, percorribilita strutturata, report di completezza | Ricerca «cavita che proseguono e non riviste da N anni» — **fatta**, `v1.1.0` |
 | **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
 
-**Ordine di esecuzione dopo il rilascio 1.0.0**: **12**, poi **6b**, poi **4b**, infine **11**. La 12 viene prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione.
+**Ordine di esecuzione dopo il rilascio 1.0.0**: **12** (`v1.1.0`), poi **4b** e **6b** (`v1.2.0`), infine **11**. La 12 e venuta prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione. La 4b e stata anticipata alla 6b perche la sezione geologica si appoggia ai layer cartografici, e conveniva che l'astrazione del provider fosse gia in piedi.
 
 Al termine di ogni fase: commit, aggiornamento `CHANGELOG.md`, incremento delle versioni dei file toccati.
 
@@ -1901,6 +1959,9 @@ Nessuno bloccante per l'avvio degli sviluppi. Si procede con i default indicati 
 3. **Vocabolari precaricati**: `grandezze.xml` e `periodi_storici.xml` sono compilati con la mia proposta (§6.4). Vanno riletti da te e da chi si occupa di monitoraggi: sono modificabili in ogni momento, ma partire con un vocabolario corretto evita di dover riclassificare dati già inseriti.
 4. **Determinazione tassonomica in biospeleologia**: serve un elenco chiuso di specie precaricato (almeno per i chirotteri italiani) o si lascia il nome scientifico libero? *Default: campo libero con suggerimento dai valori già inseriti nell'archivio, che si auto-arricchisce senza imporre una lista da manutenere.*
 5. **Fase 11**: le fonti pubbliche da cui importare dati vanno individuate insieme, con verifica delle licenze prima di scrivere codice (vedi nota in §15).
+6. **Resa visiva del provider Google**: verificabile solo con una chiave API valida. Con una chiave finta l'API si carica e l'implementazione gira — costruisce la mappa, registra lo sfondo, proietta le coordinate — ma Google non disegna la propria cornice, quindi legenda e lettura coordinate risultano registrate nei suoi controlli e non innestate nel DOM.
+7. **Layer dei geoportali**: gli endpoint verificati il 2026-08-07 (§7.2.3) sono di enti pubblici che li spostano senza preavviso. Non c'è un controllo automatico: la suite `prova-geoportali.ps1` li interroga a ogni giro e li elenca a parte, contati separatamente dalle verifiche su CATAGEO, perché un ente che spegne un servizio non è una regressione dell'applicativo. Se un layer smette di rispondere, la riga da correggere è in `config.xml.dist` e nel `config.xml` delle installazioni.
+8. **Ortografia dei vocabolari**: le chiavi memorizzate negli archivi restano senza accento (`per porosita`, `zonaCavita`) perché sono scritte nell'XML delle schede già salvate. Le etichette che l'utente legge sono corrette. Cambiare anche le chiavi richiederebbe una migrazione degli archivi esistenti: si può fare, ma è una fase a sé.
 
 ---
 

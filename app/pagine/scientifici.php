@@ -46,7 +46,7 @@ if (!Visibilita::schedaVisibile(
     (string) $scheda['ubicazione']['riservatezza'],
     (string) $scheda['catasto']['statoScheda']
 )) {
-    Auth::messaggio('errore', 'La scheda richiesta non e consultabile con il livello di utenza in uso.');
+    Auth::messaggio('errore', 'La scheda richiesta non è consultabile con il livello di utenza in uso.');
     header('Location: index.php?p=ipogei');
     exit;
 }
@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Scientifici::eliminaSerie($codice, (int) ($_POST['progressivo'] ?? 0));
                 IndiceIpogei::aggiorna($codice);
                 Auth::messaggio('successo',
-                    'Serie rimossa. Il CSV e stato spostato in "' . $codice . ' - '
+                    'Serie rimossa. Il CSV è stato spostato in "' . $codice . ' - '
                     . Risorse::CARTELLA_RIMOSSI . '" e resta recuperabile.');
                 break;
 
@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!is_array($sosta) || !is_file((string) $sosta['percorso'])) {
                     throw new ScientificiEccezione(
-                        'Il file caricato non e piu disponibile: ricaricalo e riprova.');
+                        'Il file caricato non è più disponibile: ricaricalo e riprova.');
                 }
 
                 $mappatura = [];
@@ -367,7 +367,7 @@ if ($azione === 'import' && $prog > 0 && $puoImportare) {
             <div class="catageo-nota mt-3">
               Se data e ora stanno nella stessa colonna, indicala per entrambe:
               l'ora viene estratta dal testo.
-              Le altre colonne del file non vengono importate; strumento, unita
+              Le altre colonne del file non vengono importate; strumento, unità
               e provenienza li mette la serie.
             </div>
           </div>
@@ -489,7 +489,7 @@ if ($azione === 'serie' && $prog > 0) {
                 <thead class="sticky-top">
                   <tr>
                     <th>Data</th><th>Ora</th><th class="text-end">Valore</th>
-                    <th>Validita</th><th>Note</th>
+                    <th>Validità</th><th>Note</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -553,7 +553,7 @@ if ($azione === 'serie' && $prog > 0) {
                   <div class="catageo-nota">Vuoto = non misurato.</div>
                 </div>
                 <div class="col-6 col-md-2">
-                  <label for="validita" class="form-label">Validita</label>
+                  <label for="validita" class="form-label">Validità</label>
                   <select class="form-select" id="validita" name="validita">
                     <?php foreach (Scientifici::VALIDITA as $valore => $etichetta): ?>
                       <option value="<?= $valore ?>"><?= Testo::esc($etichetta) ?></option>
@@ -595,7 +595,7 @@ if ($azione === 'serie' && $prog > 0) {
                 </div>
               </form>
               <div class="catageo-nota mt-2">
-                Le letture si accodano a quelle gia presenti: l'importazione non
+                Le letture si accodano a quelle già presenti: l'importazione non
                 sostituisce la serie.
               </div>
             </div>
@@ -634,7 +634,7 @@ if ($azione === 'serie' && $prog > 0) {
               <hr>
               <div class="catageo-nota">
                 <?php if ($stat['esclusePerValidita'] > 0): ?>
-                  <?= (int) $stat['esclusePerValidita'] ?> letture escluse perche
+                  <?= (int) $stat['esclusePerValidita'] ?> letture escluse perché
                   marcate anomale o scartate.<br>
                 <?php endif; ?>
                 <?php if ($stat['senzaValore'] > 0): ?>
@@ -769,7 +769,7 @@ if (($azione === 'nuovaSerie' || ($azione === 'modificaSerie' && $prog > 0)) && 
                   <?php if ($modifica): ?>
                     <div class="catageo-nota">
                       Il nome del file non cambia: contiene dati e potrebbe essere
-                      gia stato scaricato o citato.
+                      già stato scaricato o citato.
                     </div>
                   <?php else: ?>
                     <div class="catageo-nota">Compare nel nome del file CSV.</div>
@@ -792,7 +792,7 @@ if (($azione === 'nuovaSerie' || ($azione === 'modificaSerie' && $prog > 0)) && 
                       </optgroup>
                     <?php endforeach; ?>
                   </select>
-                  <div class="catageo-nota">L'unita viene dalla grandezza scelta.</div>
+                  <div class="catageo-nota">L'unità viene dalla grandezza scelta.</div>
                 </div>
 
                 <div class="col-md-5">
@@ -918,7 +918,7 @@ if (($azione === 'nuovaSerie' || ($azione === 'modificaSerie' && $prog > 0)) && 
                   </option>
                 </select>
                 <div class="catageo-nota">
-                  Indipendente da quella dell'ipogeo: una cavita pubblica puo
+                  Indipendente da quella dell'ipogeo: una cavità pubblica può
                   ospitare un monitoraggio che non va divulgato.
                 </div>
               </div>
@@ -987,7 +987,7 @@ $titolo = 'Dati scientifici — ' . $codice;
             <p class="text-body-secondary mb-0">
               Una serie e un CSV di letture con il suo descrittore: si accoda nel
               tempo e si apre in un foglio di calcolo. Conviene definire prima i
-              punti di misura, cosi due misure prese a distanza di anni restano
+              punti di misura, così due misure prese a distanza di anni restano
               confrontabili.
             </p>
           </div>

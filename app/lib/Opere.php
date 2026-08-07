@@ -123,7 +123,7 @@ final class Opere extends Anagrafica
     {
         $titolo = trim((string) ($dati['titolo'] ?? ''));
         if ($titolo === '') {
-            throw new AnagraficaEccezione('Il titolo dell\'opera e obbligatorio.');
+            throw new AnagraficaEccezione('Il titolo dell\'opera è obbligatorio.');
         }
 
         $tipo = trim((string) ($dati['tipoOpera'] ?? ''));
@@ -159,7 +159,7 @@ final class Opere extends Anagrafica
             if (strcasecmp((string) $voce['titolo'], $titolo) === 0
                 && (string) $voce['anno'] === $anno && $anno !== '') {
                 throw new AnagraficaEccezione(
-                    'Esiste gia un\'opera con questo titolo e questo anno (' . $voce['id'] . '). '
+                    'Esiste già un\'opera con questo titolo e questo anno (' . $voce['id'] . '). '
                     . 'Se e davvero un\'altra opera, distinguila nel titolo o lascia vuoto l\'anno.'
                 );
             }
@@ -347,7 +347,7 @@ final class Opere extends Anagrafica
         }
 
         if ($righe === []) {
-            return "% Il catalogo generale delle opere e vuoto.\n";
+            return "% Il catalogo generale delle opere è vuoto.\n";
         }
 
         return "% Catalogo generale delle opere — esportato da CATAGEO\n\n"

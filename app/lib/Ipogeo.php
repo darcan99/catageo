@@ -142,7 +142,7 @@ final class Ipogeo
      * scala pensata per le grotte non esisterebbe.
      */
     public const GRADI_PROGRESSIONE = [
-        'T'   => 'T — turistico, senza difficolta',
+        'T'   => 'T — turistico, senza difficoltà',
         'F'   => 'F — facile, senza attrezzatura',
         'PD'  => 'PD — poco difficile',
         'AD'  => 'AD — abbastanza difficile',
@@ -495,7 +495,7 @@ final class Ipogeo
         $cartella     = Percorsi::unisci($cartellaIpogei, $nomeCartella);
 
         if (is_dir($cartella)) {
-            throw new IpogeoEccezione('Esiste gia una cartella "' . $nomeCartella . '" nel catalogo.');
+            throw new IpogeoEccezione('Esiste già una cartella "' . $nomeCartella . '" nel catalogo.');
         }
 
         // Completamento dei dati di catasto.
@@ -613,7 +613,7 @@ final class Ipogeo
             throw new IpogeoEccezione('Il nuovo codice contiene caratteri non ammessi.');
         }
         if (IndiceCodici::esiste($nuovoCodice) || CodiceCatastale::cartellaEsistente($nuovoCodice)) {
-            throw new IpogeoEccezione('Il codice "' . $nuovoCodice . '" e gia presente in archivio.');
+            throw new IpogeoEccezione('Il codice "' . $nuovoCodice . '" è già presente in archivio.');
         }
 
         $scheda = self::trova($codice);
@@ -700,7 +700,7 @@ final class Ipogeo
         $catalogoOrigine = (string) $scheda['catasto']['catalogo'];
         if (strcasecmp($catalogoOrigine, (string) $destinazione['sigla']) === 0) {
             throw new IpogeoEccezione(
-                'L\'ipogeo ' . $codice . ' e gia nel catalogo ' . $destinazione['sigla'] . '.');
+                'L\'ipogeo ' . $codice . ' è già nel catalogo ' . $destinazione['sigla'] . '.');
         }
 
         $cartella = (string) $scheda['_percorso'];
@@ -736,7 +736,7 @@ final class Ipogeo
         $provvisoria = Percorsi::unisci($cartellaIpogei, basename($cartella));
         if (is_dir($provvisoria)) {
             throw new IpogeoEccezione(
-                'Nel catalogo di destinazione esiste gia una cartella "' . basename($cartella) . '".');
+                'Nel catalogo di destinazione esiste già una cartella "' . basename($cartella) . '".');
         }
         if (!@rename($cartella, $provvisoria)) {
             throw new IpogeoEccezione(
@@ -916,12 +916,12 @@ final class Ipogeo
     {
         $nome = trim((string) ($scheda['identificazione']['nome'] ?? ''));
         if ($nome === '') {
-            throw new IpogeoEccezione('Il nome dell\'ipogeo e obbligatorio.');
+            throw new IpogeoEccezione('Il nome dell\'ipogeo è obbligatorio.');
         }
 
         $natura = trim((string) ($scheda['identificazione']['natura'] ?? ''));
         if ($natura === '') {
-            throw new IpogeoEccezione('La natura (artificiale o naturale) e obbligatoria.');
+            throw new IpogeoEccezione('La natura (artificiale o naturale) è obbligatoria.');
         }
         if (Tipologie::trova($natura) === null) {
             throw new IpogeoEccezione('Natura non presente in tassonomia: ' . $natura);
@@ -929,7 +929,7 @@ final class Ipogeo
 
         $tipologia = trim((string) ($scheda['identificazione']['tipologia'] ?? ''));
         if ($tipologia === '') {
-            throw new IpogeoEccezione('La tipologia e obbligatoria.');
+            throw new IpogeoEccezione('La tipologia è obbligatoria.');
         }
         if (Tipologie::trova($tipologia) === null) {
             throw new IpogeoEccezione('Tipologia non presente in tassonomia: ' . $tipologia);
@@ -980,7 +980,7 @@ final class Ipogeo
         foreach (['sviluppoPlanimetrico', 'sviluppoSpaziale', 'profonditaMassima'] as $campo) {
             $valore = self::numero($scheda['caratteristiche'][$campo] ?? '');
             if ($valore !== null && $valore < 0) {
-                throw new IpogeoEccezione('Le misure di sviluppo e profondita non possono essere negative.');
+                throw new IpogeoEccezione('Le misure di sviluppo e profondità non possono essere negative.');
             }
         }
     }
@@ -1019,7 +1019,7 @@ final class Ipogeo
         }
 
         if (!@copy($file, $destinazione)) {
-            throw new IpogeoEccezione('Storicizzazione non riuscita: la revisione precedente non e stata copiata.');
+            throw new IpogeoEccezione('Storicizzazione non riuscita: la revisione precedente non è stata copiata.');
         }
 
         self::ruotaStorico($storico);
@@ -1067,11 +1067,11 @@ final class Ipogeo
             return $cartella;
         }
         if (is_dir($nuovo)) {
-            throw new IpogeoEccezione('Esiste gia una cartella con il nome di destinazione.');
+            throw new IpogeoEccezione('Esiste già una cartella con il nome di destinazione.');
         }
         if (!@rename($cartella, $nuovo)) {
             throw new IpogeoEccezione(
-                'La scheda e stata salvata, ma la cartella non e stata rinominata: '
+                'La scheda è stata salvata, ma la cartella non è stata rinominata: '
                 . 'verificare che non sia aperta da un altro programma.'
             );
         }
@@ -1147,7 +1147,7 @@ final class Ipogeo
         $a  = Percorsi::unisci($genitore, $nuovo);
 
         if (file_exists($a)) {
-            throw new IpogeoEccezione('Cambio di codice interrotto: "' . $nuovo . '" esiste gia.');
+            throw new IpogeoEccezione('Cambio di codice interrotto: "' . $nuovo . '" esiste già.');
         }
         if (!@rename($da, $a)) {
             throw new IpogeoEccezione('Cambio di codice interrotto: impossibile rinominare "' . $voce . '".');

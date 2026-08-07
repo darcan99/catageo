@@ -86,7 +86,7 @@ $totaleVisibili = IndiceIpogei::conta(Visibilita::filtroIndice());
         <div class="col-md-4">
           <label for="mappaFiltroTesto" class="form-label mb-1">Cerca</label>
           <input type="search" class="form-control form-control-sm" id="mappaFiltroTesto"
-                 placeholder="codice, nome, comune, localita" autocomplete="off">
+                 placeholder="codice, nome, comune, località" autocomplete="off">
         </div>
         <div class="col-md-2">
           <label for="mappaFiltroNatura" class="form-label mb-1">Natura</label>

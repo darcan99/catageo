@@ -147,7 +147,7 @@ final class Utenti
         self::validaLivello($livello);
 
         if (self::trovaPerUsername($username) !== null) {
-            throw new UtenteEccezione("Esiste gia un utente con username \"{$username}\".");
+            throw new UtenteEccezione("Esiste già un utente con username \"{$username}\".");
         }
 
         $email = trim((string) ($dati['email'] ?? ''));

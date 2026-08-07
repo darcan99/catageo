@@ -190,7 +190,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
                 <label for="massiccio" class="form-label">Massiccio</label>
                 <input type="text" class="form-control" id="massiccio" name="massiccio"
                        maxlength="120" value="<?= $v('massiccio') ?>">
-                <div class="catageo-nota">Campo libero: la nomenclatura dei massicci non e normalizzata.</div>
+                <div class="catageo-nota">Campo libero: la nomenclatura dei massicci non è normalizzata.</div>
               </div>
               <div class="col-md-6">
                 <label for="litologia" class="form-label">Litologia prevalente</label>
@@ -220,7 +220,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
               <div class="col-md-6 d-flex align-items-end">
                 <div class="catageo-nota">
                   Facoltative, e volutamente approssimative: servono a inquadrare
-                  la mappa, non a delimitare l'area. L'appartenenza di una cavita
+                  la mappa, non a delimitare l'area. L'appartenenza di una cavità
                   si dichiara sulla sua scheda, non qui.
                 </div>
               </div>
@@ -291,8 +291,8 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
                   <label class="form-check-label" for="attivo">Area attiva</label>
                 </div>
                 <div class="catageo-nota">
-                  Un'area disattivata non compare piu fra le scelte in scheda, ma
-                  resta leggibile su quelle che la citano gia.
+                  Un'area disattivata non compare più fra le scelte in scheda, ma
+                  resta leggibile su quelle che la citano già.
                 </div>
               </div>
             </div>
@@ -317,7 +317,7 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
       <i class="bi bi-bounding-box fs-1 text-body-tertiary" aria-hidden="true"></i>
       <p class="mt-3 mb-1 text-body-secondary">Nessuna area censita.</p>
       <p class="catageo-nota mb-3">
-        Un'area raggruppa le cavita come le raggruppa chi le esplora, e non come
+        Un'area raggruppa le cavità come le raggruppa chi le esplora, e non come
         le raggruppano i confini amministrativi.
       </p>
       <a class="btn btn-primary" href="index.php?p=aree&amp;azione=nuovo">

@@ -224,7 +224,7 @@ final class Archeologia
             'livello' => 'warning',
             'titolo'  => 'Cavita sottoposta a vincolo',
             'testo'   => $pezzi === []
-                ? 'La cavita risulta vincolata; il dettaglio non e stato compilato.'
+                ? 'La cavità risulta vincolata; il dettaglio non è stato compilato.'
                 : implode('. ', $pezzi) . '.',
         ]];
     }
@@ -690,7 +690,7 @@ final class Archeologia
         }
 
         if (trim((string) ($dati['descrizione'] ?? '')) === '') {
-            throw new ArcheologiaEccezione('La descrizione dell\'evidenza e obbligatoria.');
+            throw new ArcheologiaEccezione('La descrizione dell\'evidenza è obbligatoria.');
         }
 
         $periodo = trim((string) ($dati['periodo'] ?? ''));

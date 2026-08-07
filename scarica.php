@@ -48,7 +48,7 @@ function fermati(int $codice, string $messaggio): never
 }
 
 if (!Config::caricata()) {
-    fermati(503, 'CATAGEO non e configurato.');
+    fermati(503, 'CATAGEO non è configurato.');
 }
 
 // --------------------------------------------------------------- accesso

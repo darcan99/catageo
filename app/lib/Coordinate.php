@@ -558,7 +558,7 @@ final class Coordinate
             $valoreOriginale = $latTesto . ' ' . $lonTesto;
 
             if (self::eProiettato($sistema)) {
-                $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema e stato riportato a WGS84 geografiche.';
+                $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema è stato riportato a WGS84 geografiche.';
                 $sistema  = self::CANONICO;
             }
 
@@ -576,7 +576,7 @@ final class Coordinate
         // Gradi con un sistema proiettato e una contraddizione: si riporta al
         // sistema canonico avvisando, invece di rifiutare un dato buono.
         if (self::eProiettato($sistema)) {
-            $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema e stato riportato a WGS84 geografiche.';
+            $avvisi[] = 'Formato in gradi con un sistema proiettato: il sistema è stato riportato a WGS84 geografiche.';
             $sistema  = self::CANONICO;
         }
 
