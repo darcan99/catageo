@@ -197,6 +197,54 @@ così chiaro. Sono stati tutti ritarati: i pulsanti che stanno **fuori** da una
 scheda hanno come riferimento il grigio della pagina, non il bianco del box, e
 vanno più scuri di quanto sembri necessario.
 
+## Difetti di impaginazione
+
+Il contrasto è una misura di **colore**: non vede la geometria. Questo è il
+primo difetto trovato qui che non riguarda i colori, ed è arrivato da una
+segnalazione, non dalla misura.
+
+### L'etichetta che usciva dal proprio riquadro — 2026-08-08
+
+Nella scheda si leggeva `Rinolofo maggioprotetta`: la scritta dell'etichetta
+verde «protetta» stava **18 px a sinistra** del proprio fondo colorato, sopra il
+testo accanto.
+
+La causa non è l'etichetta ma la riga che la contiene. Una voce di elenco
+(`.catageo-voce-biblio`) ha un **rientro sporgente** — `padding-left: 1.6rem` con
+`text-indent: -1.6rem` — che è la convenzione tipografica con cui si contano le
+voci a colpo d'occhio in un elenco lungo. Il punto è che:
+
+> `text-indent` **si eredita**, e agisce sulla prima riga di **ogni contenitore
+> di blocco** che lo riceve. Un `.badge` di Bootstrap è `inline-block`, quindi è
+> un contenitore di blocco: si prendeva il rientro negativo e lo applicava alla
+> propria prima riga, cioè alla sua unica parola.
+
+Il CSS aveva già l'azzeramento, ma per un **elenco di classi** (`p`,
+`.catageo-dati-media`) che non comprendeva i badge — e l'elenco andava allungato
+a ogni riquadro nuovo, con il difetto visibile solo guardando la pagina. Ora
+l'azzeramento vale per tutti i discendenti: su un elemento in linea puro
+`text-indent` non ha effetto, quindi azzerarlo non costa nulla.
+
+Riguardava due punti: l'etichetta **«protetta»** delle specie in biospeleologia e
+il **livello dei rischi** geologici. Nella scheda da stampare lo stesso rientro
+c'è (`.stampa-avvisi li`) ma dentro quelle righe va solo testo, quindi lì il
+difetto non esisteva.
+
+**Come si misura.** Si confronta il rettangolo dell'elemento con quello del suo
+contenuto, preso con un `Range`: se il testo comincia prima del bordo sinistro
+della propria scatola, sta uscendo.
+
+```js
+var scatola = badge.getBoundingClientRect();
+var r = document.createRange(); r.selectNodeContents(badge);
+var testo = r.getBoundingClientRect();
+// prima: scostamento -18 px    dopo: +8 px, cioè il padding
+```
+
+`prova-web.ps1` verifica ora la premessa strutturale: **ogni** regola con un
+`text-indent` negativo deve avere accanto l'azzeramento sui discendenti. Non
+sostituisce lo sguardo, ma impedisce che un rientro nuovo nasca già rotto.
+
 ## Esito finale
 
 Nessun elemento sotto soglia, in **entrambi i temi**, su **dieci pagine** misurate
@@ -207,6 +255,12 @@ installer. Verificata a parte anche la pagina di errore permessi.
 
 ## Cosa questa verifica **non** copre
 
+- **L'impaginazione.** Il contrasto misura i colori, non le posizioni: un
+  elemento può avere un contrasto perfetto e stare sopra un altro. Il caso
+  dell'etichetta uscita dal proprio riquadro, qui sopra, è arrivato da una
+  segnalazione dopo il rilascio, non dalla misura. Non esiste una passata
+  automatica equivalente per la geometria; ci sono controlli strutturali mirati
+  sui casi già visti.
 - La percezione reale: un rapporto di contrasto è una misura fisica, non un
   giudizio estetico né una prova di usabilità.
 - Il daltonismo: la distinzione fra cavità artificiali e naturali sulla mappa è

@@ -5,12 +5,14 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 1.2.0
+ *  Versione .....: 1.3.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.3.1  2026-08-08  D.Candela  Il rientro sporgente non esce piu dai
+ *                                riquadri annidati (etichette).
  *  1.2.0  2026-08-07  D.Candela  Riga di intestazione delle tabelle a
  *                                contrasto con le righe dati, opaca quando
  *                                resta in cima allo scorrimento.
@@ -505,10 +507,22 @@ a.catageo-geotag:hover {
     padding-top: 0;
 }
 
-/* Il rientro negativo vale per il testo della citazione, non per i blocchi
-   annidati: senza questo, dati e note ereditano la sporgenza e si disallineano. */
-.catageo-voce-biblio .catageo-dati-media,
-.catageo-voce-biblio p {
+/* Il rientro negativo vale per la prima riga della voce, non per quello che
+   sta dentro la voce.
+ *
+ * text-indent si EREDITA, e agisce sulla prima riga di ogni contenitore di
+ * blocco che lo riceve. Un .badge e inline-block, quindi e un contenitore di
+ * blocco: senza questo azzeramento la sua scritta scivolava 1,6rem a sinistra
+ * uscendo dal proprio fondo colorato e finendo sopra il testo accanto — si
+ * leggeva «Rinolofo maggioprotetta». Valeva per l'etichetta «protetta» delle
+ * specie e per il livello dei rischi geologici.
+ *
+ * La regola prende tutti i discendenti e non un elenco di classi: su un
+ * elemento in linea puro text-indent non ha effetto, quindi azzerarlo non
+ * costa nulla, mentre un elenco andrebbe allungato a ogni riquadro nuovo che
+ * qualcuno mette dentro una voce — e ci si accorgerebbe del difetto solo
+ * guardando la pagina. */
+.catageo-voce-biblio * {
     text-indent: 0;
 }
 

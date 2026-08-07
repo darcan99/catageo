@@ -6,6 +6,21 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.3.1] — 2026-08-08
+
+### Corretto
+- **L'etichetta «protetta» usciva dal proprio riquadro** e finiva sopra il
+  testo accanto: nella scheda si leggeva «Rinolofo maggioprotetta». La causa
+  non era l'etichetta ma la riga che la contiene: una voce di elenco ha un
+  rientro sporgente (`text-indent` negativo), `text-indent` si eredita e agisce
+  sulla prima riga di ogni contenitore di blocco, e un `.badge` e inline-block,
+  quindi lo e. Riguardava anche il livello dei rischi geologici. L'azzeramento
+  c'era gia ma per un elenco di classi che non comprendeva i badge: ora vale
+  per tutti i discendenti, cosi un riquadro nuovo dentro una voce non nasce
+  gia rotto.
+- `prova-web.ps1` verifica che **ogni** rientro sporgente del CSS abbia accanto
+  l'azzeramento sui discendenti.
+
 ## [1.3.0] — 2026-08-07
 
 ### Aggiunto
