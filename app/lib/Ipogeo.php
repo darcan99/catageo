@@ -39,6 +39,78 @@ final class Ipogeo
     /** Stati possibili dell'accesso. */
     public const STATI_ACCESSO = ['aperto', 'chiuso', 'interrato', 'distrutto', 'non_localizzato'];
 
+    /**
+     * Tipi di ingresso (9.17.3).
+     *
+     * L'elenco e piu lungo di quanto serva a una grotta perche il caso che
+     * rompe il modello e quello artificiale: un acquedotto non ha "un
+     * ingresso", ha una sequenza di accessi di natura diversa — pozzi di
+     * areazione, finestre, cunicoli di servizio — e chiamarli tutti "ingresso
+     * secondario" perderebbe l'unica cosa che li distingue.
+     */
+    public const TIPI_INGRESSO = [
+        'principale'           => 'Ingresso principale',
+        'secondario'           => 'Ingresso secondario',
+        'pozzo'                => 'Pozzo di accesso',
+        'pozzo_areazione'      => 'Pozzo di areazione',
+        'finestra'             => 'Finestra',
+        'cunicolo_servizio'    => 'Cunicolo di servizio',
+        'inghiottitoio'        => 'Inghiottitoio',
+        'risorgenza'           => 'Risorgenza',
+        'apertura_artificiale' => 'Apertura artificiale',
+        'altro'                => 'Altro',
+    ];
+
+    /**
+     * Stati del singolo ingresso (9.17.3).
+     *
+     * Distinti da STATI_ACCESSO, che descrive la cavita nel suo insieme. Le
+     * differenze sono quelle che contano sul campo: un pozzo **tombato** resta
+     * un possibile accesso — c'e, si sa dov'e, e in teoria si riapre — mentre
+     * uno **crollato** e un'altra cosa e uno **murato** un'altra ancora. Un
+     * unico "chiuso" li appiattirebbe, e chi programma un'uscita perderebbe
+     * proprio l'informazione per cui li ha censiti.
+     */
+    public const STATI_INGRESSO = [
+        'aperto'          => 'Aperto',
+        'chiuso'          => 'Chiuso (cancello, botola)',
+        'murato'          => 'Murato',
+        'tombato'         => 'Tombato',
+        'interrato'       => 'Interrato',
+        'crollato'        => 'Crollato',
+        'allagato'        => 'Allagato',
+        'non_localizzato' => 'Non localizzato',
+    ];
+
+    /** Campi di un ingresso, con i valori di riposo. */
+    public const CAMPI_INGRESSO = [
+        'nome'        => '',
+        'tipo'        => '',
+        'stato'       => '',
+        'progressiva' => '',
+        'descrizione' => '',
+        'latitudine'  => '',
+        'longitudine' => '',
+        'quota'       => '',
+        'dimensioni'  => '',
+    ];
+
+    /** Riporta il tipo di ingresso a un valore ammesso; vuoto se non lo e. */
+    public static function normalizzaTipoIngresso(mixed $valore): string
+    {
+        $valore = strtolower(trim((string) $valore));
+
+        return isset(self::TIPI_INGRESSO[$valore]) ? $valore : '';
+    }
+
+    /** Riporta lo stato di ingresso a un valore ammesso; vuoto se non lo e. */
+    public static function normalizzaStatoIngresso(mixed $valore): string
+    {
+        $valore = strtolower(trim((string) $valore));
+
+        return isset(self::STATI_INGRESSO[$valore]) ? $valore : '';
+    }
+
     /** Livelli di riservatezza (D12). */
     public const RISERVATEZZE = ['pubblica', 'coordinate_offuscate', 'riservata'];
 
@@ -1217,17 +1289,27 @@ final class Ipogeo
         foreach ((array) $s['caratteristiche']['ingressi'] as $ingresso) {
             $descrizione = trim((string) ($ingresso['descrizione'] ?? ''));
             $lat         = trim((string) ($ingresso['latitudine'] ?? ''));
-            if ($descrizione === '' && $lat === '') {
+            // Una riga si considera compilata se ha almeno una fra nome,
+            // descrizione e coordinata: il modulo offre righe libere in coda,
+            // e senza questo controllo ogni salvataggio ne scriverebbe di vuote.
+            $nomeIngresso = trim((string) ($ingresso['nome'] ?? ''));
+            if ($descrizione === '' && $lat === '' && $nomeIngresso === '') {
                 continue;
             }
             $n++;
             $nodo = Xml::aggiungi($ingressi, 'ingresso', null, ['n' => (string) $n]);
+            Xml::imposta($nodo, 'nome', trim((string) ($ingresso['nome'] ?? '')));
+            Xml::imposta($nodo, 'tipo', self::normalizzaTipoIngresso($ingresso['tipo'] ?? ''));
+            Xml::imposta($nodo, 'stato', self::normalizzaStatoIngresso($ingresso['stato'] ?? ''));
+            // Progressiva: la distanza dall'imbocco lungo la cavita. Su un
+            // acquedotto e cio che mette gli accessi in sequenza, che e il
+            // modo in cui li si percorre e li si cerca.
+            Xml::aggiungi($nodo, 'progressiva', trim((string) ($ingresso['progressiva'] ?? '')), ['unita' => 'm']);
             Xml::imposta($nodo, 'descrizione', $descrizione, true);
             Xml::imposta($nodo, 'latitudine', $lat);
             Xml::imposta($nodo, 'longitudine', trim((string) ($ingresso['longitudine'] ?? '')));
             Xml::aggiungi($nodo, 'quota', trim((string) ($ingresso['quota'] ?? '')), ['unita' => 'm']);
             Xml::imposta($nodo, 'dimensioni', trim((string) ($ingresso['dimensioni'] ?? '')));
-            Xml::imposta($nodo, 'stato', trim((string) ($ingresso['stato'] ?? '')));
         }
 
         $idro = Xml::aggiungi($car, 'idrologia');
@@ -1374,12 +1456,15 @@ final class Ipogeo
         }
         foreach (Xml::elenco($doc, '/ipogeo/caratteristiche/ingressi/ingresso') as $nodo) {
             $s['caratteristiche']['ingressi'][] = [
+                'nome'        => Xml::testo($nodo, 'nome'),
+                'tipo'        => Xml::testo($nodo, 'tipo'),
+                'stato'       => Xml::testo($nodo, 'stato'),
+                'progressiva' => Xml::testo($nodo, 'progressiva'),
                 'descrizione' => Xml::testo($nodo, 'descrizione'),
                 'latitudine'  => Xml::testo($nodo, 'latitudine'),
                 'longitudine' => Xml::testo($nodo, 'longitudine'),
                 'quota'       => Xml::testo($nodo, 'quota'),
                 'dimensioni'  => Xml::testo($nodo, 'dimensioni'),
-                'stato'       => Xml::testo($nodo, 'stato'),
             ];
         }
         $s['caratteristiche']['idrologia']['presenzaAcqua'] = Xml::testo($doc, '/ipogeo/caratteristiche/idrologia/presenzaAcqua');

@@ -1596,15 +1596,36 @@ Lo stato scheda dice quanto è affidabile *la compilazione*; questi dicono se **
 
 Oggi le coordinate, la cartografia e l'accesso stanno sulla **cavità**, e l'ingresso è una riga leggera (descrizione, dimensioni, quota, stato, coordinate). Per una grotta con più ingressi a quote diverse — in comuni diversi, con proprietari e permessi diversi — il modello costringe a eleggere «l'ingresso vero» e a perdere il resto.
 
-L'ingresso acquisisce quindi i campi che oggi vivono solo a livello di cavità: metodo e strumentazione della coordinata, tipo di quota, cartografia IGM/CTR, stato e vincoli d'accesso, itinerario, foto di riferimento, chi ha rilevato il dato e quando.
-
 **La coordinata di cavità resta dov'è** ed è quella dell'ingresso principale: mappa, ricerca per raggio ed esportazioni continuano a funzionare senza sapere nulla di questa estensione. È il motivo per cui il cambiamento è additivo e non una migrazione.
+
+**Decisione del committente** (2026-08-07), che ha ridefinito la portata di questa estensione: *«Le coordinate di una grotta sono sempre riferite a un ingresso principale, e più ingressi sono l'eccezione se non si tratta di enormi complessi. Diverso è il caso delle cavità artificiali, dove gli accessi oltre al principale sono molteplici — come negli acquedotti — e sarebbe interessante mapparli in sequenza esplicitandone lo stato: per esempio un pozzo tombato è un possibile accesso, però è tombato.»*
+
+Il caso che dimensiona il modello è quindi **l'acquedotto e non la grotta**, ed è un'applicazione diretta del principio di parità fra naturali e artificiali (§16.2).
+
+L'ingresso acquisisce:
+
+- **nome** breve — su un condotto con dodici pozzi, «Pozzo 7» è l'unico modo per nominarne uno in un discorso;
+- **tipo**, da elenco chiuso: principale, secondario, pozzo di accesso, pozzo di areazione, finestra, cunicolo di servizio, inghiottitoio, risorgenza, apertura artificiale, altro. Un elenco più lungo di quanto serva a una grotta, perché chiamare tutto «ingresso secondario» perderebbe l'unica cosa che distingue quegli accessi fra loro;
+- **stato**, da elenco chiuso **distinto da quello della cavità**: aperto, chiuso, murato, **tombato**, interrato, crollato, allagato, non localizzato. La distinzione è quella che conta sul campo — un pozzo tombato resta un possibile accesso, uno crollato è un'altra cosa, uno murato un'altra ancora — e un unico «chiuso» le appiattirebbe togliendo il dato per cui li si è censiti;
+- **progressiva** in metri dall'imbocco lungo la cavità, che è ciò che li mette **in sequenza**: è il modo in cui li si percorre e li si ritrova. Lo stesso concetto e lo stesso nome dei punti di misura (§6.13).
+
+**Scelte assunte** (2026-08-07):
+
+- **Tutti i campi restano facoltativi**, e la tabella si può ignorare del tutto: su una grotta con un ingresso solo la coordinata di scheda basta, e il modello non deve far pagare al caso normale il costo del caso complesso.
+- **In scheda gli accessi si ordinano per progressiva**, non per ordine di inserimento; chi non la compila finisce in coda nell'ordine in cui l'ha scritto.
+- **Gli accessi con coordinate proprie compaiono sulla mappa di scheda**, con tre colori e non due: verde dove si passa, giallo dove l'accesso c'è ma è sbarrato (chiuso, murato, tombato, allagato), rosso dove non c'è più (crollato, interrato, non localizzato).
+- **Su una scheda a coordinate ridotte non si manda alla mappa nessun accesso.** Dodici puntini esatti attorno a un cerchio di approssimazione vanificherebbero l'offuscamento, che è la ragione per cui il cerchio esiste.
+- **Non si sono portati sull'ingresso** metodo e strumentazione della coordinata, cartografia IGM/CTR e vincoli d'accesso, che l'ipotesi iniziale prevedeva: sono dati che nella pratica valgono per la cavità, e replicarli per dodici pozzi significherebbe dodici occasioni di divergenza per un'informazione che è una sola.
 
 #### 9.17.4 Complessi carsici
 
 Oggi le relazioni fra ipogei sono un grafo: `<collegamenti>` con codice e tipo di relazione. Manca l'oggetto: il **Complesso X** ha un nome proprio, uno sviluppo e un dislivello suoi, una bibliografia sua, ed è la cosa di cui si parla in letteratura — non la somma dei rimandi fra le schede che lo compongono.
 
-Nuova entità con codice proprio, elenco delle cavità che vi appartengono e totali **calcolati e non digitati**: uno sviluppo complessivo scritto a mano diverge dalla somma delle schede al primo aggiornamento.
+**Decisione del committente** (2026-08-07): *«Un complesso non ha un suo codice catastale, e solitamente un nome che raggruppa. Se dovessimo pero sfruttare questo sistema per il raggruppamento anche di cavita artificiali, forse potrebbe essere sensato gestirli con codici.»*
+
+Quindi: **nessun codice assegnato da una serie di codifica**, che consumerebbe progressivi del catasto per un oggetto che non e una cavita. Il complesso e un'anagrafica come le aree (§9.17.5), con un identificativo interno e un **codice proprio facoltativo**, campo libero, per chi — tipicamente su cavita artificiali — vuole numerare i propri complessi con una convenzione sua.
+
+L'appartenenza si dichiara sulla scheda della cavita, come per l'area. Totali **calcolati e non digitati**: uno sviluppo complessivo scritto a mano diverge dalla somma delle schede al primo aggiornamento.
 
 #### 9.17.5 Aree speleologiche
 
@@ -1614,7 +1635,9 @@ Nuova anagrafica (`dati/aree.xml`, `Aree`), con l'area assegnabile alla scheda e
 
 **Scelte assunte** (2026-08-07):
 
-- **L'area non ha una geometria.** Disegnarne il perimetro sembrerebbe più preciso e sarebbe una precisione finta: i confini di un'area speleologica sono d'uso e non di cartografia, cambiano con la conoscenza del carsismo, e un poligono sbagliato escluderebbe cavità che tutti considerano dentro. Si registra un punto indicativo, che serve a inquadrare la mappa e a nient'altro.
+- **L'area non ha una geometria** *in questa prima versione*. Disegnarne il perimetro sembrerebbe più preciso e sarebbe una precisione finta per il carsismo: i confini di un'area speleologica sono d'uso e non di cartografia, cambiano con la conoscenza, e un poligono sbagliato escluderebbe cavità che tutti considerano dentro. Si registra un punto indicativo.
+
+  **Decisione del committente** (2026-08-07), che rovescia il ragionamento sulle artificiali: *«Mi piace l'idea di creare un'area con lo shapefile: per le grotte naturali potrebbe servire poco, ma per cavita artificiali quali cave potrebbe essere un dato interessante da visualizzare su mappa.»* Il perimetro diventa quindi un'estensione da fare — facoltativo, e utile dove l'area **ha** confini veri, come il perimetro di una cava. Resta da decidere il formato di ingresso: vedi §9.17.9.
 - **L'appartenenza è dichiarata sulla scheda dell'ipogeo, non nell'area.** È un dato della cavità, e tenerlo in due posti significherebbe doverlo tenere allineato.
 - **L'area non sostituisce regione, provincia e comune**, che restano perché servono per altro: la provincia serve a chi scrive a un ente, l'area a chi programma un'uscita. Nella ricerca stanno accanto e si combinano.
 - **Il nome è unico**, imposto sia da `Aree::valida()` sia dallo schema: è la sola cosa che identifica un'area in un elenco, e due «Alto Chiascio» renderebbero ambiguo ogni rimando.
@@ -1639,6 +1662,18 @@ Tabella con una colonna per voce — coordinate, posizione verificata, comune, t
 
 - **Itinerario di avvicinamento in GPX**, distinto dai tracciati dei rilievi: è la traccia per arrivare all'ingresso, non quella della cavità.
 - **Percorribilità strutturata**: necessità di armo, difficoltà di progressione e difficoltà idriche da vocabolario, periodo consigliato, cavità inquinata o a rischio. Oggi sono testo libero, quindi non filtrabili.
+
+#### 9.17.9 Perimetro delle aree — formato ancora da decidere
+
+Il committente ha chiesto di poter definire un'area **da shapefile** (§9.17.5). Prima di scrivere il codice va sciolto un nodo di formato, perché le tre strade costano in modo molto diverso:
+
+| Formato | Costo | Note |
+|---|---|---|
+| **GeoJSON** | quasi nullo | l'applicativo lo produce già (`Esportazione::geojson`) e lo consuma già sulla mappa; sempre in WGS84 per specifica |
+| **KML/KMZ** | quasi nullo | c'è già `Tracciato`, che converte KML in GeoJSON per i rilievi; anche KMZ, dove l'estensione `zip` è presente |
+| **Shapefile** `.shp` nativo | alto | formato binario multi-file (`.shp` + `.shx` + `.dbf`, spesso `.prj`), richiede un parser binario scritto a mano e la **riproiezione** dal sistema dichiarato nel `.prj` — che nei dati italiani è quasi sempre un grid nazionale, non WGS84 |
+
+Nessuno di questi è un ostacolo insormontabile, ma il terzo è un modulo a sé con una superficie d'errore propria, per un formato che QGIS converte negli altri due in due clic. La proposta è realizzare **GeoJSON e KML/KMZ subito** e trattare lo shapefile nativo come decisione separata, sapendo che senza di esso chi ha uno shapefile deve fare una conversione.
 
 #### 9.17.8 Cosa non si prende
 
@@ -1810,6 +1845,20 @@ Il vincolo resta valido per tutte le librerie dell'applicativo (Bootstrap, Boots
 - Con provider `osm` l'applicativo funziona senza alcuna dipendenza da domini terzi, eccetto le immagini delle tile (sostituibili con un tile server proprio tramite provider `custom`).
 - Con provider `google` occorrono chiave API, account di fatturazione Google Cloud e connessione al dominio Google; l'assenza di connettività degrada la sola mappa, non il resto dell'applicativo.
 - Il provider è selezionabile da ADM in configurazione, con avviso in interfaccia sulle implicazioni.
+
+### 16.2 Parità fra cavità naturali e artificiali
+
+Dichiarata dal committente il 2026-08-07: *«Io esploro cavità naturali ma moltissime artificiali, e CATAGEO deve essere improntata di pari merito su di esse, cosa che non fanno gli attuali catasti, tutti sbilanciati esclusivamente sulle cavità naturali.»*
+
+Non è una preferenza personale ma il **tratto che distingue CATAGEO** dagli altri catasti, e va trattato come un vincolo di progetto al pari del «nessun database».
+
+**Come si applica.** Davanti a ogni scelta di modello ci si chiede come si comporta sulle artificiali, non solo sulle naturali — perché il caso artificiale è quasi sempre quello che rompe il modello, e correggerlo dopo costa una migrazione. Casi già emersi in fase 12:
+
+- gli **ingressi** (§9.17.3): una grotta ne ha uno, un acquedotto ne ha molti, in sequenza e con stati diversi. Il modello è dimensionato sull'acquedotto e resta gratuito sulla grotta;
+- i **complessi** (§9.17.4): per le naturali un nome che raggruppa, per le artificiali forse anche un codice;
+- il **perimetro di un'area** (§9.17.5): quasi inutile per il carsismo, interessante per una cava.
+
+Il corollario pratico è che i vocabolari chiusi vanno riletti due volte: una pensando a una grotta, una pensando a una cava o a un acquedotto. Un elenco che copre solo il primo caso non è incompleto per caso, lo è per lo stesso sbilanciamento che questo progetto vuole evitare.
 
 ## 17. Punti ancora aperti
 

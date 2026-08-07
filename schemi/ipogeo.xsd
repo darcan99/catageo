@@ -120,6 +120,41 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <!-- Tipi e stati del singolo ingresso (9.17.3). Distinti da
+       tStatoAccesso, che descrive la cavita nel suo insieme: un pozzo
+       tombato resta un possibile accesso, uno crollato e un'altra cosa, e
+       un unico "chiuso" li appiattirebbe. La distinzione serve alle cavita
+       artificiali, dove gli accessi sono molti e di natura diversa. -->
+  <xs:simpleType name="tTipoIngresso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="principale"/>
+      <xs:enumeration value="secondario"/>
+      <xs:enumeration value="pozzo"/>
+      <xs:enumeration value="pozzo_areazione"/>
+      <xs:enumeration value="finestra"/>
+      <xs:enumeration value="cunicolo_servizio"/>
+      <xs:enumeration value="inghiottitoio"/>
+      <xs:enumeration value="risorgenza"/>
+      <xs:enumeration value="apertura_artificiale"/>
+      <xs:enumeration value="altro"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tStatoIngresso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="aperto"/>
+      <xs:enumeration value="chiuso"/>
+      <xs:enumeration value="murato"/>
+      <xs:enumeration value="tombato"/>
+      <xs:enumeration value="interrato"/>
+      <xs:enumeration value="crollato"/>
+      <xs:enumeration value="allagato"/>
+      <xs:enumeration value="non_localizzato"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="tStatoAccesso">
     <xs:restriction base="xs:string">
       <xs:enumeration value=""/>
@@ -310,12 +345,20 @@
                     <xs:element name="ingresso" minOccurs="0" maxOccurs="unbounded">
                       <xs:complexType>
                         <xs:all>
+                          <!-- Nome breve dell'ingresso: su un acquedotto con
+                               dodici pozzi, "Pozzo 7" e l'unico modo per
+                               nominarne uno in un discorso. -->
+                          <xs:element name="nome"        type="xs:string"     minOccurs="0"/>
+                          <xs:element name="tipo"        type="tTipoIngresso"  minOccurs="0"/>
+                          <xs:element name="stato"       type="tStatoIngresso" minOccurs="0"/>
+                          <!-- Distanza dall'imbocco lungo la cavita: mette gli
+                               accessi in sequenza, che e come li si percorre. -->
+                          <xs:element name="progressiva" type="tMisura"       minOccurs="0"/>
                           <xs:element name="descrizione" type="xs:string"     minOccurs="0"/>
                           <xs:element name="latitudine"  type="tNumeroOVuoto" minOccurs="0"/>
                           <xs:element name="longitudine" type="tNumeroOVuoto" minOccurs="0"/>
                           <xs:element name="quota"       type="tMisura"       minOccurs="0"/>
                           <xs:element name="dimensioni"  type="xs:string"     minOccurs="0"/>
-                          <xs:element name="stato"       type="tStatoAccesso" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="n" type="xs:string"/>
                       </xs:complexType>

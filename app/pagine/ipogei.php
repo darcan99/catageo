@@ -128,14 +128,12 @@ function datiSchedaDaPost(): array
         if (!is_array($riga)) {
             continue;
         }
-        $ingressi[] = [
-            'descrizione' => (string) ($riga['descrizione'] ?? ''),
-            'latitudine'  => (string) ($riga['latitudine'] ?? ''),
-            'longitudine' => (string) ($riga['longitudine'] ?? ''),
-            'quota'       => (string) ($riga['quota'] ?? ''),
-            'dimensioni'  => (string) ($riga['dimensioni'] ?? ''),
-            'stato'       => (string) ($riga['stato'] ?? ''),
-        ];
+        // array_merge sui campi di riposo: cosi un campo aggiunto in futuro
+        // non arriva mancante a chi scrive, e il modulo puo anche non averlo.
+        $ingressi[] = array_merge(Ipogeo::CAMPI_INGRESSO, array_intersect_key(
+            array_map(static fn ($v): string => is_scalar($v) ? (string) $v : '', $riga),
+            Ipogeo::CAMPI_INGRESSO
+        ));
     }
 
     $dati = [
@@ -825,22 +823,60 @@ if ($azione === 'scheda' && $codice !== '') {
 
         <?php if ((array) $scheda['caratteristiche']['ingressi'] !== []): ?>
           <div class="card mt-4">
-            <div class="card-header"><h2 class="h6 mb-0">Ingressi</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Ingressi e accessi</h2></div>
             <div class="table-responsive">
               <table class="table table-sm catageo-tabella mb-0">
-                <thead><tr><th>#</th><th>Descrizione</th><th>Coordinate</th><th>Quota</th><th>Dimensioni</th><th>Stato</th></tr></thead>
+                <thead><tr>
+                  <th>#</th><th>Nome</th><th>Tipo</th><th>Stato</th>
+                  <th>Progr.</th><th>Quota</th><th>Coordinate</th><th>Dimensioni</th><th>Descrizione</th>
+                </tr></thead>
                 <tbody>
-                  <?php foreach ((array) $scheda['caratteristiche']['ingressi'] as $i => $ingresso): ?>
+                  <?php
+                  /*
+                   * In sequenza per progressiva quando c'e, altrimenti nell'ordine
+                   * in cui sono stati scritti: su un acquedotto la sequenza e il
+                   * modo in cui gli accessi si incontrano percorrendolo, e un
+                   * elenco in ordine di inserimento non direbbe nulla.
+                   */
+                  $ingressiOrdinati = (array) $scheda['caratteristiche']['ingressi'];
+                  usort($ingressiOrdinati, static function (array $a, array $b): int {
+                      $pa = trim((string) ($a['progressiva'] ?? ''));
+                      $pb = trim((string) ($b['progressiva'] ?? ''));
+                      if ($pa === '' || $pb === '') {
+                          return $pa === $pb ? 0 : ($pa === '' ? 1 : -1);
+                      }
+                      return (float) str_replace(',', '.', $pa) <=> (float) str_replace(',', '.', $pb);
+                  });
+                  ?>
+                  <?php foreach ($ingressiOrdinati as $i => $ingresso): ?>
+                    <?php
+                    $statoIng = (string) ($ingresso['stato'] ?? '');
+                    // Rosso solo dove l'accesso non c'e piu; giallo dove c'e ma
+                    // non si passa. Un pozzo tombato non e un pozzo perduto.
+                    $classeStato = in_array($statoIng, ['crollato', 'interrato', 'non_localizzato'], true)
+                        ? 'text-bg-danger'
+                        : (in_array($statoIng, ['chiuso', 'murato', 'tombato', 'allagato'], true)
+                            ? 'text-bg-warning' : 'text-bg-success');
+                    ?>
                     <tr>
                       <td><?= $i + 1 ?></td>
-                      <td><?= Testo::esc((string) $ingresso['descrizione']) ?></td>
+                      <td><?= Testo::esc((string) ($ingresso['nome'] ?? '')) ?></td>
+                      <td><?= Testo::esc(Ipogeo::TIPI_INGRESSO[(string) ($ingresso['tipo'] ?? '')] ?? '') ?></td>
+                      <td>
+                        <?php if ($statoIng !== ''): ?>
+                          <span class="badge <?= $classeStato ?>">
+                            <?= Testo::esc(Ipogeo::STATI_INGRESSO[$statoIng] ?? $statoIng) ?>
+                          </span>
+                        <?php endif; ?>
+                      </td>
+                      <td class="catageo-valore"><?= Testo::esc((string) ($ingresso['progressiva'] ?? '')) ?></td>
+                      <td class="catageo-valore"><?= Testo::esc((string) $ingresso['quota']) ?></td>
                       <td class="catageo-valore">
                         <?= $coord['offuscate'] ? '<span class="text-body-tertiary">approssimate</span>'
                             : Testo::esc(trim((string) $ingresso['latitudine'] . ' ' . (string) $ingresso['longitudine'])) ?>
                       </td>
-                      <td class="catageo-valore"><?= Testo::esc((string) $ingresso['quota']) ?></td>
                       <td><?= Testo::esc((string) $ingresso['dimensioni']) ?></td>
-                      <td><?= Testo::esc((string) $ingresso['stato']) ?></td>
+                      <td><?= Testo::esc((string) $ingresso['descrizione']) ?></td>
                     </tr>
                   <?php endforeach; ?>
                 </tbody>
@@ -1547,6 +1583,36 @@ if ($azione === 'scheda' && $codice !== '') {
           'natura'    => (string) $scheda['identificazione']['natura'],
           'offuscate' => $coord['offuscate'],
           'raggio'    => max(100, Config::intero('sicurezza.offuscamentoCoordinate', 1000)),
+          /*
+           * Gli ingressi con coordinate proprie vanno sulla mappa distinti dal
+           * punto della cavita: su un acquedotto sono la cosa che si cerca, e
+           * un solo puntino non direbbe dove sono i pozzi.
+           *
+           * Con coordinate offuscate non se ne manda nessuno: mostrare dodici
+           * accessi esatti attorno a un cerchio di approssimazione vanificherebbe
+           * l'offuscamento, che e la ragione per cui il cerchio esiste.
+           */
+          'ingressi'  => $coord['offuscate'] ? [] : (static function () use ($scheda): array {
+              $punti = [];
+              foreach ((array) $scheda['caratteristiche']['ingressi'] as $ingresso) {
+                  $lat = trim((string) ($ingresso['latitudine'] ?? ''));
+                  $lon = trim((string) ($ingresso['longitudine'] ?? ''));
+                  if ($lat === '' || $lon === '') {
+                      continue;
+                  }
+                  $stato = (string) ($ingresso['stato'] ?? '');
+                  $punti[] = [
+                      'lat'         => $lat,
+                      'lon'         => $lon,
+                      'nome'        => (string) ($ingresso['nome'] ?? ''),
+                      'tipo'        => Ipogeo::TIPI_INGRESSO[(string) ($ingresso['tipo'] ?? '')] ?? '',
+                      'stato'       => Ipogeo::STATI_INGRESSO[$stato] ?? '',
+                      'statoCodice' => $stato,
+                      'progressiva' => (string) ($ingresso['progressiva'] ?? ''),
+                  ];
+              }
+              return $punti;
+          })(),
       ];
       ?>
       <script type="application/json" id="catageoMappaConfig"><?= Testo::escJson(Mappa::perBrowser()) ?></script>
@@ -2121,52 +2187,91 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
         <!-- ------------------------------------------------------ ingressi -->
         <div class="col-12">
           <div class="card">
-            <div class="card-header"><h2 class="h6 mb-0">Ingressi</h2></div>
+            <div class="card-header"><h2 class="h6 mb-0">Ingressi e accessi</h2></div>
             <div class="card-body">
+              <?php
+              /*
+               * Su una grotta gli ingressi sono uno, raramente due: tutti i
+               * campi sono facoltativi e chi compila puo ignorare la tabella.
+               * Su una cavita artificiale — un acquedotto, una cava — gli
+               * accessi sono molti, di natura diversa e in sequenza, e senza
+               * tipo, stato e progressiva non si distinguono fra loro.
+               */
+              ?>
               <p class="catageo-nota">
-                Le coordinate del singolo ingresso servono quando sono piu di uno:
-                in mappa verranno mostrati distinti.
+                Tutti i campi sono facoltativi. Su una cavita con un ingresso solo
+                si puo lasciare la tabella vuota: le coordinate della scheda bastano.
+                Gli ingressi con coordinate proprie compaiono distinti sulla mappa.
               </p>
               <div class="table-responsive">
                 <table class="table table-sm align-middle">
                   <thead>
                     <tr>
-                      <th style="width:30%">Descrizione</th><th>Latitudine</th><th>Longitudine</th>
-                      <th>Quota</th><th>Dimensioni</th><th>Stato</th>
+                      <th style="width:14%">Nome</th>
+                      <th style="width:13%">Tipo</th>
+                      <th style="width:12%">Stato</th>
+                      <th style="width:7%">Progr. (m)</th>
+                      <th style="width:7%">Quota</th>
+                      <th>Latitudine</th><th>Longitudine</th>
+                      <th style="width:10%">Dimensioni</th>
+                      <th style="width:18%">Descrizione</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php
                     $ingressiForm = (array) ($_POST['ingressi'] ?? $s['caratteristiche']['ingressi']);
                     for ($i = 0; $i < count($ingressiForm) + RIGHE_INGRESSO_LIBERE; $i++):
-                        $ing = $ingressiForm[$i] ?? ['descrizione' => '', 'latitudine' => '', 'longitudine' => '',
-                                                     'quota' => '', 'dimensioni' => '', 'stato' => ''];
+                        $ing = array_merge(Ipogeo::CAMPI_INGRESSO, (array) ($ingressiForm[$i] ?? []));
                     ?>
                       <tr>
-                        <td><input type="text" class="form-control form-control-sm" name="ingressi[<?= $i ?>][descrizione]"
-                                   value="<?= Testo::esc((string) ($ing['descrizione'] ?? '')) ?>"></td>
-                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][latitudine]"
-                                   value="<?= Testo::esc((string) ($ing['latitudine'] ?? '')) ?>"></td>
-                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][longitudine]"
-                                   value="<?= Testo::esc((string) ($ing['longitudine'] ?? '')) ?>"></td>
-                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][quota]"
-                                   value="<?= Testo::esc((string) ($ing['quota'] ?? '')) ?>"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="ingressi[<?= $i ?>][dimensioni]"
-                                   value="<?= Testo::esc((string) ($ing['dimensioni'] ?? '')) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="ingressi[<?= $i ?>][nome]"
+                                   placeholder="Pozzo 3" value="<?= Testo::esc((string) $ing['nome']) ?>"></td>
                         <td>
-                          <select class="form-select form-select-sm" name="ingressi[<?= $i ?>][stato]">
+                          <select class="form-select form-select-sm" name="ingressi[<?= $i ?>][tipo]">
                             <option value="">—</option>
-                            <?php foreach (Ipogeo::STATI_ACCESSO as $st): ?>
-                              <option value="<?= Testo::esc($st) ?>" <?= (string) ($ing['stato'] ?? '') === $st ? 'selected' : '' ?>>
-                                <?= Testo::esc(str_replace('_', ' ', $st)) ?>
+                            <?php foreach (Ipogeo::TIPI_INGRESSO as $valore => $etichetta): ?>
+                              <option value="<?= Testo::esc((string) $valore) ?>"
+                                      <?= (string) $ing['tipo'] === (string) $valore ? 'selected' : '' ?>>
+                                <?= Testo::esc($etichetta) ?>
                               </option>
                             <?php endforeach; ?>
                           </select>
                         </td>
+                        <td>
+                          <select class="form-select form-select-sm" name="ingressi[<?= $i ?>][stato]">
+                            <option value="">—</option>
+                            <?php foreach (Ipogeo::STATI_INGRESSO as $valore => $etichetta): ?>
+                              <option value="<?= Testo::esc((string) $valore) ?>"
+                                      <?= (string) $ing['stato'] === (string) $valore ? 'selected' : '' ?>>
+                                <?= Testo::esc($etichetta) ?>
+                              </option>
+                            <?php endforeach; ?>
+                          </select>
+                        </td>
+                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][progressiva]"
+                                   value="<?= Testo::esc((string) $ing['progressiva']) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][quota]"
+                                   value="<?= Testo::esc((string) $ing['quota']) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][latitudine]"
+                                   value="<?= Testo::esc((string) $ing['latitudine']) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm catageo-valore" name="ingressi[<?= $i ?>][longitudine]"
+                                   value="<?= Testo::esc((string) $ing['longitudine']) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="ingressi[<?= $i ?>][dimensioni]"
+                                   value="<?= Testo::esc((string) $ing['dimensioni']) ?>"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="ingressi[<?= $i ?>][descrizione]"
+                                   value="<?= Testo::esc((string) $ing['descrizione']) ?>"></td>
                       </tr>
                     <?php endfor; ?>
                   </tbody>
                 </table>
+              </div>
+              <div class="catageo-nota">
+                <strong>Progressiva</strong>: distanza dall'imbocco lungo la cavita.
+                Su un acquedotto e cio che mette gli accessi in sequenza, che e il
+                modo in cui li si percorre e li si ritrova.
+                <strong>Tombato</strong> non e come <strong>crollato</strong>: il
+                primo resta un possibile accesso, e la distinzione serve a chi
+                progetta una riapertura.
               </div>
             </div>
           </div>

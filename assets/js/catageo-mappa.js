@@ -13,12 +13,14 @@
  *                  I dati arrivano dal GeoJSON del server, che ha gia applicato
  *                  la riservatezza: qui non si decide cosa mostrare, si mostra
  *                  cio che e stato inviato.
- *  Versione .....: 0.9.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Ingressi con coordinate proprie sulla mappa
+ *                                di scheda, con tre stati di praticabilita.
  *  0.9.0  2026-08-06  D.Candela  Tracciato da dati gia presenti in pagina.
  *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sovrapposti.
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
@@ -745,6 +747,47 @@
                 '<div class="catageo-popup"><div class="catageo-popup-titolo">'
                 + esc(punto.nome || '') + '</div><div class="catageo-popup-codice">'
                 + esc(punto.codice || '') + '</div></div>'
+            );
+        }
+
+        /*
+         * Ingressi con coordinate proprie. Su una grotta di solito non ce ne
+         * sono e questo blocco non fa nulla; su un acquedotto sono la cosa che
+         * si cerca, e un solo puntino non direbbe dove stanno i pozzi.
+         *
+         * Il colore distingue tre situazioni, non due: verde dove si passa,
+         * giallo dove l'accesso c'e ma e chiuso — murato, tombato, allagato —
+         * e rosso dove non c'e piu. Un pozzo tombato non e un pozzo perduto, e
+         * schiacciare le due cose toglierebbe proprio il dato per cui e stato
+         * censito.
+         */
+        var ingressi = punto.ingressi || [];
+        for (var i = 0; i < ingressi.length; i++) {
+            var ing = ingressi[i];
+            var ilat = parseFloat(ing.lat);
+            var ilon = parseFloat(ing.lon);
+            if (isNaN(ilat) || isNaN(ilon)) {
+                continue;
+            }
+
+            var perduto = ['crollato', 'interrato', 'non_localizzato'].indexOf(ing.statoCodice) !== -1;
+            var sbarrato = ['chiuso', 'murato', 'tombato', 'allagato'].indexOf(ing.statoCodice) !== -1;
+
+            var righe = [];
+            if (ing.tipo) { righe.push(esc(ing.tipo)); }
+            if (ing.stato) { righe.push(esc(ing.stato)); }
+            if (ing.progressiva) { righe.push('progressiva ' + esc(ing.progressiva) + ' m'); }
+
+            L.circleMarker([ilat, ilon], {
+                radius: 5,
+                color: '#ffffff',
+                weight: 2,
+                fillColor: perduto ? '#dc2626' : (sbarrato ? '#d97706' : '#16a34a'),
+                fillOpacity: 0.9
+            }).addTo(mappa).bindPopup(
+                '<div class="catageo-popup"><div class="catageo-popup-titolo">'
+                + esc(ing.nome || 'Ingresso') + '</div><div>'
+                + righe.join(' · ') + '</div></div>'
             );
         }
 

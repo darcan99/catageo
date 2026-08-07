@@ -27,6 +27,15 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   coincide con regione, provincia o comune, che restano perche servono per
   altro. Assegnabile in scheda, cercabile, e mostrata per nome anche in
   stampa.
+- **Ingressi come scheda, e non piu come riga**: nome, tipo (pozzo di
+  areazione, finestra, cunicolo di servizio…), stato proprio distinto da
+  quello della cavita, e **progressiva** in metri dall'imbocco, che li mette
+  in sequenza. Il caso che dimensiona il modello e l'acquedotto e non la
+  grotta: gli accessi sono molti, di natura diversa, e un unico "chiuso"
+  appiattirebbe un pozzo **tombato** — che resta un possibile accesso — su
+  uno **crollato**, che e un'altra cosa. Gli accessi con coordinate proprie
+  compaiono sulla mappa di scheda, con tre colori: si passa, e sbarrato,
+  non c'e piu.
 - **Report di completezza** nella pagina Strumenti, distinto dalla verifica di
   integrita: quella dice se l'archivio e **corretto**, questo dice se e
   **finito**. Una colonna per voce — coordinate, posizione verificata, comune,
@@ -53,6 +62,16 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   escluderebbe cavita che tutti considerano dentro.
 - **Un'area assegnata a qualche ipogeo non si cancella**, si disattiva: una
   voce cancellata sotto le schede che la citano lascia rimandi rotti.
+- **Sugli ingressi tutti i campi restano facoltativi** e la tabella si puo
+  ignorare: su una grotta con un ingresso solo la coordinata di scheda basta,
+  e il caso normale non deve pagare il costo del caso complesso.
+- **Su una scheda a coordinate ridotte nessun accesso finisce sulla mappa**:
+  dodici puntini esatti attorno a un cerchio di approssimazione vanificherebbero
+  l'offuscamento.
+- **Parita fra cavita naturali e artificiali** dichiarata come vincolo di
+  progetto (ANALISI 16.2), non come preferenza: e il tratto che distingue
+  CATAGEO dai catasti esistenti, e da qui in avanti ogni scelta di modello si
+  rilegge una volta pensando a una grotta e una pensando a una cava.
 
 ## [1.0.0] — 2026-08-07
 

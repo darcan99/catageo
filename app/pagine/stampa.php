@@ -597,16 +597,19 @@ header('Content-Type: text/html; charset=utf-8');
 
     <?php $ingressi = $scheda['caratteristiche']['ingressi'] ?? []; ?>
     <?php if (is_array($ingressi) && $ingressi !== []): ?>
-      <h3>Ingressi</h3>
+      <h3>Ingressi e accessi</h3>
       <table class="stampa-elenco">
-        <thead><tr><th>Descrizione</th><th>Dimensioni</th><th>Quota</th><th>Stato</th></tr></thead>
+        <thead><tr><th>Nome</th><th>Tipo</th><th>Stato</th><th>Progr.</th><th>Quota</th><th>Dimensioni</th><th>Descrizione</th></tr></thead>
         <tbody>
           <?php foreach ($ingressi as $ingresso): ?>
             <tr>
-              <td><?= catageoStampaValore((string) ($ingresso['descrizione'] ?? '')) ?></td>
-              <td><?= catageoStampaValore((string) ($ingresso['dimensioni'] ?? '')) ?></td>
+              <td><?= catageoStampaValore((string) ($ingresso['nome'] ?? '')) ?></td>
+              <td><?= catageoStampaValore(Ipogeo::TIPI_INGRESSO[(string) ($ingresso['tipo'] ?? '')] ?? '') ?></td>
+              <td><?= catageoStampaValore(Ipogeo::STATI_INGRESSO[(string) ($ingresso['stato'] ?? '')] ?? '') ?></td>
+              <td><?= catageoStampaValore((string) ($ingresso['progressiva'] ?? '')) ?></td>
               <td><?= catageoStampaValore((string) ($ingresso['quota'] ?? '')) ?></td>
-              <td><?= catageoStampaValore((string) ($ingresso['stato'] ?? '')) ?></td>
+              <td><?= catageoStampaValore((string) ($ingresso['dimensioni'] ?? '')) ?></td>
+              <td><?= catageoStampaValore((string) ($ingresso['descrizione'] ?? '')) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
