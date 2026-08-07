@@ -1616,7 +1616,16 @@ Nuova anagrafica, con l'area assegnabile alla scheda e usabile come criterio di 
 
 Nella pagina Strumenti, accanto alla verifica di integrità e ben distinto da essa: **l'integrità dice se l'archivio è corretto, la completezza dice se è finito**. Sono due domande diverse e le confonde solo chi non cura un catasto.
 
-Tabella con una colonna per rilievo, foto d'ingresso, foto, descrizione, itinerario, coordinate verificate, e in fondo chi ha aggiornato la scheda e quando; ordinabile e **scaricabile in CSV**. I conteggi sono già tutti nell'indice, quindi il costo è la pagina, non il calcolo.
+Tabella con una colonna per voce — coordinate, posizione verificata, comune, tipologia, sviluppo, foto, rilievi, esplorazioni, bibliografia, stato esplorativo — e in fondo quante ne mancano; **scaricabile in CSV**. I conteggi sono già tutti nell'indice, che si legge in streaming: il costo è la pagina, non il calcolo, e il report deve poter girare su migliaia di schede su un hosting da pochi euro.
+
+**Scelte assunte** (2026-08-07):
+
+- **Nessun punteggio complessivo in percentuale.** Un «72% di completezza» sembra una misura e non lo è: pesa insieme cose incomparabili, e chi lo legge non sa cosa fare per alzarlo. Si contano le voci mancanti, una colonna per voce, e chi cura decide cosa gli manca davvero.
+- **«Non si sa» conta come voce mancante** nello stato esplorativo. Non è una risposta, ed è proprio la non-risposta che questo report deve far emergere.
+- **Il report applica il filtro di visibilità della consultazione.** Uno strumento di manutenzione che mostrasse le schede riservate a chi non le può vedere sarebbe una fuga di dati con l'aspetto di un attrezzo.
+- **La tabella a video si ferma alle 200 schede più incomplete, il CSV le contiene tutte**, e la pagina dichiara quante ne ha lasciate fuori. Un elenco troncato in silenzio farebbe correggere una parte del catasto credendo di averlo visto tutto.
+- **Nel CSV si scrive «si»/«no» e non «1»/«0»**: il file finisce in un foglio di calcolo, dove una colonna di 1 e 0 si legge come numero e si somma per sbaglio. Con BOM, perché la destinazione tipica è Excel.
+- **Una scheda senza coordinate non si crea dall'interfaccia** — `Ipogeo::crea()` le esige — ma può esistere in un archivio ricostruito a mano o importato, ed è esattamente il caso per cui la voce «Coordinate» esiste nel report.
 
 #### 9.17.7 Minori
 

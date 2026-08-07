@@ -12,12 +12,13 @@ declare(strict_types=1);
  *                  Le pagine si raggiungono via querystring e non con URL
  *                  riscritti: nessun mod_rewrite richiesto, quindi
  *                  l'applicativo funziona su qualunque hosting.
- *  Versione .....: 1.0.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Rotta del report di completezza in CSV.
  *  1.0.0  2026-08-07  D.Candela  Rotta della scheda da stampare.
  *  0.16.0 2026-08-06  D.Candela  Rotta dell'importazione massiva.
  *  0.15.0 2026-08-06  D.Candela  Rotte degli strumenti e del backup.
@@ -97,6 +98,7 @@ $pagine = [
     'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],
     'strumenti'    => ['file' => 'strumenti.php',    'permesso' => 'strumenti',          'titolo' => 'Strumenti'],
     'scarica-backup' => ['file' => 'scarica-backup.php', 'permesso' => 'strumenti',        'titolo' => 'Backup', 'grezza' => true],
+    'completezza-csv' => ['file' => 'completezza-csv.php', 'permesso' => 'strumenti',      'titolo' => 'Completezza', 'grezza' => true],
     'importa'      => ['file' => 'importa.php',      'permesso' => 'strumenti',          'titolo' => 'Importazione da CSV'],
     'utenti'       => ['file' => 'utenti.php',       'permesso' => 'gestisci_utenti',    'titolo' => 'Gestione utenti'],
     'diagnostica'  => ['file' => 'diagnostica.php',  'permesso' => 'strumenti',          'titolo' => 'Diagnostica'],

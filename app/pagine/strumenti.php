@@ -13,12 +13,13 @@ declare(strict_types=1);
  *                  e una correzione automatica che indovina male su un catasto
  *                  di trent'anni fa piu danni del problema. L'unica cosa che si
  *                  offre di rifare e l'indice, che e una cache.
- *  Versione .....: 0.16.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0   2026-08-07  D.Candela  Report di completezza delle schede (fase 12).
  *  0.16.0  2026-08-06  D.Candela  Riquadro dell'importazione da CSV (fase 9b).
  *  0.15.0  2026-08-06  D.Candela  Prima stesura (fase 9).
  * ============================================================================
@@ -94,6 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  */
 $integrita = $azione === 'integrita' ? Integrita::verifica() : null;
 
+$completezza = $azione === 'completezza'
+    ? Completezza::report((string) ($_GET['catalogo'] ?? ''))
+    : null;
+
 $link = null;
 if ($azione === 'link') {
     $link = VerificaLink::esegui((int) ($_GET['salta'] ?? 0));
@@ -152,6 +157,40 @@ $cataloghi = Cataloghi::elenco();
         <a class="btn btn-primary" href="index.php?p=strumenti&amp;azione=integrita">
           <i class="bi bi-clipboard-check"></i> Verifica l'archivio
         </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =============================================== completezza -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><h2 class="h6 mb-0">Completezza delle schede</h2></div>
+      <div class="card-body">
+        <p class="text-body-secondary">
+          L'integrita dice se l'archivio e <strong>corretto</strong>; questo dice
+          se e <strong>finito</strong>. Quali schede sono senza coordinate, senza
+          rilievo, senza foto, e quali non hanno mai risposto alla domanda se
+          la cavita prosegua.
+        </p>
+        <form method="get" action="index.php" class="d-flex flex-wrap gap-2 align-items-end">
+          <input type="hidden" name="p" value="strumenti">
+          <input type="hidden" name="azione" value="completezza">
+          <div>
+            <label for="catalogoCompletezza" class="form-label">Catalogo</label>
+            <select class="form-select" id="catalogoCompletezza" name="catalogo">
+              <option value="">Tutti</option>
+              <?php foreach ($cataloghi as $c): ?>
+                <option value="<?= Testo::esc((string) $c['sigla']) ?>"
+                        <?= (string) ($_GET['catalogo'] ?? '') === (string) $c['sigla'] ? 'selected' : '' ?>>
+                  <?= Testo::esc((string) $c['sigla']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-list-check"></i> Guarda cosa manca
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -296,6 +335,122 @@ $cataloghi = Cataloghi::elenco();
     </div>
   </div>
 </div>
+
+<?php // ================================================= esito completezza ?>
+<?php if ($completezza !== null): ?>
+  <?php
+  /*
+   * Un tetto alla tabella, non al conteggio: i riepiloghi in cima contano
+   * tutte le schede, l'elenco ne mostra le prime. Chi ne vuole di piu scarica
+   * il CSV, che invece e completo.
+   */
+  $limiteTabella = 200;
+  $mostrate = array_slice($completezza['righe'], 0, $limiteTabella);
+  ?>
+  <div class="card mt-4">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <h2 class="h6 mb-0">
+        Completezza
+        <span class="catageo-nota">· <?= (int) $completezza['totale'] ?> schede esaminate</span>
+      </h2>
+      <?php if ($completezza['totale'] > 0): ?>
+        <a class="btn btn-sm btn-outline-secondary"
+           href="index.php?p=completezza-csv&amp;catalogo=<?= urlencode((string) ($_GET['catalogo'] ?? '')) ?>">
+          <i class="bi bi-download"></i> Scarica in CSV
+        </a>
+      <?php endif; ?>
+    </div>
+
+    <div class="card-body">
+      <?php if ($completezza['totale'] === 0): ?>
+        <p class="mb-0 text-body-secondary">Nessuna scheda da esaminare.</p>
+      <?php else: ?>
+
+        <?php // Quante schede mancano di ciascuna voce: e da qui che si decide da dove partire. ?>
+        <div class="table-responsive mb-3">
+          <table class="table table-sm catageo-tabella mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Voce</th>
+                <th scope="col" style="width:8rem">Schede senza</th>
+                <th scope="col">Su <?= (int) $completezza['totale'] ?></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($completezza['etichette'] as $chiave => $etichetta): ?>
+                <?php
+                $senza = (int) $completezza['conteggi'][$chiave];
+                $quota = $completezza['totale'] > 0
+                    ? (int) round($senza * 100 / $completezza['totale']) : 0;
+                ?>
+                <tr>
+                  <td><?= Testo::esc($etichetta) ?></td>
+                  <td class="catageo-valore"><?= $senza ?></td>
+                  <td>
+                    <div class="progress" role="img"
+                         aria-label="<?= $quota ?> per cento delle schede senza <?= Testo::esc($etichetta) ?>"
+                         style="height:.6rem">
+                      <div class="progress-bar <?= $senza === 0 ? 'bg-success' : 'bg-secondary' ?>"
+                           style="width:<?= $quota ?>%"></div>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <?php // Le schede, dalla piu incompleta: e l'ordine in cui si lavora. ?>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover catageo-tabella mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Codice</th>
+                <th scope="col">Nome</th>
+                <?php foreach ($completezza['etichette'] as $etichetta): ?>
+                  <th scope="col" class="text-center" style="width:3rem">
+                    <span title="<?= Testo::esc($etichetta) ?>"><?= Testo::esc(mb_substr($etichetta, 0, 3)) ?></span>
+                  </th>
+                <?php endforeach; ?>
+                <th scope="col" style="width:6rem">Mancanti</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($mostrate as $riga): ?>
+                <tr>
+                  <td>
+                    <a class="catageo-codice" href="index.php?p=ipogei&amp;azione=scheda&amp;codice=<?= urlencode((string) $riga['codice']) ?>">
+                      <?= Testo::esc((string) $riga['codice']) ?>
+                    </a>
+                  </td>
+                  <td><?= Testo::esc((string) $riga['nome']) ?></td>
+                  <?php foreach (array_keys($completezza['etichette']) as $chiave): ?>
+                    <td class="text-center">
+                      <?php if ($riga['stato'][$chiave]): ?>
+                        <i class="bi bi-check-lg text-success" aria-label="presente"></i>
+                      <?php else: ?>
+                        <i class="bi bi-dash text-body-tertiary" aria-label="manca"></i>
+                      <?php endif; ?>
+                    </td>
+                  <?php endforeach; ?>
+                  <td class="catageo-valore"><?= (int) $riga['mancanti'] ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+
+        <?php if (count($completezza['righe']) > count($mostrate)): ?>
+          <p class="catageo-nota mt-2 mb-0">
+            Mostrate le <?= count($mostrate) ?> schede piu incomplete delle
+            <?= count($completezza['righe']) ?> esaminate. Il CSV le contiene tutte.
+          </p>
+        <?php endif; ?>
+
+      <?php endif; ?>
+    </div>
+  </div>
+<?php endif; ?>
 
 <?php // ==================================================== esito integrita ?>
 <?php if ($integrita !== null): ?>

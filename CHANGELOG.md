@@ -21,6 +21,11 @@ Fase 12 (§9.17): estensioni del modello, in corso.
 - **Ricerca** su entrambi, con il filtro «non verificata da N anni». La query
   che giustifica la fase — *le cavita che proseguono e che non rivede nessuno
   da cinque anni* — ora si scrive in un indirizzo.
+- **Report di completezza** nella pagina Strumenti, distinto dalla verifica di
+  integrita: quella dice se l'archivio e **corretto**, questo dice se e
+  **finito**. Una colonna per voce — coordinate, posizione verificata, comune,
+  tipologia, sviluppo, foto, rilievi, esplorazioni, bibliografia, stato
+  esplorativo — le schede ordinate dalla piu incompleta, e lo scarico in CSV.
 
 ### Note di progetto
 - **Tre stati e non un booleano**: si, no, oppure «non si sa», che e il valore
@@ -31,6 +36,12 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   contrario di quello che serve.
 - **Nessuna migrazione**: i nuovi elementi sono opzionali nello schema, quindi
   una scheda scritta prima resta valida e si legge come «non si sa».
+- **Il report di completezza non da una percentuale complessiva.** Un «72% di
+  completezza» sembra una misura e non lo e: pesa insieme cose incomparabili, e
+  chi lo legge non sa cosa fare per alzarlo.
+- **Il report rispetta la riservatezza** come la consultazione, e la tabella a
+  video si ferma alle 200 schede piu incomplete dichiarandolo; il CSV le
+  contiene tutte.
 
 ## [1.0.0] — 2026-08-07
 
