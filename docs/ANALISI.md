@@ -1572,6 +1572,62 @@ Pagina dedicata (`?p=stampa&codice=…`), documento HTML autonomo con foglio di 
 - **Solo da riga di comando.** Un generatore di dati raggiungibile via HTTP è un modo per riempire l'archivio di qualcun altro.
 - **Scrive in un catalogo suo e si rifiuta di procedere se esiste già**, così i dati veri non vengono toccati nemmeno per sbaglio. La rimozione passa da `Ipogeo::elimina()`, quindi le schede finiscono in `_eliminati` come tutte le altre: la regola dell'archivio vale anche per gli esempi.
 
+### 9.17 Estensioni del modello (fase 12)
+
+Dopo il rilascio 1.0.0 il modello è stato confrontato con il **Catasto delle cavità dell'Umbria** della Federazione Speleologica Umbra (`catasto.fugs.it`, consultato il 2026-08-07), un catasto pubblico in esercizio con un impianto simile al nostro. Il confronto ha mostrato sette punti in cui il loro modello dice qualcosa che il nostro non sa dire. Nessuna riga del loro codice o dei loro dati è stata usata: si è guardata la **struttura** di un catasto funzionante, come si guarda la scheda cartacea di un catasto regionale prima di disegnare la propria.
+
+Queste estensioni si realizzano **prima** delle fasi 6b e 4b, ed è una scelta di costo: cambiano il modello dati, e farlo con gli archivi ancora piccoli costa una modifica di schema, farlo fra migliaia di schede costa una migrazione.
+
+#### 9.17.1 Stato esplorativo — la voce più importante
+
+Due campi sulla scheda: **`esplorata`** (l'esplorazione è considerata conclusa) e **`prosegue`** (esistono prosecuzioni note e non percorse), con una nota che le motiva.
+
+È l'estensione con il rapporto valore/lavoro più alto di tutte, perché è la domanda per cui il catasto esiste: *cosa è stato fatto e cos'altro si può tentare*. Oggi quell'informazione, quando c'è, sta nel testo libero del risultato di un diario, dove nessuna ricerca la trova. Come campo indicizzato diventa interrogabile — «le cavità che proseguono, in questa area, non riviste da cinque anni» — che è esattamente il modo in cui si programma una stagione di esplorazione.
+
+Entrambi sono a **tre stati** (sì / no / non si sa) e non booleani: su un catasto ricostruito da fonti eterogenee «non lo sappiamo» è la risposta più frequente, e un booleano la falsificherebbe in «no».
+
+#### 9.17.2 Verifica della posizione sul campo
+
+**`posizioneVerificata`** e **`dataUltimaVerifica`**, distinti dallo stato della scheda.
+
+Lo stato scheda dice quanto è affidabile *la compilazione*; questi dicono se **qualcuno è andato a controllare quel punto**, e quando. Sono cose diverse: una scheda può essere verificata nei contenuti e avere una coordinata mai messa alla prova, presa da una pubblicazione del 1978. Si affiancano al campo `metodo` (§6.8), che già dichiara *come* la coordinata è stata ottenuta.
+
+#### 9.17.3 L'ingresso come scheda, non come sottovoce
+
+Oggi le coordinate, la cartografia e l'accesso stanno sulla **cavità**, e l'ingresso è una riga leggera (descrizione, dimensioni, quota, stato, coordinate). Per una grotta con più ingressi a quote diverse — in comuni diversi, con proprietari e permessi diversi — il modello costringe a eleggere «l'ingresso vero» e a perdere il resto.
+
+L'ingresso acquisisce quindi i campi che oggi vivono solo a livello di cavità: metodo e strumentazione della coordinata, tipo di quota, cartografia IGM/CTR, stato e vincoli d'accesso, itinerario, foto di riferimento, chi ha rilevato il dato e quando.
+
+**La coordinata di cavità resta dov'è** ed è quella dell'ingresso principale: mappa, ricerca per raggio ed esportazioni continuano a funzionare senza sapere nulla di questa estensione. È il motivo per cui il cambiamento è additivo e non una migrazione.
+
+#### 9.17.4 Complessi carsici
+
+Oggi le relazioni fra ipogei sono un grafo: `<collegamenti>` con codice e tipo di relazione. Manca l'oggetto: il **Complesso X** ha un nome proprio, uno sviluppo e un dislivello suoi, una bibliografia sua, ed è la cosa di cui si parla in letteratura — non la somma dei rimandi fra le schede che lo compongono.
+
+Nuova entità con codice proprio, elenco delle cavità che vi appartengono e totali **calcolati e non digitati**: uno sviluppo complessivo scritto a mano diverge dalla somma delle schede al primo aggiornamento.
+
+#### 9.17.5 Aree speleologiche
+
+Un raggruppamento geografico con un nome, indipendente dai confini amministrativi. «Alto Chiascio» è il modo in cui uno speleologo colloca una cavità, e non coincide con regione, provincia o comune — che restano, perché servono per altro.
+
+Nuova anagrafica, con l'area assegnabile alla scheda e usabile come criterio di ricerca e come filtro di mappa.
+
+#### 9.17.6 Report di completezza
+
+Nella pagina Strumenti, accanto alla verifica di integrità e ben distinto da essa: **l'integrità dice se l'archivio è corretto, la completezza dice se è finito**. Sono due domande diverse e le confonde solo chi non cura un catasto.
+
+Tabella con una colonna per rilievo, foto d'ingresso, foto, descrizione, itinerario, coordinate verificate, e in fondo chi ha aggiornato la scheda e quando; ordinabile e **scaricabile in CSV**. I conteggi sono già tutti nell'indice, quindi il costo è la pagina, non il calcolo.
+
+#### 9.17.7 Minori
+
+- **Itinerario di avvicinamento in GPX**, distinto dai tracciati dei rilievi: è la traccia per arrivare all'ingresso, non quella della cavità.
+- **Percorribilità strutturata**: necessità di armo, difficoltà di progressione e difficoltà idriche da vocabolario, periodo consigliato, cavità inquinata o a rischio. Oggi sono testo libero, quindi non filtrabili.
+
+#### 9.17.8 Cosa non si prende
+
+- **Interfaccia bilingue.** È un lavoro trasversale a ogni pagina e a ogni messaggio, non un'estensione del modello: se serve, è una fase sua. Resta fra i punti aperti (§17).
+- **Le sezioni che loro dichiarano e non compilano** — biologia, meteorologia, storica: su queste il nostro modello è più avanti (§6.13, §6.14, §6.15) e non c'è nulla da imparare.
+
 ---
 
 ## 10. Ricerca
@@ -1698,7 +1754,10 @@ Altre convenzioni:
 | **9** | Strumenti ADM: ricostruzione indici, verifica integrità, backup per catalogo, verifica link | Archivio verificabile e ripristinabile |
 | **9b** | Import CSV massivo di ipogei: mappatura delle colonne, anteprima riga per riga con la validazione vera, nessuna sovrascrittura | Un CSV sporco importato per le sole righe valide, con motivo e numero di riga per le altre |
 | **10** | Rifinitura: stampa scheda, manuale utente, guida di installazione, dati di esempio, tag `v1.0.0` | Release installabile |
+| **12** | *(post-1.0.0)* Estensioni del modello (§9.17): stato esplorativo, verifica sul campo, ingressi come scheda, complessi carsici, aree speleologiche, report di completezza | Ricerca «cavita che proseguono e non riviste da N anni» |
 | **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
+
+**Ordine di esecuzione dopo il rilascio 1.0.0**: **12**, poi **6b**, poi **4b**, infine **11**. La 12 viene prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione.
 
 Al termine di ogni fase: commit, aggiornamento `CHANGELOG.md`, incremento delle versioni dei file toccati.
 

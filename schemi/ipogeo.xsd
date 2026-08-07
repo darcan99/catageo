@@ -19,12 +19,14 @@
                    - si usa xs:all e non xs:sequence dove l'ordine non porta
                      informazione, perche l'archivio deve restare modificabile a
                      mano e un ordine diverso non e un errore di contenuto.
-   Versione .....: 0.4.0
+   Versione .....: 1.1.0
    Sviluppatore .: Dario Candela <darcan99@gmail.com>
    Licenza ......: GNU GPL v3.0 - vedi LICENSE
    Copyright ....: (c) 2026 Dario Candela
   ............................................................................
    CRONOLOGIA
+   1.1.0  2026-08-07  D.Candela  Stato esplorativo a tre stati e verifica
+                                 della posizione sul campo (fase 12).
    0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
   ============================================================================
 -->
@@ -103,6 +105,18 @@
       <xs:enumeration value="bozza"/>
       <xs:enumeration value="verificata"/>
       <xs:enumeration value="pubblicata"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Si, no, oppure non lo sappiamo. Il vuoto e "non lo sappiamo" ed e il
+       valore predefinito: una scheda vecchia, che di questo campo non sapeva
+       nulla, resta valida e dichiara la propria ignoranza invece di affermare
+       il falso. -->
+  <xs:simpleType name="tTerzoStato">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="si"/>
+      <xs:enumeration value="no"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -235,6 +249,15 @@
                     <xs:element name="sistemaOriginale" type="xs:string" minOccurs="0"/>
                     <xs:element name="formatoOriginale" type="xs:string" minOccurs="0"/>
                     <xs:element name="valoreOriginale"  type="xs:string" minOccurs="0"/>
+                    <!-- Verifica della posizione sul campo (9.17.2). Distinta
+                         dallo stato della scheda: quello dice quanto e
+                         affidabile la compilazione, questi dicono se qualcuno
+                         e andato a controllare il punto, e quando. Una scheda
+                         puo essere verificata nei contenuti e avere una
+                         coordinata presa da una pubblicazione del 1978. -->
+                    <xs:element name="posizioneVerificata" type="tBooleano01" minOccurs="0"/>
+                    <xs:element name="dataUltimaVerifica"  type="tDataOVuota" minOccurs="0"/>
+                    <xs:element name="verificataDa"        type="xs:string"   minOccurs="0"/>
                   </xs:all>
                   <xs:attribute name="sistema" type="xs:string"/>
                 </xs:complexType>
@@ -321,6 +344,21 @@
                     <xs:element name="attrezzaturaNecessaria" type="xs:string" minOccurs="0"/>
                     <xs:element name="pericoli"               type="xs:string" minOccurs="0"/>
                     <xs:element name="tempoPercorrenza"       type="xs:string" minOccurs="0"/>
+                  </xs:all>
+                </xs:complexType>
+              </xs:element>
+
+              <!-- Stato esplorativo (9.17.1). E la domanda per cui il catasto
+                   esiste: cosa e stato fatto e cos'altro si puo tentare. Tre
+                   stati e non un booleano, perche su un catasto ricostruito da
+                   fonti eterogenee "non lo sappiamo" e la risposta piu
+                   frequente, e un booleano la falsificherebbe in "no". -->
+              <xs:element name="statoEsplorativo" minOccurs="0">
+                <xs:complexType>
+                  <xs:all>
+                    <xs:element name="esplorata" type="tTerzoStato" minOccurs="0"/>
+                    <xs:element name="prosegue"  type="tTerzoStato" minOccurs="0"/>
+                    <xs:element name="note"      type="xs:string"   minOccurs="0"/>
                   </xs:all>
                 </xs:complexType>
               </xs:element>

@@ -16,12 +16,14 @@ declare(strict_types=1);
  *                  E unico e globale, con la colonna del catalogo in testa:
  *                  una sola scansione copre tutta l'installazione e il filtro
  *                  per catalogo diventa un confronto di campo.
- *  Versione .....: 0.10.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Colonne esplorata, prosegue, pos_verificata
+ *                                e data_verifica (fase 12).
  *  0.10.0 2026-08-06  D.Candela  n_biblio contava file in una sezione che non
  *                                ne ha, quindi restava sempre a zero: ora
  *                                conta le voci dell'indice.
@@ -38,7 +40,8 @@ final class IndiceIpogei
         'sviluppo', 'dislivello', 'stato_accesso', 'riservatezza', 'stato_scheda',
         'n_allegati', 'n_foto', 'n_video', 'n_rilievi', 'n_esplorazioni', 'n_biblio',
         'n_serie_misure', 'ha_kml', 'ha_3d', 'ha_chirotteri', 'ha_archeologia',
-        'periodo_arch', 'data_censimento', 'ultima_modifica', 'cartella',
+        'periodo_arch', 'esplorata', 'prosegue', 'pos_verificata', 'data_verifica',
+        'data_censimento', 'ultima_modifica', 'cartella',
     ];
 
     /** Percorso del file. */
@@ -308,6 +311,14 @@ final class IndiceIpogei
             'ha_chirotteri'   => Biospeleologia::colonie($codice) !== [] ? '1' : '0',
             'ha_archeologia'  => $conteggi['AR'] > 0 ? '1' : '0',
             'periodo_arch'    => Archeologia::periodoPrincipale($codice),
+            // Stato esplorativo e verifica sul campo (9.17): stanno
+            // nell'indice perche sono criteri di ricerca, ed e la ricerca
+            // il motivo per cui esistono. Tre stati, quindi si scrive il
+            // valore e non un flag: '' vuol dire non lo sappiamo.
+            'esplorata'       => (string) ($scheda['caratteristiche']['statoEsplorativo']['esplorata'] ?? ''),
+            'prosegue'        => (string) ($scheda['caratteristiche']['statoEsplorativo']['prosegue'] ?? ''),
+            'pos_verificata'  => !empty($scheda['ubicazione']['coordinate']['posizioneVerificata']) ? '1' : '0',
+            'data_verifica'   => (string) ($scheda['ubicazione']['coordinate']['dataUltimaVerifica'] ?? ''),
             'data_censimento' => (string) $scheda['catasto']['dataCensimento'],
             'ultima_modifica' => (string) $scheda['catasto']['modificaData'],
             'cartella'        => $relativa,

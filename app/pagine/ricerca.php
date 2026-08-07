@@ -15,12 +15,14 @@ declare(strict_types=1);
  *                  Se il testo cercato e un codice — anche dismesso da una
  *                  migrazione — si va dritti alla scheda: e il caso d'uso piu
  *                  frequente, quello di chi ha in mano una pubblicazione.
- *  Versione .....: 0.14.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Filtri su prosecuzioni e verifica sul campo
+ *                                (fase 12).
  *  0.14.0  2026-08-06  D.Candela  Selezione dei risultati per la migrazione.
  *  0.13.0  2026-08-06  D.Candela  Prima stesura (fase 8).
  * ============================================================================
@@ -266,6 +268,65 @@ if ($vista === 'mappa' && $righe !== []) {
                     </option>
                   <?php endforeach; ?>
                 </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- --------------------------------------- stato esplorativo -->
+      <?php
+      /*
+       * Il riquadro sta in cima e non in fondo: e la ricerca che si fa quando
+       * si programma un'uscita, ed e il motivo per cui questi campi esistono
+       * (9.17.1). Sepolta sotto "dimensioni e quota" non la userebbe nessuno.
+       */
+      ?>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#filtriEsplorazione">
+            Stato esplorativo e verifica sul campo
+          </button>
+        </h2>
+        <div id="filtriEsplorazione" class="accordion-collapse collapse" data-bs-parent="#catageoFiltri">
+          <div class="accordion-body">
+            <div class="row g-3">
+              <?php foreach ([
+                  'prosegue'  => ['Prosecuzioni note', 'Le cavita dove c\'e ancora da andare.'],
+                  'esplorata' => ['Esplorazione conclusa', ''],
+              ] as $campo => [$etichetta, $nota]): ?>
+                <div class="col-md-3">
+                  <label for="f_<?= $campo ?>" class="form-label"><?= Testo::esc($etichetta) ?></label>
+                  <select class="form-select" id="f_<?= $campo ?>" name="<?= $campo ?>">
+                    <option value="">Qualunque</option>
+                    <option value="si"     <?= (string) $criteri[$campo] === 'si' ? 'selected' : '' ?>>si</option>
+                    <option value="no"     <?= (string) $criteri[$campo] === 'no' ? 'selected' : '' ?>>no</option>
+                    <option value="ignoto" <?= (string) $criteri[$campo] === 'ignoto' ? 'selected' : '' ?>>non si sa</option>
+                  </select>
+                  <?php if ($nota !== ''): ?>
+                    <div class="catageo-nota"><?= Testo::esc($nota) ?></div>
+                  <?php endif; ?>
+                </div>
+              <?php endforeach; ?>
+
+              <div class="col-md-3">
+                <label for="posVerificata" class="form-label">Posizione verificata</label>
+                <select class="form-select" id="posVerificata" name="posVerificata">
+                  <option value="">Qualunque</option>
+                  <option value="si" <?= (string) $criteri['posVerificata'] === 'si' ? 'selected' : '' ?>>si</option>
+                  <option value="no" <?= (string) $criteri['posVerificata'] === 'no' ? 'selected' : '' ?>>no</option>
+                </select>
+              </div>
+
+              <div class="col-md-3">
+                <label for="nonVerificataDaAnni" class="form-label">Non verificata da (anni)</label>
+                <input type="number" class="form-control" id="nonVerificataDaAnni"
+                       name="nonVerificataDaAnni" min="0" max="200" step="1"
+                       value="<?= Testo::esc((string) $criteri['nonVerificataDaAnni']) ?>">
+                <div class="catageo-nota">
+                  Le mai verificate rientrano sempre: sono il caso piu vecchio.
+                </div>
               </div>
             </div>
           </div>

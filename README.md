@@ -48,6 +48,7 @@
 | 9 | Strumenti: ricostruzione indici, verifica integrita, backup ZIP per catalogo, verifica dei collegamenti | ✅ fatto |
 | 9b | Import CSV massivo, con mappatura delle colonne e anteprima riga per riga | ✅ fatto |
 | 10 | Stampa della scheda, manuale utente, guida di installazione, dati di esempio, `v1.0.0` | ✅ fatto |
+| 12 | *(post-1.0.0)* Estensioni del modello: stato esplorativo, verifica sul campo, ingressi come scheda, complessi carsici, aree speleologiche, report di completezza | 🚧 in corso |
 | 11 | *(post-release)* Acquisizione da fonti pubbliche, previa verifica delle licenze | ⏳ da fare |
 
 Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.

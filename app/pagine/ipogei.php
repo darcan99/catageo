@@ -10,12 +10,14 @@ declare(strict_types=1);
  *                  esplorazioni e le altre) compaiono come tab dichiarati ma non
  *                  ancora compilabili: arrivano nelle fasi successive, e
  *                  nasconderle darebbe l'idea che la scheda sia completa.
- *  Versione .....: 1.0.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Riquadro dello stato esplorativo e verifica
+ *                                della posizione (fase 12).
  *  1.0.0  2026-08-07  D.Candela  Pulsante di stampa: la scheda a linguette
  *                                non si stampa, e una pagina a parte.
  *  0.8.0  2026-08-05  D.Candela  Tracciati dei rilievi sulla mappetta e
@@ -185,6 +187,11 @@ function datiSchedaDaPost(): array
                 'pericoli'               => (string) ($_POST['pericoli'] ?? ''),
                 'tempoPercorrenza'       => (string) ($_POST['tempoPercorrenza'] ?? ''),
             ],
+            'statoEsplorativo' => [
+                'esplorata' => (string) ($_POST['esplorata'] ?? ''),
+                'prosegue'  => (string) ($_POST['prosegue'] ?? ''),
+                'note'      => (string) ($_POST['noteProsecuzioni'] ?? ''),
+            ],
         ],
         'descrizione' => [
             'sintesi' => (string) ($_POST['sintesi'] ?? ''),
@@ -254,6 +261,12 @@ function coordinateDaPost(): array
         'sistemaOriginale' => $esito['sistemaOriginale'],
         'formatoOriginale' => $esito['formatoOriginale'],
         'valoreOriginale'  => $esito['valoreOriginale'],
+        // Verifica sul campo (9.17.2). Non si compila da sola al salvataggio:
+        // dichiara che qualcuno e andato sul posto, e nessun salvataggio puo
+        // saperlo al posto suo.
+        'posizioneVerificata' => !empty($_POST['posizioneVerificata']),
+        'dataUltimaVerifica'  => (string) ($_POST['dataUltimaVerifica'] ?? ''),
+        'verificataDa'        => (string) ($_POST['verificataDa'] ?? ''),
     ];
 }
 
@@ -662,6 +675,34 @@ if ($azione === 'scheda' && $codice !== '') {
                     <?php endif; ?>
                   </dd>
 
+                  <?php
+                  /*
+                   * Verifica sul campo (9.17.2). Si dichiara anche quando manca:
+                   * "mai verificata sul campo" e un'informazione, e tacere
+                   * lascerebbe credere che la coordinata sia stata controllata.
+                   */
+                  $verificata = !empty($scheda['ubicazione']['coordinate']['posizioneVerificata']);
+                  $dataVer    = (string) ($scheda['ubicazione']['coordinate']['dataUltimaVerifica'] ?? '');
+                  $chiVer     = (string) ($scheda['ubicazione']['coordinate']['verificataDa'] ?? '');
+                  ?>
+                  <dt class="col-sm-5 fw-normal text-body-secondary">Verifica sul campo</dt>
+                  <dd class="col-sm-7">
+                    <?php if ($verificata): ?>
+                      <span class="badge text-bg-success">verificata</span>
+                      <?php if ($dataVer !== ''): ?>
+                        <span class="text-body-secondary">· <?= Testo::esc($dataVer) ?></span>
+                      <?php endif; ?>
+                      <?php if ($chiVer !== ''): ?>
+                        <?php $vc = Esploratori::trova($chiVer); ?>
+                        <div class="catageo-nota">
+                          <?= Testo::esc($vc === null ? $chiVer : Esploratori::etichetta($vc)) ?>
+                        </div>
+                      <?php endif; ?>
+                    <?php else: ?>
+                      <span class="text-body-tertiary">mai verificata sul campo</span>
+                    <?php endif; ?>
+                  </dd>
+
                   <dt class="col-sm-5 fw-normal text-body-secondary">Riservatezza</dt>
                   <dd class="col-sm-7"><?= Testo::esc((string) $scheda['ubicazione']['riservatezza']) ?></dd>
                 </dl>
@@ -798,6 +839,38 @@ if ($azione === 'scheda' && $codice !== '') {
             </div>
           </div>
         <?php endif; ?>
+
+        <?php
+        /*
+         * Stato esplorativo (9.17.1): sta in fondo alla linguetta dei dati e
+         * non fra le misure, perche risponde a una domanda diversa — non
+         * "quanto e grande" ma "c'e ancora da andare".
+         */
+        $esplorativo = $scheda['caratteristiche']['statoEsplorativo'] ?? [];
+        $etichettaStato = static fn (string $v): string =>
+            $v === 'si' ? 'si' : ($v === 'no' ? 'no' : 'non si sa');
+        $prosegue = (string) ($esplorativo['prosegue'] ?? '');
+        ?>
+        <div class="card mt-3">
+          <div class="card-header d-flex align-items-center gap-2">
+            <h2 class="h6 mb-0"><i class="bi bi-compass"></i> Stato esplorativo</h2>
+            <?php if ($prosegue === 'si'): ?>
+              <span class="badge text-bg-primary">prosegue</span>
+            <?php endif; ?>
+          </div>
+          <div class="card-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4 fw-normal text-body-secondary">Esplorazione conclusa</dt>
+              <dd class="col-sm-8"><?= Testo::esc($etichettaStato((string) ($esplorativo['esplorata'] ?? ''))) ?></dd>
+              <dt class="col-sm-4 fw-normal text-body-secondary">Prosecuzioni note</dt>
+              <dd class="col-sm-8"><?= Testo::esc($etichettaStato($prosegue)) ?></dd>
+              <?php if (trim((string) ($esplorativo['note'] ?? '')) !== ''): ?>
+                <dt class="col-sm-4 fw-normal text-body-secondary">Dove si potrebbe proseguire</dt>
+                <dd class="col-sm-8" style="white-space:pre-wrap"><?= Testo::esc((string) $esplorativo['note']) ?></dd>
+              <?php endif; ?>
+            </dl>
+          </div>
+        </div>
       </div>
 
       <!-- ----------------------------------------------------- Descrizione -->
@@ -1801,6 +1874,51 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </select>
                 </div>
 
+                <?php
+                /*
+                 * Verifica della posizione sul campo (9.17.2). Non e lo stato
+                 * della scheda: quello dice quanto e affidabile la
+                 * compilazione, questo dice se qualcuno e andato a controllare
+                 * il punto. Una scheda puo essere impeccabile e avere una
+                 * coordinata copiata da una pubblicazione del 1978.
+                 */
+                $coordinate = $s['ubicazione']['coordinate'];
+                ?>
+                <div class="col-12"><hr class="my-1"></div>
+                <div class="col-md-4">
+                  <div class="form-check mt-4">
+                    <input class="form-check-input" type="checkbox" value="1"
+                           id="posizioneVerificata" name="posizioneVerificata"
+                           <?= !empty($_POST['posizioneVerificata'])
+                               || ($_SERVER['REQUEST_METHOD'] !== 'POST' && !empty($coordinate['posizioneVerificata']))
+                               ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="posizioneVerificata">
+                      Posizione verificata sul campo
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="dataUltimaVerifica" class="form-label">Data della verifica</label>
+                  <input type="date" class="form-control" id="dataUltimaVerifica" name="dataUltimaVerifica"
+                         value="<?= $v('dataUltimaVerifica', (string) ($coordinate['dataUltimaVerifica'] ?? '')) ?>">
+                </div>
+                <div class="col-md-4">
+                  <label for="verificataDa" class="form-label">Verificata da</label>
+                  <select class="form-select" id="verificataDa" name="verificataDa">
+                    <option value="">—</option>
+                    <?php $verificatore = (string) ($_POST['verificataDa'] ?? ($coordinate['verificataDa'] ?? '')); ?>
+                    <?php foreach (Esploratori::elenco(true) as $e): ?>
+                      <option value="<?= Testo::esc((string) $e['id']) ?>"
+                              <?= $verificatore === (string) $e['id'] ? 'selected' : '' ?>>
+                        <?= Testo::esc(Esploratori::etichetta($e)) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <div class="catageo-nota">
+                    Chi c'e stato, non chi ha compilato la scheda.
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -1863,6 +1981,61 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   <label for="pericoli" class="form-label">Pericoli</label>
                   <textarea class="form-control" id="pericoli" name="pericoli" rows="2"><?= Testo::esc((string) ($_POST['pericoli'] ?? $s['caratteristiche']['percorribilita']['pericoli'])) ?></textarea>
                   <div class="catageo-nota">Se compilato, compare come avviso in evidenza sulla scheda.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ------------------------------------------- stato esplorativo -->
+        <?php
+        /*
+         * Il riquadro sta da solo e non dentro "Misure": e la domanda per cui
+         * il catasto esiste — cosa e stato fatto e cos'altro si puo tentare —
+         * e sepolta fra sviluppo e dislivello nessuno la compilerebbe.
+         */
+        $statoEsplorativo = $s['caratteristiche']['statoEsplorativo'] ?? ['esplorata' => '', 'prosegue' => '', 'note' => ''];
+        ?>
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header">
+              <h2 class="h6 mb-0"><i class="bi bi-compass"></i> Stato esplorativo</h2>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <?php foreach ([
+                    'esplorata' => ['Esplorazione conclusa', 'Si dichiara conclusa quando non restano vie note da percorrere.'],
+                    'prosegue'  => ['Prosecuzioni note', 'Vale anche una strettoia mai forzata o un pozzo mai sceso.'],
+                ] as $campo => [$etichetta, $nota]): ?>
+                  <div class="col-md-6">
+                    <label for="<?= $campo ?>" class="form-label"><?= Testo::esc($etichetta) ?></label>
+                    <select class="form-select" id="<?= $campo ?>" name="<?= $campo ?>">
+                      <?php $corrente = (string) ($_POST[$campo] ?? $statoEsplorativo[$campo]); ?>
+                      <?php foreach (Ipogeo::TERZI_STATI as $valore => $testo): ?>
+                        <option value="<?= Testo::esc((string) $valore) ?>"
+                                <?= $corrente === (string) $valore ? 'selected' : '' ?>>
+                          <?= Testo::esc($testo) ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <div class="catageo-nota"><?= Testo::esc($nota) ?></div>
+                  </div>
+                <?php endforeach; ?>
+                <div class="col-12">
+                  <label for="noteProsecuzioni" class="form-label">Dove si potrebbe proseguire</label>
+                  <textarea class="form-control" id="noteProsecuzioni" name="noteProsecuzioni" rows="3"><?= Testo::esc((string) ($_POST['noteProsecuzioni'] ?? $statoEsplorativo['note'])) ?></textarea>
+                  <div class="catageo-nota">
+                    Il punto esatto e cosa servirebbe per tentarlo. E quello che
+                    si cerca quando si programma un'uscita, e lasciato nel diario
+                    di dieci anni fa non lo trova nessuno.
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="alert alert-light border mb-0 py-2 catageo-nota">
+                    <strong>«Non si sa»</strong> e un valore legittimo e resta quello
+                    predefinito: su una scheda ricostruita da fonti altrui e spesso
+                    la sola risposta onesta.
+                  </div>
                 </div>
               </div>
             </div>

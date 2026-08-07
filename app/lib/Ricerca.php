@@ -27,12 +27,14 @@ declare(strict_types=1);
  *                  L'esito dichiara sempre quante schede sono state esaminate e
  *                  se il risultato e stato troncato: un elenco tagliato in
  *                  silenzio si scambia per un elenco completo.
- *  Versione .....: 0.13.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Criteri sullo stato esplorativo e sulla
+ *                                verifica sul campo (fase 12).
  *  0.13.0  2026-08-06  D.Candela  Prima stesura (fase 8).
  * ============================================================================
  */
@@ -89,6 +91,10 @@ final class Ricerca
         'cataloghi' => [], 'natura' => '', 'tipologia' => '', 'sottotipologia' => '',
         'stato' => '', 'regione' => '', 'provincia' => '', 'comune' => '',
         'statoAccesso' => '', 'statoScheda' => '',
+        // Stato esplorativo (9.17.1): e la ricerca per cui quei campi esistono.
+        'esplorata' => '', 'prosegue' => '',
+        // Verifica sul campo (9.17.2): 'si', 'no', oppure gli anni trascorsi.
+        'posVerificata' => '', 'nonVerificataDaAnni' => '',
         'presenze' => [],
         'sviluppoMin' => '', 'sviluppoMax' => '',
         'dislivelloMin' => '', 'dislivelloMax' => '',
@@ -328,6 +334,64 @@ final class Ricerca
             && !str_contains(Testo::normalizzaRicerca((string) ($riga['comune'] ?? '')),
                              Testo::normalizzaRicerca((string) $c['comune']))) {
             return false;
+        }
+
+        /*
+         * --- stato esplorativo (9.17.1)
+         *
+         * Tre stati e non due, quindi non basta il confronto esatto del
+         * blocco sopra: serve poter cercare anche "non si sa", che
+         * nell'indice e la stringa vuota. Senza il valore sentinella
+         * quelle schede non sarebbero interrogabili, ed e proprio
+         * l'elenco che serve a chi deve completare un catasto.
+         */
+        foreach (['esplorata' => 'esplorata', 'prosegue' => 'prosegue'] as $criterio => $colonna) {
+            $scelta = (string) $c[$criterio];
+            if ($scelta === '') {
+                continue;
+            }
+            $valore = strtolower(trim((string) ($riga[$colonna] ?? '')));
+            $atteso = $scelta === 'ignoto' ? '' : $scelta;
+            if ($valore !== $atteso) {
+                return false;
+            }
+        }
+
+        /*
+         * --- posizione verificata sul campo (9.17.2)
+         *
+         * Il criterio vale 'si' o 'no' e non '1' o '0', mentre nell'indice
+         * la colonna e un flag. La traduzione avviene qui perche altrove
+         * il criterio '0' verrebbe scambiato per "nessun criterio" da
+         * haCriteri(), e cercare le posizioni non verificate mostrerebbe
+         * la schermata "non hai ancora cercato".
+         */
+        $verificata = (string) $c['posVerificata'];
+        if ($verificata !== '') {
+            $flag = trim((string) ($riga['pos_verificata'] ?? '0')) === '1';
+            if ($flag !== ($verificata === 'si')) {
+                return false;
+            }
+        }
+
+        /*
+         * --- posizione non verificata da N anni (9.17.2)
+         *
+         * Una scheda mai verificata rientra sempre: e il caso piu vecchio
+         * di tutti. Escluderla perche le manca la data sarebbe il
+         * contrario di quello che serve.
+         */
+        $anni = self::numero((string) $c['nonVerificataDaAnni']);
+        if ($anni !== null && $anni >= 0) {
+            $data = trim((string) ($riga['data_verifica'] ?? ''));
+            if ($data !== '') {
+                // Confronto fra stringhe ISO: ordina come le date e non
+                // richiede di interpretare nulla.
+                $limite = date('Y-m-d', strtotime('-' . (int) $anni . ' years'));
+                if (strcmp($data, $limite) > 0) {
+                    return false;
+                }
+            }
         }
 
         // --- presenze

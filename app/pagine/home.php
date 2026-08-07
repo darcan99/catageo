@@ -79,6 +79,7 @@ $fasi = [
     ['9',  'Indici, integrita, backup, verifica collegamenti',  'fatta'],
     ['9b', 'Import CSV massivo, con anteprima',                'fatta'],
     ['10', 'Stampa, manuale, dati di esempio, rilascio',      'fatta'],
+    ['12', 'Estensioni del modello: stato esplorativo, aree',   'in corso'],
     ['11', 'Acquisizione da fonti pubbliche (post-release)',   'da fare'],
 ];
 ?>
@@ -181,6 +182,8 @@ $fasi = [
                 <td>
                   <?php if ($stato === 'fatta'): ?>
                     <span class="badge text-bg-success">completata</span>
+                  <?php elseif ($stato === 'in corso'): ?>
+                    <span class="badge text-bg-warning">in corso</span>
                   <?php else: ?>
                     <span class="badge text-bg-secondary">da fare</span>
                   <?php endif; ?>

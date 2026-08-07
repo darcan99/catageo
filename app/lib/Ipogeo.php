@@ -14,12 +14,14 @@ declare(strict_types=1);
  *                  sono suggerimenti: sono la struttura su cui si regge la
  *                  leggibilita dell'archivio senza l'applicativo, e vengono
  *                  applicate in un unico punto per non divergere.
- *  Versione .....: 0.12.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Stato esplorativo e verifica della posizione
+ *                                sul campo (fase 12).
  *  0.12.0 2026-08-06  D.Candela  IpogeoEccezione spostata in app/lib/IpogeoEccezione.php:
  *                                l'autoload risolve una classe per file.
  *  0.4.0  2026-08-04  D.Candela  Prima stesura (fase 3).
@@ -45,6 +47,23 @@ final class Ipogeo
 
     /** Presenza d'acqua. */
     public const PRESENZA_ACQUA = ['assente', 'stagionale', 'permanente', 'allagato'];
+
+    /**
+     * Stato esplorativo: si, no, oppure non lo sappiamo (9.17.1).
+     *
+     * Il vuoto e il valore predefinito e significa "non lo sappiamo". Su un
+     * catasto ricostruito da fonti eterogenee e la risposta piu frequente, e
+     * schiacciarla su "no" trasformerebbe l'ignoranza in un'affermazione.
+     */
+    public const TERZI_STATI = ['' => 'non si sa', 'si' => 'si', 'no' => 'no'];
+
+    /** Riporta un valore qualunque ai soli stati ammessi dallo schema. */
+    public static function normalizzaTerzoStato(mixed $valore): string
+    {
+        $valore = strtolower(trim((string) $valore));
+
+        return isset(self::TERZI_STATI[$valore]) && $valore !== '' ? $valore : '';
+    }
 
     /** Cartella dove finiscono gli ipogei eliminati. */
     public const CARTELLA_ELIMINATI = '_eliminati';
@@ -96,6 +115,12 @@ final class Ipogeo
                     'sistemaOriginale' => '',
                     'formatoOriginale' => '',
                     'valoreOriginale'  => '',
+                    // Verifica sul campo (9.17.2): non e lo stato della scheda.
+                    // Quello dice quanto e affidabile la compilazione, questi
+                    // dicono se qualcuno e andato a controllare il punto.
+                    'posizioneVerificata' => false,
+                    'dataUltimaVerifica'  => '',
+                    'verificataDa'        => '',
                 ],
                 'cartografia' => ['tavolettaIGM' => '', 'sezioneCTR' => ''],
                 'accesso'     => [
@@ -122,6 +147,21 @@ final class Ipogeo
                     'attrezzaturaNecessaria'  => '',
                     'pericoli'                => '',
                     'tempoPercorrenza'        => '',
+                ],
+                /*
+                 * Stato esplorativo (9.17.1). E la domanda per cui il catasto
+                 * esiste: cosa e stato fatto e cos'altro si puo tentare. Finora
+                 * quell'informazione, quando c'era, stava nel testo libero del
+                 * risultato di un diario, dove nessuna ricerca la trovava.
+                 *
+                 * Tre stati ('', 'si', 'no') e non un booleano: su un catasto
+                 * ricostruito da fonti eterogenee "non lo sappiamo" e la
+                 * risposta piu frequente, e un booleano la falsificherebbe.
+                 */
+                'statoEsplorativo' => [
+                    'esplorata' => '',
+                    'prosegue'  => '',
+                    'note'      => '',
                 ],
             ],
             'descrizione' => ['sintesi' => '', 'testo' => '', 'storia' => '', 'note' => ''],
@@ -1142,6 +1182,10 @@ final class Ipogeo
         Xml::imposta($coord, 'sistemaOriginale', (string) $s['ubicazione']['coordinate']['sistemaOriginale']);
         Xml::imposta($coord, 'formatoOriginale', (string) $s['ubicazione']['coordinate']['formatoOriginale']);
         Xml::imposta($coord, 'valoreOriginale', (string) $s['ubicazione']['coordinate']['valoreOriginale']);
+        Xml::imposta($coord, 'posizioneVerificata',
+            !empty($s['ubicazione']['coordinate']['posizioneVerificata']) ? '1' : '0');
+        Xml::imposta($coord, 'dataUltimaVerifica', (string) $s['ubicazione']['coordinate']['dataUltimaVerifica']);
+        Xml::imposta($coord, 'verificataDa', (string) $s['ubicazione']['coordinate']['verificataDa']);
 
         $carto = Xml::aggiungi($ub, 'cartografia');
         Xml::imposta($carto, 'tavolettaIGM', (string) $s['ubicazione']['cartografia']['tavolettaIGM']);
@@ -1198,6 +1242,17 @@ final class Ipogeo
         foreach (['difficolta', 'attrezzaturaNecessaria', 'pericoli', 'tempoPercorrenza'] as $campo) {
             Xml::imposta($perc, $campo, (string) $s['caratteristiche']['percorribilita'][$campo], true);
         }
+
+        // Il terzo stato passa da normalizzaTerzoStato e non dal valore grezzo:
+        // il modulo manda stringhe vuote e valori spuri, e lo schema ammette
+        // solo '', 'si' e 'no'.
+        $esplo = Xml::aggiungi($car, 'statoEsplorativo');
+        Xml::imposta($esplo, 'esplorata',
+            self::normalizzaTerzoStato($s['caratteristiche']['statoEsplorativo']['esplorata'] ?? ''));
+        Xml::imposta($esplo, 'prosegue',
+            self::normalizzaTerzoStato($s['caratteristiche']['statoEsplorativo']['prosegue'] ?? ''));
+        Xml::imposta($esplo, 'note',
+            (string) ($s['caratteristiche']['statoEsplorativo']['note'] ?? ''), true);
 
         // ------------------------------------------------------ descrizione
         // Nessun limite di lunghezza (D6): tutto in CDATA, nessun troncamento.
@@ -1291,9 +1346,12 @@ final class Ipogeo
             $s['ubicazione'][$campo] = Xml::testo($doc, '/ipogeo/ubicazione/' . $campo);
         }
         foreach (['latitudine', 'longitudine', 'quota', 'precisione', 'metodo', 'dataRilevamento',
-                  'sistemaOriginale', 'formatoOriginale', 'valoreOriginale'] as $campo) {
+                  'sistemaOriginale', 'formatoOriginale', 'valoreOriginale',
+                  'dataUltimaVerifica', 'verificataDa'] as $campo) {
             $s['ubicazione']['coordinate'][$campo] = Xml::testo($doc, '/ipogeo/ubicazione/coordinate/' . $campo);
         }
+        $s['ubicazione']['coordinate']['posizioneVerificata'] =
+            Xml::booleano($doc, '/ipogeo/ubicazione/coordinate/posizioneVerificata', false);
         $s['ubicazione']['cartografia']['tavolettaIGM'] = Xml::testo($doc, '/ipogeo/ubicazione/cartografia/tavolettaIGM');
         $s['ubicazione']['cartografia']['sezioneCTR']   = Xml::testo($doc, '/ipogeo/ubicazione/cartografia/sezioneCTR');
 
@@ -1325,6 +1383,10 @@ final class Ipogeo
 
         foreach (Xml::elenco($doc, '/ipogeo/caratteristiche/interesse/voce') as $nodo) {
             $s['caratteristiche']['interesse'][] = trim($nodo->textContent);
+        }
+        foreach (['esplorata', 'prosegue', 'note'] as $campo) {
+            $s['caratteristiche']['statoEsplorativo'][$campo] =
+                Xml::testo($doc, '/ipogeo/caratteristiche/statoEsplorativo/' . $campo);
         }
         foreach (['difficolta', 'attrezzaturaNecessaria', 'pericoli', 'tempoPercorrenza'] as $campo) {
             $s['caratteristiche']['percorribilita'][$campo] = Xml::testo($doc, '/ipogeo/caratteristiche/percorribilita/' . $campo);

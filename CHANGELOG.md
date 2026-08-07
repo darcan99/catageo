@@ -6,6 +6,32 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+Fase 12 (§9.17): estensioni del modello, in corso.
+
+### Aggiunto
+- **Stato esplorativo della cavita**: *esplorazione conclusa* e *prosecuzioni
+  note*, piu un campo per dire **dove** si potrebbe proseguire. E la domanda
+  per cui il catasto esiste — cosa e stato fatto e cos'altro si puo tentare — e
+  finora, quando c'era, stava nel testo libero di un diario, dove nessuna
+  ricerca la trovava.
+- **Verifica della posizione sul campo**: spunta, data e chi c'e stato,
+  distinte dallo stato della scheda. Lo stato scheda dice quanto e affidabile
+  la compilazione; questi dicono se qualcuno e andato a controllare quel punto.
+  Quando manca, la scheda scrive «mai verificata sul campo» invece di tacere.
+- **Ricerca** su entrambi, con il filtro «non verificata da N anni». La query
+  che giustifica la fase — *le cavita che proseguono e che non rivede nessuno
+  da cinque anni* — ora si scrive in un indirizzo.
+
+### Note di progetto
+- **Tre stati e non un booleano**: si, no, oppure «non si sa», che e il valore
+  predefinito. Su un catasto ricostruito da fonti eterogenee «non lo sappiamo»
+  e la risposta piu frequente, e un booleano la scriverebbe come «no».
+- **Una cavita mai verificata rientra sempre** nel filtro per anni: e il caso
+  piu vecchio di tutti, ed escluderla perche le manca la data sarebbe il
+  contrario di quello che serve.
+- **Nessuna migrazione**: i nuovi elementi sono opzionali nello schema, quindi
+  una scheda scritta prima resta valida e si legge come «non si sa».
+
 ## [1.0.0] — 2026-08-07
 
 Fase 10: rifinitura e **prima release installabile**.
