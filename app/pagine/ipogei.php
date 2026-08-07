@@ -186,6 +186,11 @@ function datiSchedaDaPost(): array
                 'attrezzaturaNecessaria' => (string) ($_POST['attrezzaturaNecessaria'] ?? ''),
                 'pericoli'               => (string) ($_POST['pericoli'] ?? ''),
                 'tempoPercorrenza'       => (string) ($_POST['tempoPercorrenza'] ?? ''),
+                'necessitaArmo'          => (string) ($_POST['necessitaArmo'] ?? ''),
+                'gradoProgressione'      => (string) ($_POST['gradoProgressione'] ?? ''),
+                'gradoIdrico'            => (string) ($_POST['gradoIdrico'] ?? ''),
+                'periodoConsigliato'     => (string) ($_POST['periodoConsigliato'] ?? ''),
+                'inquinata'              => (string) ($_POST['inquinata'] ?? ''),
             ],
             'statoEsplorativo' => [
                 'esplorata' => (string) ($_POST['esplorata'] ?? ''),
@@ -804,6 +809,47 @@ if ($azione === 'scheda' && $codice !== '') {
                   </dd>
                   <dt class="col-sm-7 fw-normal text-body-secondary">Presenza d'acqua</dt>
                   <dd class="col-sm-5"><?= Testo::esc((string) $scheda['caratteristiche']['idrologia']['presenzaAcqua'] ?: '—') ?></dd>
+
+                  <?php
+                  /*
+                   * Percorribilita strutturata (9.17.7). Si mostra solo cio che
+                   * e stato compilato: sono campi nuovi, e su un archivio
+                   * esistente sono vuoti quasi ovunque. Cinque righe di trattini
+                   * su ogni scheda direbbero solo che la funzione e recente.
+                   */
+                  $percorr = $scheda['caratteristiche']['percorribilita'];
+                  $strutturata = [
+                      'Grado di progressione' => Ipogeo::GRADI_PROGRESSIONE[(string) ($percorr['gradoProgressione'] ?? '')] ?? '',
+                      'Difficolta idriche'    => Ipogeo::GRADI_IDRICI[(string) ($percorr['gradoIdrico'] ?? '')] ?? '',
+                      'Periodo consigliato'   => Ipogeo::PERIODI_CONSIGLIATI[(string) ($percorr['periodoConsigliato'] ?? '')] ?? '',
+                      'Necessita armo'        => (string) ($percorr['necessitaArmo'] ?? ''),
+                      'Inquinata o a rischio' => (string) ($percorr['inquinata'] ?? ''),
+                  ];
+                  foreach (array_filter($strutturata) as $etichetta => $valore): ?>
+                    <dt class="col-sm-7 fw-normal text-body-secondary"><?= $etichetta ?></dt>
+                    <dd class="col-sm-5"><?= Testo::esc($valore) ?></dd>
+                  <?php endforeach; ?>
+
+                  <?php
+                  /*
+                   * Difficolta e tempo di percorrenza in forma libera: si
+                   * compilavano e si stampavano, ma nella scheda a schermo non
+                   * comparivano da nessuna parte. Il difetto e emerso provando
+                   * i campi strutturati, e conta piu di prima: la decisione e
+                   * stata di affiancare i nuovi lasciando i testi dov'erano, e
+                   * un testo che non si vede non e "lasciato dov'e", e perso.
+                   *
+                   * Attrezzatura e pericoli restano nella linguetta Descrizione,
+                   * dove stanno con gli altri testi lunghi.
+                   */
+                  $liberi = [
+                      'Difficolta'         => (string) ($percorr['difficolta'] ?? ''),
+                      'Tempo di percorrenza' => (string) ($percorr['tempoPercorrenza'] ?? ''),
+                  ];
+                  foreach (array_filter($liberi) as $etichetta => $valore): ?>
+                    <dt class="col-sm-7 fw-normal text-body-secondary"><?= $etichetta ?></dt>
+                    <dd class="col-sm-5"><?= Testo::esc($valore) ?></dd>
+                  <?php endforeach; ?>
                 </dl>
 
                 <?php if ((array) $scheda['caratteristiche']['interesse'] !== []): ?>
@@ -2096,6 +2142,61 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   <input type="text" class="form-control" id="riferimentoPermessi" name="riferimentoPermessi" maxlength="200"
                          value="<?= $v('riferimentoPermessi', $s['ubicazione']['accesso']['riferimentoPermessi']) ?>">
                 </div>
+                <?php
+                /*
+                 * Campi strutturati (9.17.7). Stanno **sopra** i campi liberi
+                 * e non al loro posto: i testi gia scritti restano validi, e
+                 * questi rendono filtrabile cio che oggi non lo e. Chi compila
+                 * puo usare gli uni, gli altri o entrambi.
+                 */
+                $perc = $s['caratteristiche']['percorribilita'];
+                $scelta = static function (string $campo, array $voci, string $vuoto) use ($perc): void {
+                    $corrente = (string) ($_POST[$campo] ?? ($perc[$campo] ?? ''));
+                    echo '<option value="">' . Testo::esc($vuoto) . '</option>';
+                    foreach ($voci as $valore => $etichetta) {
+                        printf('<option value="%s"%s>%s</option>',
+                            Testo::esc((string) $valore),
+                            $corrente === (string) $valore ? ' selected' : '',
+                            Testo::esc($etichetta));
+                    }
+                };
+                ?>
+                <div class="col-md-4">
+                  <label for="gradoProgressione" class="form-label">Grado di progressione</label>
+                  <select class="form-select" id="gradoProgressione" name="gradoProgressione">
+                    <?php $scelta('gradoProgressione', Ipogeo::GRADI_PROGRESSIONE, 'non indicato'); ?>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="gradoIdrico" class="form-label">Difficolta idriche</label>
+                  <select class="form-select" id="gradoIdrico" name="gradoIdrico">
+                    <?php $scelta('gradoIdrico', Ipogeo::GRADI_IDRICI, 'non indicate'); ?>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="periodoConsigliato" class="form-label">Periodo consigliato</label>
+                  <select class="form-select" id="periodoConsigliato" name="periodoConsigliato">
+                    <?php $scelta('periodoConsigliato', Ipogeo::PERIODI_CONSIGLIATI, 'non indicato'); ?>
+                  </select>
+                  <div class="catageo-nota">
+                    Il periodo critico delle colonie di chirotteri sta in
+                    biospeleologia e prevale su questo.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="necessitaArmo" class="form-label">Necessita armo</label>
+                  <select class="form-select" id="necessitaArmo" name="necessitaArmo">
+                    <?php $scelta('necessitaArmo', ['si' => 'si', 'no' => 'no'], 'non si sa'); ?>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="inquinata" class="form-label">Inquinata o a rischio</label>
+                  <select class="form-select" id="inquinata" name="inquinata">
+                    <?php $scelta('inquinata', ['si' => 'si', 'no' => 'no'], 'non si sa'); ?>
+                  </select>
+                </div>
+                <div class="col-12"><hr class="my-1"></div>
+
                 <div class="col-md-6">
                   <label for="difficolta" class="form-label">Difficolta</label>
                   <input type="text" class="form-control" id="difficolta" name="difficolta" maxlength="60"

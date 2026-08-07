@@ -129,6 +129,61 @@ final class Ipogeo
      */
     public const TERZI_STATI = ['' => 'non si sa', 'si' => 'si', 'no' => 'no'];
 
+    /**
+     * Percorribilita strutturata (9.17.7).
+     *
+     * Questi elenchi **si affiancano** ai campi liberi di percorribilita, non
+     * li sostituiscono: i testi gia scritti valgono, e dedurre un grado da una
+     * frase in italiano e il genere di conversione che sbaglia in silenzio.
+     * Servono a rendere filtrabile cio che oggi non lo e.
+     *
+     * I gradi seguono la scala d'uso in speleologia, con l'aggiunta di «T»
+     * turistico, che sulle cavita artificiali e il caso piu frequente e in una
+     * scala pensata per le grotte non esisterebbe.
+     */
+    public const GRADI_PROGRESSIONE = [
+        'T'   => 'T — turistico, senza difficolta',
+        'F'   => 'F — facile, senza attrezzatura',
+        'PD'  => 'PD — poco difficile',
+        'AD'  => 'AD — abbastanza difficile',
+        'D'   => 'D — difficile',
+        'TD'  => 'TD — molto difficile',
+        'EX'  => 'EX — estremamente difficile',
+    ];
+
+    /** Difficolta dovute all'acqua, indipendenti da quelle di progressione. */
+    public const GRADI_IDRICI = [
+        'asciutta'   => 'Asciutta',
+        'stillicidio' => 'Stillicidio',
+        'bagnata'    => 'Bagnata',
+        'attiva'     => 'Attiva, con corso d\'acqua',
+        'sifonante'  => 'Con sifoni',
+        'allagabile' => 'Allagabile in piena',
+    ];
+
+    /**
+     * Periodo consigliato per la visita.
+     *
+     * Non e una preferenza meteorologica: su una cavita attiva e una questione
+     * di sicurezza, e su una con colonie di chirotteri si somma al periodo
+     * critico della sezione biospeleologica (§6.14), che resta prevalente.
+     */
+    public const PERIODI_CONSIGLIATI = [
+        'tutto_anno' => 'Tutto l\'anno',
+        'estate'     => 'Estate',
+        'secca'      => 'Stagione secca',
+        'inverno'    => 'Inverno',
+        'no_piogge'  => 'Mai dopo le piogge',
+    ];
+
+    /** Riporta un valore a una chiave del vocabolario dato; vuoto se non lo e. */
+    public static function daVocabolario(mixed $valore, array $vocabolario): string
+    {
+        $valore = trim((string) $valore);
+
+        return isset($vocabolario[$valore]) ? $valore : '';
+    }
+
     /** Riporta un valore qualunque ai soli stati ammessi dallo schema. */
     public static function normalizzaTerzoStato(mixed $valore): string
     {
@@ -223,11 +278,24 @@ final class Ipogeo
                 'ingressi'             => [],  // [{descrizione, latitudine, longitudine, quota, dimensioni, stato}]
                 'idrologia'            => ['presenzaAcqua' => '', 'note' => ''],
                 'interesse'            => [],
+                /*
+                 * Percorribilita (9.17.7). I quattro campi liberi restano
+                 * dov'erano: i testi gia scritti valgono, e dedurre "EEA" da
+                 * una frase in italiano e il genere di conversione che
+                 * sbaglia in silenzio. I campi strutturati si affiancano, e
+                 * servono a rendere filtrabile cio che oggi non lo e.
+                 */
                 'percorribilita'       => [
                     'difficolta'              => '',
                     'attrezzaturaNecessaria'  => '',
                     'pericoli'                => '',
                     'tempoPercorrenza'        => '',
+                    // strutturati, affiancati ai liberi
+                    'necessitaArmo'           => '',
+                    'gradoProgressione'       => '',
+                    'gradoIdrico'             => '',
+                    'periodoConsigliato'      => '',
+                    'inquinata'               => '',
                 ],
                 /*
                  * Stato esplorativo (9.17.1). E la domanda per cui il catasto
@@ -1334,6 +1402,18 @@ final class Ipogeo
         foreach (['difficolta', 'attrezzaturaNecessaria', 'pericoli', 'tempoPercorrenza'] as $campo) {
             Xml::imposta($perc, $campo, (string) $s['caratteristiche']['percorribilita'][$campo], true);
         }
+        // I campi strutturati passano dai normalizzatori: il modulo manda
+        // stringhe vuote e, se qualcuno tocca l'HTML, anche valori inventati.
+        Xml::imposta($perc, 'necessitaArmo',
+            self::normalizzaTerzoStato($s['caratteristiche']['percorribilita']['necessitaArmo'] ?? ''));
+        Xml::imposta($perc, 'inquinata',
+            self::normalizzaTerzoStato($s['caratteristiche']['percorribilita']['inquinata'] ?? ''));
+        Xml::imposta($perc, 'gradoProgressione',
+            self::daVocabolario($s['caratteristiche']['percorribilita']['gradoProgressione'] ?? '', self::GRADI_PROGRESSIONE));
+        Xml::imposta($perc, 'gradoIdrico',
+            self::daVocabolario($s['caratteristiche']['percorribilita']['gradoIdrico'] ?? '', self::GRADI_IDRICI));
+        Xml::imposta($perc, 'periodoConsigliato',
+            self::daVocabolario($s['caratteristiche']['percorribilita']['periodoConsigliato'] ?? '', self::PERIODI_CONSIGLIATI));
 
         // Il terzo stato passa da normalizzaTerzoStato e non dal valore grezzo:
         // il modulo manda stringhe vuote e valori spuri, e lo schema ammette
@@ -1484,7 +1564,9 @@ final class Ipogeo
             $s['caratteristiche']['statoEsplorativo'][$campo] =
                 Xml::testo($doc, '/ipogeo/caratteristiche/statoEsplorativo/' . $campo);
         }
-        foreach (['difficolta', 'attrezzaturaNecessaria', 'pericoli', 'tempoPercorrenza'] as $campo) {
+        foreach (['difficolta', 'attrezzaturaNecessaria', 'pericoli', 'tempoPercorrenza',
+                  'necessitaArmo', 'gradoProgressione', 'gradoIdrico',
+                  'periodoConsigliato', 'inquinata'] as $campo) {
             $s['caratteristiche']['percorribilita'][$campo] = Xml::testo($doc, '/ipogeo/caratteristiche/percorribilita/' . $campo);
         }
 

@@ -594,6 +594,13 @@ header('Content-Type: text/html; charset=utf-8');
         catageoStampaCampi([
             'Presenza acqua'   => (string) $scheda['caratteristiche']['idrologia']['presenzaAcqua'],
             'Interesse'        => implode(', ', array_map('strval', is_array($interesse) ? $interesse : [])),
+            // Prima i gradi, che sono confrontabili fra cavita, poi il testo
+            // libero, che dice il resto.
+            'Grado di progressione' => Ipogeo::GRADI_PROGRESSIONE[(string) ($scheda['caratteristiche']['percorribilita']['gradoProgressione'] ?? '')] ?? '',
+            'Difficolta idriche' => Ipogeo::GRADI_IDRICI[(string) ($scheda['caratteristiche']['percorribilita']['gradoIdrico'] ?? '')] ?? '',
+            'Periodo consigliato' => Ipogeo::PERIODI_CONSIGLIATI[(string) ($scheda['caratteristiche']['percorribilita']['periodoConsigliato'] ?? '')] ?? '',
+            'Necessita armo'  => (string) ($scheda['caratteristiche']['percorribilita']['necessitaArmo'] ?? ''),
+            'Inquinata'       => (string) ($scheda['caratteristiche']['percorribilita']['inquinata'] ?? ''),
             'Difficolta'       => (string) $scheda['caratteristiche']['percorribilita']['difficolta'],
             'Attrezzatura'     => (string) $scheda['caratteristiche']['percorribilita']['attrezzaturaNecessaria'],
             'Tempo percorrenza' => (string) $scheda['caratteristiche']['percorribilita']['tempoPercorrenza'],

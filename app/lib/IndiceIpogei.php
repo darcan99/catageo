@@ -41,6 +41,7 @@ final class IndiceIpogei
         'n_allegati', 'n_foto', 'n_video', 'n_rilievi', 'n_esplorazioni', 'n_biblio',
         'n_serie_misure', 'ha_kml', 'ha_3d', 'ha_chirotteri', 'ha_archeologia',
         'periodo_arch', 'esplorata', 'prosegue', 'pos_verificata', 'data_verifica',
+        'grado', 'grado_idrico', 'armo',
         'data_censimento', 'ultima_modifica', 'cartella',
     ];
 
@@ -319,6 +320,13 @@ final class IndiceIpogei
             // valore e non un flag: '' vuol dire non lo sappiamo.
             'esplorata'       => (string) ($scheda['caratteristiche']['statoEsplorativo']['esplorata'] ?? ''),
             'prosegue'        => (string) ($scheda['caratteristiche']['statoEsplorativo']['prosegue'] ?? ''),
+            // Percorribilita strutturata (9.17.7): solo i tre campi che si
+            // cercano davvero. Periodo consigliato e inquinamento restano in
+            // scheda: un indice non e un archivio di comodo, ogni colonna in
+            // piu e byte letti a ogni ricerca su ogni riga.
+            'grado'           => (string) ($scheda['caratteristiche']['percorribilita']['gradoProgressione'] ?? ''),
+            'grado_idrico'    => (string) ($scheda['caratteristiche']['percorribilita']['gradoIdrico'] ?? ''),
+            'armo'            => (string) ($scheda['caratteristiche']['percorribilita']['necessitaArmo'] ?? ''),
             'pos_verificata'  => !empty($scheda['ubicazione']['coordinate']['posizioneVerificata']) ? '1' : '0',
             'data_verifica'   => (string) ($scheda['ubicazione']['coordinate']['dataUltimaVerifica'] ?? ''),
             'data_censimento' => (string) $scheda['catasto']['dataCensimento'],

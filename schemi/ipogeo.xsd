@@ -155,6 +155,45 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <!-- Gradi di percorribilita (9.17.7). La scala include "T" turistico, che
+       su una scala pensata per le grotte non esisterebbe ma sulle cavita
+       artificiali e il caso piu frequente. -->
+  <xs:simpleType name="tGradoProgressione">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="T"/>
+      <xs:enumeration value="F"/>
+      <xs:enumeration value="PD"/>
+      <xs:enumeration value="AD"/>
+      <xs:enumeration value="D"/>
+      <xs:enumeration value="TD"/>
+      <xs:enumeration value="EX"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tGradoIdrico">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="asciutta"/>
+      <xs:enumeration value="stillicidio"/>
+      <xs:enumeration value="bagnata"/>
+      <xs:enumeration value="attiva"/>
+      <xs:enumeration value="sifonante"/>
+      <xs:enumeration value="allagabile"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tPeriodoConsigliato">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="tutto_anno"/>
+      <xs:enumeration value="estate"/>
+      <xs:enumeration value="secca"/>
+      <xs:enumeration value="inverno"/>
+      <xs:enumeration value="no_piogge"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="tStatoAccesso">
     <xs:restriction base="xs:string">
       <xs:enumeration value=""/>
@@ -395,6 +434,16 @@
                     <xs:element name="attrezzaturaNecessaria" type="xs:string" minOccurs="0"/>
                     <xs:element name="pericoli"               type="xs:string" minOccurs="0"/>
                     <xs:element name="tempoPercorrenza"       type="xs:string" minOccurs="0"/>
+                    <!-- Percorribilita strutturata (9.17.7). Si affianca ai
+                         campi liberi qui sopra e non li sostituisce: i testi
+                         gia scritti valgono, e dedurre un grado da una frase
+                         in italiano sbaglierebbe in silenzio. Serve a rendere
+                         filtrabile cio che oggi non lo e. -->
+                    <xs:element name="necessitaArmo"      type="tTerzoStato"        minOccurs="0"/>
+                    <xs:element name="gradoProgressione"  type="tGradoProgressione" minOccurs="0"/>
+                    <xs:element name="gradoIdrico"        type="tGradoIdrico"       minOccurs="0"/>
+                    <xs:element name="periodoConsigliato" type="tPeriodoConsigliato" minOccurs="0"/>
+                    <xs:element name="inquinata"          type="tTerzoStato"        minOccurs="0"/>
                   </xs:all>
                 </xs:complexType>
               </xs:element>

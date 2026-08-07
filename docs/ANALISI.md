@@ -1669,7 +1669,17 @@ Tabella con una colonna per voce — coordinate, posizione verificata, comune, t
 #### 9.17.7 Minori
 
 - **Itinerario di avvicinamento in GPX**, distinto dai tracciati dei rilievi: è la traccia per arrivare all'ingresso, non quella della cavità.
-- **Percorribilità strutturata**: necessità di armo, difficoltà di progressione e difficoltà idriche da vocabolario, periodo consigliato, cavità inquinata o a rischio. Oggi sono testo libero, quindi non filtrabili.
+- **Percorribilità strutturata**: necessità di armo, grado di progressione e difficoltà idriche da vocabolario, periodo consigliato, cavità inquinata o a rischio.
+
+  **Decisione del committente** (2026-08-07): *«affianchiamo lasciando il testo dov'è»*. I quattro campi liberi restano al loro posto e i nuovi si aggiungono accanto; chi compila usa gli uni, gli altri o entrambi.
+
+  **Nessuna conversione automatica dei testi già scritti.** Dedurre «AD» da una frase in italiano è il genere di operazione che sbaglia in silenzio, e su un catasto ricostruito produrrebbe gradi plausibili e falsi che nessuno riverificherebbe.
+
+  La scala dei gradi include **«T» turistico**, che su una scala pensata per le grotte non esisterebbe ma sulle cavità artificiali è il caso più frequente: applicazione diretta di §16.2.
+
+  Nell'indice finiscono tre colonne su cinque — grado, grado idrico, armo — perché sono quelle che si cercano. Periodo consigliato e inquinamento restano in scheda: ogni colonna in più sono byte letti a ogni riga di ogni ricerca.
+
+  **Difetto preesistente emerso qui**: difficoltà e tempo di percorrenza si compilavano e si stampavano ma **non comparivano nella scheda a schermo**. Contava poco prima, conta adesso: se il testo non si vede, «lasciarlo dov'è» significa perderlo.
 
 #### 9.17.9 Perimetro delle aree — formato ancora da decidere
 
@@ -1828,7 +1838,7 @@ Altre convenzioni:
 | **9** | Strumenti ADM: ricostruzione indici, verifica integrità, backup per catalogo, verifica link | Archivio verificabile e ripristinabile |
 | **9b** | Import CSV massivo di ipogei: mappatura delle colonne, anteprima riga per riga con la validazione vera, nessuna sovrascrittura | Un CSV sporco importato per le sole righe valide, con motivo e numero di riga per le altre |
 | **10** | Rifinitura: stampa scheda, manuale utente, guida di installazione, dati di esempio, tag `v1.0.0` | Release installabile |
-| **12** | *(post-1.0.0)* Estensioni del modello (§9.17): stato esplorativo, verifica sul campo, ingressi come scheda, complessi carsici, aree speleologiche, report di completezza | Ricerca «cavita che proseguono e non riviste da N anni» |
+| **12** | *(post-1.0.0)* Estensioni del modello (§9.17): stato esplorativo, verifica sul campo, ingressi come scheda, complessi, aree con perimetro, percorribilita strutturata, report di completezza | Ricerca «cavita che proseguono e non riviste da N anni» — **fatta**, `v1.1.0` |
 | **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
 
 **Ordine di esecuzione dopo il rilascio 1.0.0**: **12**, poi **6b**, poi **4b**, infine **11**. La 12 viene prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione.

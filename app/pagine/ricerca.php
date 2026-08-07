@@ -322,7 +322,7 @@ if ($vista === 'mappa' && $righe !== []) {
         <h2 class="accordion-header">
           <button class="accordion-button collapsed" type="button"
                   data-bs-toggle="collapse" data-bs-target="#filtriEsplorazione">
-            Stato esplorativo e verifica sul campo
+            Stato esplorativo, percorribilita e verifica sul campo
           </button>
         </h2>
         <div id="filtriEsplorazione" class="accordion-collapse collapse" data-bs-parent="#catageoFiltri">
@@ -352,6 +352,44 @@ if ($vista === 'mappa' && $righe !== []) {
                   <option value="">Qualunque</option>
                   <option value="si" <?= (string) $criteri['posVerificata'] === 'si' ? 'selected' : '' ?>>si</option>
                   <option value="no" <?= (string) $criteri['posVerificata'] === 'no' ? 'selected' : '' ?>>no</option>
+                </select>
+              </div>
+
+              <?php
+              // Percorribilita strutturata (9.17.7): sta qui e non fra le
+              // dimensioni perche risponde alla stessa domanda dello stato
+              // esplorativo — si puo andarci, e come?
+              ?>
+              <div class="col-md-3">
+                <label for="grado" class="form-label">Grado di progressione</label>
+                <select class="form-select" id="grado" name="grado">
+                  <option value="">Qualunque</option>
+                  <?php foreach (Ipogeo::GRADI_PROGRESSIONE as $valore => $etichetta): ?>
+                    <option value="<?= Testo::esc((string) $valore) ?>"
+                            <?= (string) $criteri['grado'] === (string) $valore ? 'selected' : '' ?>>
+                      <?= Testo::esc($etichetta) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="gradoIdrico" class="form-label">Difficolta idriche</label>
+                <select class="form-select" id="gradoIdrico" name="gradoIdrico">
+                  <option value="">Qualunque</option>
+                  <?php foreach (Ipogeo::GRADI_IDRICI as $valore => $etichetta): ?>
+                    <option value="<?= Testo::esc((string) $valore) ?>"
+                            <?= (string) $criteri['gradoIdrico'] === (string) $valore ? 'selected' : '' ?>>
+                      <?= Testo::esc($etichetta) ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="armo" class="form-label">Necessita armo</label>
+                <select class="form-select" id="armo" name="armo">
+                  <option value="">Qualunque</option>
+                  <option value="si" <?= (string) $criteri['armo'] === 'si' ? 'selected' : '' ?>>si</option>
+                  <option value="no" <?= (string) $criteri['armo'] === 'no' ? 'selected' : '' ?>>no</option>
                 </select>
               </div>
 

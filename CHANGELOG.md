@@ -6,7 +6,12 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
-Fase 12 (§9.17): estensioni del modello, in corso.
+## [1.1.0] — 2026-08-07
+
+Fase 12 (§9.17): estensioni del modello, nate dal confronto con il catasto
+delle cavita dell'Umbria della Federazione Speleologica Umbra. Tutto
+additivo: **nessuna migrazione**, le schede scritte con la 1.0.0 restano
+valide e si leggono come «non si sa» sui campi nuovi.
 
 ### Aggiunto
 - **Stato esplorativo della cavita**: *esplorazione conclusa* e *prosecuzioni
@@ -44,6 +49,21 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   uno **crollato**, che e un'altra cosa. Gli accessi con coordinate proprie
   compaiono sulla mappa di scheda, con tre colori: si passa, e sbarrato,
   non c'e piu.
+- **Perimetro delle aree**, da **GeoJSON** o **KML/KMZ**: dove un'area ha
+  confini veri — il recinto di una cava — il perimetro si carica e compare
+  sulla mappa generale, in un layer spegnibile e sotto i marker. Lo
+  shapefile nativo resta fuori: e binario multi-file e QGIS lo converte in
+  due clic, e il messaggio di rifiuto lo dice invece di limitarsi a un no.
+  Il poligono sta in un file suo, `dati/aree/AS001.geojson`, e non
+  nell'anagrafica, che deve restare leggibile a mano.
+- **Percorribilita strutturata**, affiancata al testo libero e non al suo
+  posto: grado di progressione, difficolta idriche, periodo consigliato,
+  necessita di armo e cavita inquinata, da vocabolario e quindi cercabili.
+  I quattro campi liberi restano dove sono, e **i testi gia scritti non
+  vengono convertiti**: dedurre un grado da una frase in italiano
+  sbaglierebbe in silenzio. La scala comprende «T» turistico, che su una
+  scala per grotte non esisterebbe ma sulle artificiali e il caso piu
+  frequente.
 - **Report di completezza** nella pagina Strumenti, distinto dalla verifica di
   integrita: quella dice se l'archivio e **corretto**, questo dice se e
   **finito**. Una colonna per voce — coordinate, posizione verificata, comune,
@@ -51,6 +71,10 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   esplorativo — le schede ordinate dalla piu incompleta, e lo scarico in CSV.
 
 ### Corretto
+- **Difficolta e tempo di percorrenza non comparivano nella scheda a
+  schermo**: si compilavano nel modulo e si stampavano sul foglio, ma la
+  linguetta dei dati non li mostrava. Difetto preesistente, emerso provando
+  i campi strutturati.
 - **Nessun KML veniva accettato come perimetro.** `Tracciato::aGeoJson()` deduce
   il formato dall'estensione del percorso, e il file temporaneo di PHP non ne
   ha: ogni caricamento finiva in «formato non convertibile». Ora si copia in un

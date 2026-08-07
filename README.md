@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-**Versione 1.0.0** — prima release installabile. Tutto quello che l'elenco qui sopra descrive è realizzato e provato, con due eccezioni dichiarate: il **provider Google Maps** alternativo (fase 4b) e la **sezione geologia** con i layer cartografici tematici (fase 6b) non ci sono ancora. La riga della geologia nell'elenco delle caratteristiche descrive quindi il progetto, non questa versione.
+**Versione 1.1.0** — prima release installabile, con le estensioni del modello della fase 12. Tutto quello che l'elenco qui sopra descrive è realizzato e provato, con due eccezioni dichiarate: il **provider Google Maps** alternativo (fase 4b) e la **sezione geologia** con i layer cartografici tematici (fase 6b) non ci sono ancora. La riga della geologia nell'elenco delle caratteristiche descrive quindi il progetto, non questa versione.
 
 | Fase | Contenuto | Stato |
 |---|---|---|
@@ -48,7 +48,7 @@
 | 9 | Strumenti: ricostruzione indici, verifica integrita, backup ZIP per catalogo, verifica dei collegamenti | ✅ fatto |
 | 9b | Import CSV massivo, con mappatura delle colonne e anteprima riga per riga | ✅ fatto |
 | 10 | Stampa della scheda, manuale utente, guida di installazione, dati di esempio, `v1.0.0` | ✅ fatto |
-| 12 | *(post-1.0.0)* Estensioni del modello: stato esplorativo, verifica sul campo, ingressi come scheda, complessi carsici, aree speleologiche, report di completezza | 🚧 in corso |
+| 12 | *(post-1.0.0)* Estensioni del modello: stato esplorativo, verifica sul campo, ingressi come scheda, complessi, aree speleologiche con perimetro, percorribilita strutturata, report di completezza | ✅ fatto |
 | 11 | *(post-release)* Acquisizione da fonti pubbliche, previa verifica delle licenze | ⏳ da fare |
 
 Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.

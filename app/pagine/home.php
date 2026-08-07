@@ -7,12 +7,13 @@ declare(strict_types=1);
  *  File .........: app/pagine/home.php
  *  Descrizione ..: Pagina iniziale: riepilogo dell'archivio, stato di
  *                  avanzamento delle fasi di sviluppo e collegamenti rapidi.
- *  Versione .....: 1.0.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Fase 12 conclusa.
  *  1.0.0  2026-08-07  D.Candela  Fase 10 conclusa: prima release.
  *  0.16.0 2026-08-06  D.Candela  Fase 9b conclusa: resta solo la 10.
  *  0.15.0 2026-08-06  D.Candela  Fase 9 conclusa; l'import CSV diventa 9b.
@@ -79,7 +80,7 @@ $fasi = [
     ['9',  'Indici, integrita, backup, verifica collegamenti',  'fatta'],
     ['9b', 'Import CSV massivo, con anteprima',                'fatta'],
     ['10', 'Stampa, manuale, dati di esempio, rilascio',      'fatta'],
-    ['12', 'Estensioni del modello: stato esplorativo, aree',   'in corso'],
+    ['12', 'Estensioni del modello: esplorativo, aree, complessi', 'fatta'],
     ['11', 'Acquisizione da fonti pubbliche (post-release)',   'da fare'],
 ];
 ?>

@@ -91,6 +91,8 @@ final class Ricerca
         'cataloghi' => [], 'natura' => '', 'tipologia' => '', 'sottotipologia' => '',
         'stato' => '', 'regione' => '', 'provincia' => '', 'comune' => '', 'area' => '', 'complesso' => '',
         'statoAccesso' => '', 'statoScheda' => '',
+        // Percorribilita strutturata (9.17.7).
+        'grado' => '', 'gradoIdrico' => '', 'armo' => '',
         // Stato esplorativo (9.17.1): e la ricerca per cui quei campi esistono.
         'esplorata' => '', 'prosegue' => '',
         // Verifica sul campo (9.17.2): 'si', 'no', oppure gli anni trascorsi.
@@ -319,7 +321,8 @@ final class Ricerca
         foreach (['natura' => 'natura', 'tipologia' => 'tipologia',
                   'sottotipologia' => 'sottotipologia', 'stato' => 'stato',
                   'regione' => 'regione', 'provincia' => 'provincia', 'area' => 'area', 'complesso' => 'complesso',
-                  'statoAccesso' => 'stato_accesso', 'statoScheda' => 'stato_scheda'] as $criterio => $colonna) {
+                  'statoAccesso' => 'stato_accesso', 'statoScheda' => 'stato_scheda',
+                  'grado' => 'grado', 'gradoIdrico' => 'grado_idrico', 'armo' => 'armo'] as $criterio => $colonna) {
             if ((string) $c[$criterio] === '') {
                 continue;
             }
