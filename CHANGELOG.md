@@ -6,6 +6,22 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.2.1] — 2026-08-07
+
+### Corretto
+- **La riga di intestazione delle tabelle aveva lo stesso fondo delle righe
+  dati.** Su un elenco lungo si perdeva subito quale colonna si stava
+  leggendo. Ora ha una tinta propria per tavolozza, misurata contro il fondo
+  della scheda e non contro il bianco della pagina: 1,26 bastava per la fascia
+  in cima a un box, non per una riga in mezzo ai dati. Portata a 1,7 — la
+  stessa separazione che il tema scuro usa fra pagina e scheda — con il testo
+  dell'intestazione fra 6,6:1 e 9,1:1 in tutte e cinque le combinazioni di
+  tema e tavolozza.
+- **L'intestazione che resta in cima allo scorrimento** (le letture di una
+  serie di misure) non aveva fondo: le righe le passavano sotto e si
+  leggevano in trasparenza. Ora e opaca, con lo stesso colore ottenuto
+  sovrapponendo la tinta al fondo della scheda.
+
 ## [1.2.0] — 2026-08-07
 
 Fasi 4b e 6b: provider cartografico Google Maps, sezione geologica, geoportali

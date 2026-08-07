@@ -15,6 +15,7 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.2.1  2026-08-07  D.Candela  Intestazioni delle tabelle a contrasto.
  *  1.2.0  2026-08-07  D.Candela  Fasi 4b e 6b: geologia, geoportali,
  *                                compilazione assistita. script-src e font-src
  *                                allargati solo quando
@@ -47,7 +48,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '1.2.0');
+define('CATAGEO_VERSIONE', '1.2.1');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');

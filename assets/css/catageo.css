@@ -5,12 +5,15 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 0.11.0
+ *  Versione .....: 1.2.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.2.0  2026-08-07  D.Candela  Riga di intestazione delle tabelle a
+ *                                contrasto con le righe dati, opaca quando
+ *                                resta in cima allo scorrimento.
  *  0.11.0 2026-08-06  D.Candela  Grafico SVG e voci bibliografiche.
  *  0.9.0  2026-08-06  D.Candela  Voci di diario, in lettura e nel modulo.
  *  0.8.0  2026-08-05  D.Candela  Visualizzatore 3D, documenti 2D, nota
@@ -68,6 +71,7 @@
     --catageo-fondo-pagina: #ffffff;
     --catageo-fondo-scheda: #e6ddc9;
     --catageo-fondo-intestazione: rgba(80, 56, 20, 0.14);
+    --catageo-fondo-intestazione-tabella: rgba(80, 56, 20, 0.32); /* banda/righe 1.73 */
     --catageo-bordo-intestazione: rgba(80, 56, 20, 0.30);
     --catageo-bordo-scheda: #cdbfa3;
     --catageo-fondo-barre: #ebe3d3;
@@ -88,6 +92,7 @@
 [data-bs-theme="light"] [data-catageo-tavolozza="sabbia"] {
     --catageo-fondo-scheda: #e6ddc9;
     --catageo-fondo-intestazione: rgba(80, 56, 20, 0.14);
+    --catageo-fondo-intestazione-tabella: rgba(80, 56, 20, 0.32); /* banda/righe 1.73 */
     --catageo-bordo-intestazione: rgba(80, 56, 20, 0.30);
     --catageo-bordo-scheda: #cdbfa3;
     --catageo-fondo-barre: #ebe3d3;
@@ -98,6 +103,7 @@
 [data-bs-theme="light"] [data-catageo-tavolozza="verde"] {
     --catageo-fondo-scheda: #d5e2d8;
     --catageo-fondo-intestazione: rgba(12, 60, 44, 0.13);
+    --catageo-fondo-intestazione-tabella: rgba(12, 60, 44, 0.30); /* banda/righe 1.72 */
     --catageo-bordo-intestazione: rgba(12, 60, 44, 0.28);
     --catageo-bordo-scheda: #b2c7b9;
     --catageo-fondo-barre: #dfeae2;
@@ -108,6 +114,7 @@
 [data-bs-theme="light"] [data-catageo-tavolozza="azzurra"] {
     --catageo-fondo-scheda: #d1e0f1;
     --catageo-fondo-intestazione: rgba(5, 44, 101, 0.13);
+    --catageo-fondo-intestazione-tabella: rgba(5, 44, 101, 0.29); /* banda/righe 1.73 */
     --catageo-bordo-intestazione: rgba(5, 44, 101, 0.28);
     --catageo-bordo-scheda: #a9c1dd;
     --catageo-fondo-barre: #dce8f5;
@@ -118,6 +125,7 @@
 [data-bs-theme="light"] [data-catageo-tavolozza="neutra"] {
     --catageo-fondo-scheda: #d3dae2;
     --catageo-fondo-intestazione: rgba(5, 44, 101, 0.13);
+    --catageo-fondo-intestazione-tabella: rgba(5, 44, 101, 0.29); /* banda/righe 1.73 */
     --catageo-bordo-intestazione: rgba(5, 44, 101, 0.28);
     --catageo-bordo-scheda: #b0bccb;
     --catageo-fondo-barre: #e0e5ea;
@@ -130,6 +138,7 @@
     --catageo-fondo-pagina: #0c0f12;
     --catageo-fondo-scheda: #343b43;
     --catageo-fondo-intestazione: rgba(110, 168, 254, 0.21); /* pagina/scheda 1.70 */
+    --catageo-fondo-intestazione-tabella: rgba(110, 168, 254, 0.32); /* banda/righe 1.71 */
     --catageo-bordo-intestazione: rgba(110, 168, 254, 0.36); /* scheda/intestazione 1.42 */
     --catageo-bordo-scheda: #4a535d;
     --catageo-fondo-barre: #2b3035;
@@ -632,6 +641,54 @@ tr.catageo-riga-attenzione { background-color: rgba(var(--bs-warning-rgb), 0.10)
 .catageo-tabella td,
 .catageo-tabella th {
     vertical-align: middle;
+}
+
+/* Riga di intestazione delle tabelle.
+ *
+ * Bootstrap la lascia sul fondo della tabella, che dentro una scheda e lo
+ * stesso delle righe dati: su un elenco lungo si perde subito quale colonna si
+ * sta leggendo, e scorrendo si finisce per contarle a mano.
+ *
+ * Tinta propria e non quella dell'intestazione di scheda, che vale 1,25:1
+ * contro il fondo del box: quella era tarata contro il BIANCO della pagina,
+ * dove basta, mentre qui il confronto e con la scheda ed e troppo tenue.
+ * L'alfa di ciascuna tavolozza porta la banda a circa 1,7:1, la stessa
+ * separazione che il tema scuro usa fra pagina e scheda, lasciando il testo
+ * sopra 5:1 ovunque.
+ *
+ * Il fondo va sulle celle e non sulla riga: su <tr> lo coprirebbe
+ * --bs-table-bg delle celle, e l'effetto sarebbe nullo senza che si capisca
+ * perche. */
+.table > thead > tr > th,
+.table > thead > tr > td {
+    background-color: var(--catageo-fondo-intestazione-tabella);
+    border-bottom: 2px solid var(--catageo-bordo-intestazione);
+    color: var(--bs-emphasis-color);
+}
+
+/* Intestazione che resta in cima mentre l'elenco scorre (le letture di una
+   serie di misure). Qui il fondo deve essere OPACO: con una tinta
+   semitrasparente le righe passano sotto e si leggono attraverso
+   l'intestazione, e su una tabella di numeri e proprio il momento in cui
+   serve non sbagliare colonna. Il colore e lo stesso, ottenuto sovrapponendo
+   la tinta al fondo della scheda invece di lasciarla trasparente. */
+.table > thead.sticky-top > tr > th,
+.table > thead.sticky-top > tr > td {
+    background-color: var(--catageo-fondo-scheda);
+    background-image: linear-gradient(
+        var(--catageo-fondo-intestazione-tabella),
+        var(--catageo-fondo-intestazione-tabella)
+    );
+}
+
+/* Un'intestazione a cui la pagina ha dato un colore proprio sta dicendo
+   qualcosa: la tinta neutra non la calpesta. Stessa regola gia adottata per
+   le intestazioni di scheda. */
+.table > thead[class*="table-"] > tr > th,
+.table > thead > tr[class*="table-"] > th,
+.table > thead > tr > th[class*="bg-"] {
+    background-color: revert;
+    color: revert;
 }
 
 /* Note di aiuto sotto ai campi. */

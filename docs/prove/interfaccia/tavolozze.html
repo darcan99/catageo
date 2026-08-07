@@ -237,14 +237,16 @@ body { padding-bottom: 4rem; }
       <thead>
         <tr>
           <th>Tavolozza</th><th>Scheda</th><th class="text-end">bianco / scheda</th>
-          <th class="text-end">scheda / intestazione</th><th class="text-end">testo / scheda</th>
+          <th class="text-end">scheda / intestazione</th>
+          <th class="text-end">righe / intestazione tabella</th>
+          <th class="text-end">testo / scheda</th>
         </tr>
       </thead>
       <tbody class="catageo-valore">
-        <tr><td>Sabbia <em>(predefinita)</em></td><td>#e6ddc9</td><td class="text-end">1,35</td><td class="text-end">1,25</td><td class="text-end">11,4</td></tr>
-        <tr><td>Verde</td><td>#d5e2d8</td><td class="text-end">1,34</td><td class="text-end">1,25</td><td class="text-end">11,5</td></tr>
-        <tr><td>Azzurra</td><td>#d1e0f1</td><td class="text-end">1,34</td><td class="text-end">1,26</td><td class="text-end">11,5</td></tr>
-        <tr><td>Neutra</td><td>#d3dae2</td><td class="text-end">1,41</td><td class="text-end">1,26</td><td class="text-end">10,9</td></tr>
+        <tr><td>Sabbia <em>(predefinita)</em></td><td>#e6ddc9</td><td class="text-end">1,35</td><td class="text-end">1,25</td><td class="text-end">1,73</td><td class="text-end">11,4</td></tr>
+        <tr><td>Verde</td><td>#d5e2d8</td><td class="text-end">1,34</td><td class="text-end">1,25</td><td class="text-end">1,72</td><td class="text-end">11,5</td></tr>
+        <tr><td>Azzurra</td><td>#d1e0f1</td><td class="text-end">1,34</td><td class="text-end">1,26</td><td class="text-end">1,73</td><td class="text-end">11,5</td></tr>
+        <tr><td>Neutra</td><td>#d3dae2</td><td class="text-end">1,41</td><td class="text-end">1,26</td><td class="text-end">1,73</td><td class="text-end">10,9</td></tr>
       </tbody>
     </table>
   </div>
@@ -252,6 +254,14 @@ body { padding-bottom: 4rem; }
     Il rapporto fra scheda e intestazione è tenuto a 1,26 in tutte: era già stato
     approvato e non va toccato cambiando temperatura. Il testo resta ben oltre la
     soglia WCAG AA in ogni caso, quindi la scelta è puramente di gusto.
+  </p>
+  <p class="catageo-nota">
+    L'intestazione delle <strong>tabelle</strong> usa una tinta propria e più
+    marcata, misurata contro il fondo della scheda invece che contro il bianco
+    della pagina: 1,26 bastava per la fascia in cima a un box, ma su un elenco di
+    venti righe la riga dei titoli spariva fra i dati. Portata a 1,7 — la stessa
+    separazione che il tema scuro usa fra pagina e scheda — il testo
+    dell'intestazione resta fra 6,6:1 e 9,1:1. In tema scuro la banda vale 1,71.
   </p>
 
 </div>
