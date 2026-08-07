@@ -123,8 +123,7 @@ $jsPagina = ['assets/js/catageo-ricerca.js'];
 
 if ($vista === 'mappa' && $righe !== []) {
     $cssPagina = ['assets/vendor/leaflet-1.9.4/leaflet.css', 'assets/css/catageo-mappa.css'];
-    $jsPagina[] = 'assets/vendor/leaflet-1.9.4/leaflet.js';
-    $jsPagina[] = 'assets/js/catageo-mappa.js';
+    $jsPagina = array_merge($jsPagina, Mappa::scriptBrowser());
 }
 ?>
 

@@ -9,12 +9,14 @@ declare(strict_types=1);
  *                  classi, gestione degli errori, caricamento della
  *                  configurazione, fuso orario e avvio della sessione.
  *                  Va incluso da index.php e da installa.php.
- *  Versione .....: 1.1.0
+ *  Versione .....: 1.2.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.2.0  2026-08-07  D.Candela  script-src e font-src allargati solo quando
+ *                                il provider Google e attivo (fase 4b).
  *  1.1.0  2026-08-07  D.Candela  Fase 12: estensioni del modello.
  *  1.0.0  2026-08-07  D.Candela  Prima release: fase 10 conclusa.
  *  0.16.0 2026-08-06  D.Candela  Versione 0.16.0 (fase 9b).
@@ -165,15 +167,37 @@ if (!headers_sent()) {
         }
     }
 
+    /*
+     * Con il provider Google lo script della mappa arriva da un dominio
+     * terzo, quindi script-src va allargato — ed e l'unico punto in cui
+     * succede, per la sola installazione che lo ha scelto (16.1). Su
+     * OpenStreetMap la direttiva resta 'self' e non entra nulla di esterno
+     * se non le immagini dei tile.
+     */
+    $catageoScript = '';
+    $catageoFont   = '';
+    if ($catageoConfigurato) {
+        try {
+            if (Mappa::googleAttivo()) {
+                // blob: serve ai worker che l'API di Google crea da se.
+                $catageoScript = ' ' . implode(' ', Mappa::ORIGINI_GOOGLE) . ' blob:';
+                $catageoFont   = ' https://fonts.gstatic.com';
+            }
+        } catch (Throwable $e) {
+            $catageoScript = '';
+            $catageoFont   = '';
+        }
+    }
+
     header(
         "Content-Security-Policy: default-src 'self'; "
         . "base-uri 'self'; "
         . "form-action 'self'; "
         . "frame-ancestors 'self'; "
         . "object-src 'none'; "
-        . "script-src 'self'; "
+        . "script-src 'self'" . $catageoScript . '; '
         . "style-src 'self' 'unsafe-inline'; "
-        . "font-src 'self'; "
+        . "font-src 'self'" . $catageoFont . '; '
         . "img-src 'self' data: blob:" . $catageoOrigini . '; '
         . "connect-src 'self'" . $catageoOrigini
     );

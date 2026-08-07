@@ -90,10 +90,7 @@ if ($inMappa) {
         'assets/vendor/leaflet-1.9.4/leaflet.css',
         'assets/css/catageo-mappa.css',
     ]);
-    $jsPagina = array_merge($jsPagina ?? [], [
-        'assets/vendor/leaflet-1.9.4/leaflet.js',
-        'assets/js/catageo-mappa.js',
-    ]);
+    $jsPagina = array_merge($jsPagina ?? [], Mappa::scriptBrowser());
 }
 ?>
 

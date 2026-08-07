@@ -6,6 +6,52 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+Fase 4b: provider cartografico Google Maps, alternativo a OpenStreetMap.
+
+### Aggiunto
+- **Astrazione del provider cartografico** (`catageo-mappa-api.js`), con due
+  implementazioni interscambiabili: Leaflet e Google Maps. In fase 4 non era
+  stata scritta, e la ragione era che un'interfaccia con una sola
+  implementazione non ha modo di essere sbagliata nel punto giusto. Il
+  contratto effettivo **non coincide** con quello ipotizzato allora: mancavano
+  la proiezione in coordinate schermo, il riquadro della vista e il test di
+  contenimento, senza i quali ogni provider avrebbe dovuto riscrivere il
+  raggruppamento dei marker.
+- **Google Maps selezionabile** da `mappa.provider` in configurazione, con la
+  chiave in `mappa.chiaveApi`. WMS e tile server diventano ImageMapType con
+  le GetMap costruite per tile; il pannello dei layer, che Google non ha, e
+  ricostruito con le stesse voci del selettore di Leaflet.
+
+### Note di progetto
+- **Senza chiave si resta su OpenStreetMap.** L'API di Google senza chiave
+  disegna una mappa in filigrana con un cartello di errore: peggio di nessuna
+  mappa, perche sembra un guasto dell'applicativo.
+- **La Content-Security-Policy si allarga solo quando Google e davvero
+  attivo.** Allargarla per tutti sarebbe una riduzione di sicurezza che
+  nessuno noterebbe. E la deroga documentata al vincolo «nessuna CDN» (16.1),
+  e vale per la sola installazione che l'ha scelta.
+- **Leaflet si carica sempre**, anche con Google attivo: e il ripiego se
+  l'API non arriva, e una pagina senza mappa e peggio di centoquaranta
+  kilobyte non usati. Il ripiego viene dichiarato in pagina, non subito in
+  silenzio.
+- **L'elenco degli script della mappa era ripetuto in cinque pagine**: ora e
+  in `Mappa::scriptBrowser()`. Con l'arrivo del secondo provider sarebbero
+  diventati cinque posti in cui ricordarsi la stessa condizione, e il quinto
+  sarebbe rimasto indietro.
+- **Il provider Google non e verificabile fino in fondo senza una chiave
+  valida.** Con una chiave finta l'API si carica lo stesso e l'implementazione
+  gira — costruisce la mappa, registra lo sfondo, elabora i dati, proietta le
+  coordinate — ma Google non disegna la propria cornice, quindi legenda e
+  lettura coordinate risultano registrate nei suoi controlli e non innestate
+  nel DOM. La resa visiva resta da confermare.
+
+### Corretto
+- **Su Google il pannello dei layer non veniva creato** con un solo sfondo, e
+  in quel caso i perimetri delle aree sarebbero arrivati in mappa senza un
+  modo per spegnerli, mentre su Leaflet il controllo c'e. Due provider che si
+  comportano diverso sulla stessa pagina sono un difetto, non una differenza
+  di libreria.
+
 ## [1.1.0] — 2026-08-07
 
 Fase 12 (§9.17): estensioni del modello, nate dal confronto con il catasto

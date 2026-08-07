@@ -2,23 +2,32 @@
  *  CATAGEO — Catasto Ipogei
  * ============================================================================
  *  File .........: assets/js/catageo-mappa.js
- *  Descrizione ..: Cartografia con Leaflet: sfondi, layer WMS, marker degli
- *                  ipogei, raggruppamento, legenda e filtri.
+ *  Descrizione ..: Logica cartografica dell'applicativo: marker degli ipogei,
+ *                  raggruppamento, legenda, filtri, tracciati dei rilievi.
  *
- *                  Il raggruppamento dei marker e scritto qui e non affidato a
- *                  markercluster: serve una griglia in coordinate schermo, che
- *                  in un centinaio di righe fa quello che ci occorre, senza
- *                  aggiungere una dipendenza da mantenere e da aggiornare.
+ *                  Da qui non si chiama piu Leaflet direttamente: si passa per
+ *                  l'astrazione di catageo-mappa-api.js (7.1.1), che ha due
+ *                  implementazioni interscambiabili. In questo file non deve
+ *                  comparire nessun riferimento a "L." ne a "google.maps": se
+ *                  ne serve uno, vuol dire che manca una primitiva
+ *                  nell'interfaccia, ed e li che va aggiunta.
+ *
+ *                  Il raggruppamento dei marker resta scritto qui e non
+ *                  affidato a una libreria: serve una griglia in coordinate
+ *                  schermo, che in un centinaio di righe fa quello che occorre
+ *                  ed e identica sui due provider.
  *
  *                  I dati arrivano dal GeoJSON del server, che ha gia applicato
  *                  la riservatezza: qui non si decide cosa mostrare, si mostra
  *                  cio che e stato inviato.
- *  Versione .....: 1.1.0
+ *  Versione .....: 1.2.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.2.0  2026-08-07  D.Candela  Riscritto sull'astrazione del provider, per
+ *                                l'arrivo di Google Maps (fase 4b).
  *  1.1.0  2026-08-07  D.Candela  Ingressi con coordinate proprie sulla mappa
  *                                di scheda, con tre stati di praticabilita.
  *  0.9.0  2026-08-06  D.Candela  Tracciato da dati gia presenti in pagina.
@@ -29,7 +38,7 @@
 (function () {
     'use strict';
 
-    if (typeof L === 'undefined') {
+    if (typeof window.CatageoMappa === 'undefined') {
         return;
     }
 
@@ -87,87 +96,26 @@
         return 'CDEFGHJKLMNPQRSTUVWX'.charAt(Math.floor((lat + 80) / 8));
     }
 
-    // ------------------------------------------------------------------ layer
-
-    /** Costruisce un layer Leaflet da una voce di configurazione. */
-    function creaLayer(voce) {
-        var comuni = {
-            attribution: voce.attribuzione || '',
-            maxZoom: voce.maxZoom || 19,
-            minZoom: voce.minZoom || 0,
-            opacity: typeof voce.opacita === 'number' ? voce.opacita : 1
-        };
-
-        if (voce.tipo === 'wms') {
-            return L.tileLayer.wms(voce.url, L.extend(comuni, {
-                layers: voce.layers,
-                format: voce.formato || 'image/png',
-                transparent: voce.trasparente !== false,
-                version: voce.versione || '1.3.0'
-            }));
-        }
-
-        return L.tileLayer(voce.url, L.extend(comuni, {
-            subdomains: voce.sottodomini || 'abc'
-        }));
-    }
-
     /**
-     * Crea la mappa con sfondi e layer tematici, e il relativo selettore.
-     * Restituisce la mappa pronta all'uso.
+     * Crea la mappa e, se si e dovuto ripiegare su un provider diverso da
+     * quello configurato, lo dichiara in pagina.
+     *
+     * Il ripiego silenzioso sarebbe peggio del guasto: chi ha configurato
+     * Google e vede OpenStreetMap penserebbe a un errore dei dati, non a una
+     * chiave scaduta.
      */
-    function creaMappa(contenitore, cfg, opzioni) {
-        var mappa = L.map(contenitore, {
-            center: [cfg.centro.lat, cfg.centro.lon],
-            zoom: opzioni.zoom,
-            zoomControl: true,
-            scrollWheelZoom: opzioni.scrollWheelZoom !== false
-        });
+    function apriMappa(contenitore, cfg, opzioni) {
+        var mappa = window.CatageoMappa.crea(contenitore, cfg, opzioni);
+        if (!mappa) { return null; }
 
-        var sfondi = {};
-        var acceso = false;
-
-        (cfg.base || []).forEach(function (voce) {
-            var layer = creaLayer(voce);
-            sfondi[voce.nome] = layer;
-            // Il primo sfondo attivo va in mappa; se nessuno lo e, il primo in
-            // elenco, perche una mappa senza sfondo non e utilizzabile.
-            if (voce.attivo && !acceso) {
-                layer.addTo(mappa);
-                acceso = true;
-            }
-        });
-        if (!acceso) {
-            var nomi = Object.keys(sfondi);
-            if (nomi.length) {
-                sfondi[nomi[0]].addTo(mappa);
+        if (window.CatageoMappa.ripiego) {
+            var stato = document.getElementById('catageoMappaStato');
+            if (stato && !stato.hidden) {
+                stato.className = 'alert alert-warning py-2';
+                stato.textContent = 'Il provider cartografico configurato non e disponibile: '
+                    + 'la mappa usa OpenStreetMap. Controllare la chiave API in configurazione.';
             }
         }
-
-        var tematici = {};
-        (cfg.overlay || []).forEach(function (voce) {
-            var layer = creaLayer(voce);
-            tematici[voce.nome] = layer;
-            if (voce.attivo) {
-                layer.addTo(mappa);
-            }
-        });
-
-        /*
-         * Il controllo dei layer si conserva sulla mappa: i perimetri delle
-         * aree arrivano dopo, con una richiesta asincrona, e senza un
-         * riferimento non avrebbero dove aggiungersi.
-         *
-         * Si crea anche quando c'e un solo sfondo e nessun tematico, purche la
-         * pagina possa aggiungere overlay a caricamento avvenuto: un controllo
-         * con una voce sola e piu utile di un layer che non si puo spegnere.
-         */
-        if (Object.keys(sfondi).length > 1 || Object.keys(tematici).length > 0
-            || opzioni.overlayDifferiti) {
-            mappa.catageoControlloLayer = L.control.layers(sfondi, tematici, { collapsed: true }).addTo(mappa);
-        }
-
-        L.control.scale({ imperial: false, metric: true }).addTo(mappa);
 
         return mappa;
     }
@@ -185,19 +133,19 @@
         return ACCESSI_CHIUSI.indexOf(prop.statoAccesso) !== -1;
     }
 
-    /** Marker circolare di un singolo ipogeo. */
-    function creaMarker(cfg, elemento) {
+    /** Simbolo di un singolo ipogeo. */
+    function creaMarker(mappa, cfg, elemento) {
         var prop = elemento.prop;
         var nonAperto = chiuso(prop);
 
-        return L.circleMarker(elemento.latlng, {
-            radius: 6,
-            color: '#ffffff',
-            weight: 2,
-            opacity: 0.95,
-            fillColor: colore(cfg, prop.natura),
-            fillOpacity: nonAperto ? 0.25 : 0.9,
-            dashArray: nonAperto ? '2,2' : null
+        return mappa.cerchio(elemento.punto, {
+            raggio: 6,
+            bordo: '#ffffff',
+            spessore: 2,
+            opacitaBordo: 0.95,
+            riempimento: colore(cfg, prop.natura),
+            opacita: nonAperto ? 0.25 : 0.9,
+            tratteggio: nonAperto ? '2,2' : null
         });
     }
 
@@ -231,21 +179,13 @@
             + '</div>';
     }
 
-    /** Marker di un gruppo di ipogei sovrapposti alla scala corrente. */
-    function creaCluster(gruppo, centro) {
+    /** Simbolo di un gruppo di ipogei sovrapposti alla scala corrente. */
+    function creaCluster(mappa, gruppo, centro) {
         var n = gruppo.length;
         var classe = n < 10 ? 'catageo-cluster-p' : (n < 100 ? 'catageo-cluster-m' : 'catageo-cluster-g');
         var lato = n < 10 ? 30 : (n < 100 ? 36 : 44);
 
-        return L.marker(centro, {
-            icon: L.divIcon({
-                className: 'catageo-cluster ' + classe,
-                html: '<div>' + n + '</div>',
-                iconSize: [lato, lato],
-                iconAnchor: [lato / 2, lato / 2]
-            }),
-            title: n + ' ipogei in quest\'area'
-        });
+        return mappa.simbolo(centro, '<div>' + n + '</div>', 'catageo-cluster ' + classe, lato);
     }
 
     /** Popup con l'elenco degli ipogei di un gruppo che non si puo separare. */
@@ -269,28 +209,21 @@
 
     /** Legenda: spiega colori e simboli, altrimenti restano decorazioni. */
     function aggiungiLegenda(mappa, cfg, nature) {
-        var controllo = L.control({ position: 'bottomright' });
+        var div = document.createElement('div');
+        div.className = 'catageo-legenda';
 
-        controllo.onAdd = function () {
-            var div = L.DomUtil.create('div', 'catageo-legenda');
-            var voci = '';
+        var voci = '';
+        Object.keys(nature).forEach(function (codice) {
+            voci += '<li><span class="catageo-legenda-segno" style="background-color:'
+                + esc(colore(cfg, codice)) + '"></span>' + esc(nature[codice]) + '</li>';
+        });
+        voci += '<li><span class="catageo-legenda-segno catageo-legenda-segno-chiuso"></span>'
+            + 'Ingresso non praticabile</li>';
+        voci += '<li><span class="catageo-legenda-segno" style="background-color:rgba(13,110,253,.85)">'
+            + '</span>Gruppo di ipogei</li>';
 
-            Object.keys(nature).forEach(function (codice) {
-                voci += '<li><span class="catageo-legenda-segno" style="background-color:'
-                    + esc(colore(cfg, codice)) + '"></span>' + esc(nature[codice]) + '</li>';
-            });
-
-            voci += '<li><span class="catageo-legenda-segno catageo-legenda-segno-chiuso"></span>'
-                + 'Ingresso non praticabile</li>';
-            voci += '<li><span class="catageo-legenda-segno" style="background-color:rgba(13,110,253,.85)">'
-                + '</span>Gruppo di ipogei</li>';
-
-            div.innerHTML = '<h2>Legenda</h2><ul>' + voci + '</ul>';
-            L.DomEvent.disableClickPropagation(div);
-            return div;
-        };
-
-        controllo.addTo(mappa);
+        div.innerHTML = '<h2>Legenda</h2><ul>' + voci + '</ul>';
+        mappa.controlloAngolo('bassoDestra', div);
     }
 
     /**
@@ -301,21 +234,13 @@
      * sempre quello giusto, senza doverlo cambiare a mano.
      */
     function aggiungiCoordinate(mappa) {
-        var controllo = L.control({ position: 'bottomleft' });
-        var div = null;
+        var div = document.createElement('div');
+        div.className = 'catageo-coordinate-puntatore';
+        div.textContent = 'Muovere il puntatore sulla mappa';
 
-        controllo.onAdd = function () {
-            div = L.DomUtil.create('div', 'catageo-coordinate-puntatore');
-            div.textContent = 'Muovere il puntatore sulla mappa';
-            return div;
-        };
+        mappa.controlloAngolo('bassoSinistra', div);
 
-        controllo.addTo(mappa);
-
-        mappa.on('mousemove', function (evento) {
-            if (!div) { return; }
-            var lat = evento.latlng.lat;
-            var lon = evento.latlng.lng;
+        mappa.su('mousemove', function (lat, lon) {
             var testo = lat.toFixed(6) + ', ' + lon.toFixed(6) + ' WGS84';
 
             if (typeof proj4 !== 'undefined') {
@@ -339,9 +264,90 @@
             div.textContent = testo;
         });
 
-        mappa.on('mouseout', function () {
-            if (div) { div.textContent = 'Muovere il puntatore sulla mappa'; }
+        mappa.su('mouseout', function () {
+            div.textContent = 'Muovere il puntatore sulla mappa';
         });
+    }
+
+    // ------------------------------------------------------------- tracciati
+
+    /**
+     * Stile dei rilievi sovrapposti alla mappa.
+     *
+     * Il colore lo decide CATAGEO e non il file: gli stili KML tradotti a meta
+     * producono una mappa peggiore di una mappa con uno stile coerente. Il
+     * magenta non e casuale — non compare quasi mai nella cartografia di sfondo,
+     * quindi un tracciato resta visibile sia su bosco sia su abitato.
+     */
+    var STILE_TRACCIATO = {
+        color: '#d6208f',
+        weight: 3,
+        opacity: 0.95,
+        fillColor: '#d6208f',
+        fillOpacity: 0.15
+    };
+
+    /** Contenuto del popup di una geometria di rilievo. */
+    function popupTracciato(proprieta) {
+        var righe = '';
+        if (proprieta.nome) {
+            righe += '<div class="catageo-popup-titolo">' + esc(proprieta.nome) + '</div>';
+        }
+        if (proprieta.rilievo) {
+            righe += '<div class="catageo-popup-codice">' + esc(proprieta.rilievo)
+                  + (proprieta.rilievoTitolo ? ' · ' + esc(proprieta.rilievoTitolo) : '') + '</div>';
+        }
+        if (proprieta.descrizione) {
+            righe += '<div class="mt-1">' + esc(proprieta.descrizione) + '</div>';
+        }
+        return righe === '' ? null : '<div class="catageo-popup">' + righe + '</div>';
+    }
+
+    /**
+     * Strato da una raccolta GeoJSON gia in memoria.
+     *
+     * E separato dallo scaricamento perche non tutti i tracciati arrivano dalla
+     * rete: i punti di un diario sono gia nella pagina che li elenca, e farne
+     * una seconda richiesta significherebbe rileggere lo stesso file due volte.
+     */
+    function costruisciTracciato(mappa, dati) {
+        return mappa.geoJson(dati, {
+            stile: STILE_TRACCIATO,
+            perPunto: function (elemento, posizione) {
+                return mappa.cerchio(posizione, {
+                    raggio: 4, bordo: '#ffffff', spessore: 1.5,
+                    riempimento: STILE_TRACCIATO.color, opacita: 0.9
+                });
+            },
+            perElemento: function (elemento, strato) {
+                var contenuto = popupTracciato(elemento.properties || {});
+                if (contenuto) { strato.bindPopup(contenuto); }
+            }
+        });
+    }
+
+    /**
+     * Scarica un tracciato GeoJSON e lo sovrappone alla mappa.
+     *
+     * Restituisce il layer creato, cosi chi chiama puo inquadrarlo insieme al
+     * resto invece di due inquadrature che si sovrascrivono.
+     */
+    function aggiungiTracciato(mappa, url, alFatto) {
+        fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+            .then(function (risposta) {
+                if (!risposta.ok) { throw new Error('HTTP ' + risposta.status); }
+                return risposta.json();
+            })
+            .then(function (dati) {
+                if (dati.errore) { throw new Error(dati.errore); }
+
+                var strato = costruisciTracciato(mappa, dati);
+                strato.aggiungiA();
+                alFatto(null, strato, dati.catageo || {});
+            })
+            .catch(function (errore) {
+                alFatto(errore, null, null);
+            });
     }
 
     // ------------------------------------------------------- mappa principale
@@ -353,7 +359,9 @@
      * da raggruppare, c'e una geometria da guardare.
      */
     function avviaMappaTracciato(contenitore, cfg, urlTracciato) {
-        var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
+        var mappa = apriMappa(contenitore, cfg, { zoom: cfg.zoom });
+        if (!mappa) { return; }
+
         var stato = document.getElementById('catageoTracciatoStato');
 
         aggiungiCoordinate(mappa);
@@ -366,9 +374,9 @@
                 return;
             }
 
-            var limiti = strato.getBounds();
-            if (limiti.isValid()) {
-                mappa.fitBounds(limiti, { padding: [30, 30], maxZoom: 19 });
+            var limiti = strato.riquadro();
+            if (mappa.riquadroValido(limiti)) {
+                mappa.adattaVista(limiti, { margine: 30, zoomMassimo: 19 });
             }
 
             if (stato) {
@@ -392,7 +400,9 @@
 
     /** Tracciato i cui dati sono gia nella pagina (punti di un diario). */
     function avviaMappaTracciatoInPagina(contenitore, cfg, dati) {
-        var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
+        var mappa = apriMappa(contenitore, cfg, { zoom: cfg.zoom });
+        if (!mappa) { return; }
+
         aggiungiCoordinate(mappa);
 
         window.CATAGEO = window.CATAGEO || {};
@@ -402,24 +412,26 @@
             return;
         }
 
-        var strato = costruisciTracciato(dati);
-        strato.addTo(mappa);
+        var strato = costruisciTracciato(mappa, dati);
+        strato.aggiungiA();
 
-        var limiti = strato.getBounds();
-        if (limiti.isValid()) {
-            mappa.fitBounds(limiti, { padding: [30, 30], maxZoom: cfg.zoomScheda || 17 });
+        var limiti = strato.riquadro();
+        if (mappa.riquadroValido(limiti)) {
+            mappa.adattaVista(limiti, { margine: 30, zoomMassimo: cfg.zoomScheda || 17 });
         }
     }
 
     function avviaMappaElenco(contenitore, cfg) {
         var urlDati = contenitore.getAttribute('data-catageo-geojson');
-        var mappa = creaMappa(contenitore, cfg, {
+        var mappa = apriMappa(contenitore, cfg, {
             zoom: cfg.zoom,
             // I perimetri delle aree arrivano dopo, via fetch: il controllo
             // dei layer deve esistere gia per poterli accogliere.
             overlayDifferiti: !!contenitore.getAttribute('data-catageo-perimetri')
         });
-        var strato = L.layerGroup().addTo(mappa);
+        if (!mappa) { return; }
+
+        var gruppoMarker = mappa.gruppo();
 
         var elementi = [];
         var senzaCoordinate = 0;
@@ -450,14 +462,14 @@
                     if (!dati || !dati.features || !dati.features.length) {
                         return;
                     }
-                    var strato = L.geoJSON(dati, {
-                        style: {
+                    var strato = mappa.geoJson(dati, {
+                        stile: {
                             color: '#7c3aed',
                             weight: 2,
                             fillOpacity: 0.07,
                             dashArray: '6,4'
                         },
-                        onEachFeature: function (feature, layer) {
+                        perElemento: function (feature, layer) {
                             var prop = (feature && feature.properties) || {};
                             if (prop.areaNome) {
                                 layer.bindPopup(
@@ -467,10 +479,7 @@
                             }
                         }
                     });
-                    strato.addTo(mappa);
-                    if (mappa.catageoControlloLayer) {
-                        mappa.catageoControlloLayer.addOverlay(strato, 'Perimetri delle aree');
-                    }
+                    mappa.aggiungiOverlay('Perimetri delle aree', strato, true);
                 })
                 .catch(function () {
                     // Una mappa senza perimetri resta una mappa valida: il
@@ -513,17 +522,17 @@
 
         // -------------------------------------------------------- disegno
         function ridisegna() {
-            strato.clearLayers();
+            gruppoMarker.svuota();
 
-            var zoom = mappa.getZoom();
-            var limiti = mappa.getBounds().pad(0.25);
+            var zoom = mappa.zoomCorrente();
+            var limiti = mappa.riquadroVista(0.25);
             var selezionati = 0;
             var visibili = [];
 
             elementi.forEach(function (e) {
                 if (!e.visibile) { return; }
                 selezionati++;
-                if (limiti.contains(e.latlng)) { visibili.push(e); }
+                if (mappa.contiene(limiti, e.punto)) { visibili.push(e); }
             });
 
             troncato = false;
@@ -534,7 +543,9 @@
                     troncato = true;
                 }
                 visibili.forEach(function (e) {
-                    creaMarker(cfg, e).bindPopup(popupIpogeo(e.prop)).addTo(strato);
+                    var marker = creaMarker(mappa, cfg, e);
+                    mappa.popup(marker, popupIpogeo(e.prop));
+                    gruppoMarker.aggiungi(marker);
                 });
             } else {
                 disegnaRaggruppati(visibili, zoom);
@@ -548,7 +559,7 @@
             var celle = {};
 
             visibili.forEach(function (e) {
-                var p = mappa.project(e.latlng, zoom);
+                var p = mappa.proietta(e.punto, zoom);
                 var chiave = Math.floor(p.x / CELLA) + ':' + Math.floor(p.y / CELLA);
                 if (!celle[chiave]) { celle[chiave] = []; }
                 celle[chiave].push(e);
@@ -558,29 +569,31 @@
                 var gruppo = celle[chiave];
 
                 if (gruppo.length === 1) {
-                    creaMarker(cfg, gruppo[0]).bindPopup(popupIpogeo(gruppo[0].prop)).addTo(strato);
+                    var singolo = creaMarker(mappa, cfg, gruppo[0]);
+                    mappa.popup(singolo, popupIpogeo(gruppo[0].prop));
+                    gruppoMarker.aggiungi(singolo);
                     return;
                 }
 
                 var somma = gruppo.reduce(function (acc, e) {
-                    return [acc[0] + e.latlng.lat, acc[1] + e.latlng.lng];
+                    return [acc[0] + mappa.latDi(e.punto), acc[1] + mappa.lonDi(e.punto)];
                 }, [0, 0]);
-                var centro = L.latLng(somma[0] / gruppo.length, somma[1] / gruppo.length);
+                var centro = mappa.punto(somma[0] / gruppo.length, somma[1] / gruppo.length);
 
-                var limitiGruppo = L.latLngBounds(gruppo.map(function (e) { return e.latlng; }));
-                var marker = creaCluster(gruppo, centro);
+                var limitiGruppo = mappa.riquadro(gruppo.map(function (e) { return e.punto; }));
+                var marker = creaCluster(mappa, gruppo, centro);
 
-                marker.on('click', function () {
+                mappa.alClick(marker, function () {
                     // Ipogei con le stesse coordinate non si separano zoomando:
                     // in quel caso si mostra l'elenco, altrimenti si stringe.
-                    if (limitiGruppo.getNorthEast().equals(limitiGruppo.getSouthWest())) {
-                        marker.bindPopup(popupElenco(gruppo)).openPopup();
+                    if (mappa.riquadroDegenere(limitiGruppo)) {
+                        mappa.apriPopup(marker, popupElenco(gruppo));
                         return;
                     }
-                    mappa.fitBounds(limitiGruppo, { padding: [40, 40], maxZoom: ZOOM_SENZA_CLUSTER });
+                    mappa.adattaVista(limitiGruppo, { margine: 40, zoomMassimo: ZOOM_SENZA_CLUSTER });
                 });
 
-                marker.addTo(strato);
+                gruppoMarker.aggiungi(marker);
             });
         }
 
@@ -603,16 +616,17 @@
         if (btnAdatta) {
             btnAdatta.addEventListener('click', function () {
                 var punti = elementi.filter(function (e) { return e.visibile; })
-                                    .map(function (e) { return e.latlng; });
+                                    .map(function (e) { return e.punto; });
                 if (punti.length === 0) { return; }
-                mappa.fitBounds(L.latLngBounds(punti), { padding: [30, 30], maxZoom: ZOOM_SENZA_CLUSTER });
+                mappa.adattaVista(mappa.riquadro(punti),
+                    { margine: 30, zoomMassimo: ZOOM_SENZA_CLUSTER });
             });
         }
 
         var btnPosizione = document.getElementById('mappaPosizione');
         if (btnPosizione) {
             btnPosizione.addEventListener('click', function () {
-                mappa.locate({ setView: true, maxZoom: 16 });
+                mappa.localizza(16);
             });
         }
 
@@ -625,7 +639,7 @@
         window.CATAGEO.ridisegna = ridisegna;
 
         // ------------------------------------------------------- caricamento
-        mappa.on('moveend zoomend', ridisegna);
+        mappa.su('vista', ridisegna);
 
         [campoTesto, campoNatura, campoCatalogo, campoAccesso].forEach(function (campo) {
             if (!campo) { return; }
@@ -649,7 +663,7 @@
                     if (!c || c.length < 2) { return; }
                     var prop = f.properties || {};
                     elementi.push({
-                        latlng: L.latLng(c[1], c[0]),
+                        punto: mappa.punto(c[1], c[0]),
                         prop: prop,
                         visibile: true,
                         // Indice di ricerca precalcolato: filtrare migliaia di
@@ -666,12 +680,10 @@
                 applicaFiltri();
 
                 var punti = elementi.filter(function (e) { return e.visibile; })
-                                    .map(function (e) { return e.latlng; });
+                                    .map(function (e) { return e.punto; });
                 if (punti.length > 0) {
-                    mappa.fitBounds(L.latLngBounds(punti), {
-                        padding: [30, 30],
-                        maxZoom: ZOOM_SENZA_CLUSTER
-                    });
+                    mappa.adattaVista(mappa.riquadro(punti),
+                        { margine: 30, zoomMassimo: ZOOM_SENZA_CLUSTER });
                 }
             })
             .catch(function (errore) {
@@ -682,133 +694,52 @@
             });
     }
 
-    // ------------------------------------------------------------- tracciati
-
-    /**
-     * Stile dei rilievi sovrapposti alla mappa.
-     *
-     * Il colore lo decide CATAGEO e non il file: gli stili KML tradotti a meta
-     * producono una mappa peggiore di una mappa con uno stile coerente. Il
-     * magenta non e casuale — non compare quasi mai nella cartografia di sfondo,
-     * quindi un tracciato resta visibile sia su bosco sia su abitato.
-     */
-    var STILE_TRACCIATO = {
-        color: '#d6208f',
-        weight: 3,
-        opacity: 0.95,
-        fillColor: '#d6208f',
-        fillOpacity: 0.15
-    };
-
-    /** Contenuto del popup di una geometria di rilievo. */
-    function popupTracciato(proprieta) {
-        var righe = '';
-        if (proprieta.nome) {
-            righe += '<div class="catageo-popup-titolo">' + esc(proprieta.nome) + '</div>';
-        }
-        if (proprieta.rilievo) {
-            righe += '<div class="catageo-popup-codice">' + esc(proprieta.rilievo)
-                  + (proprieta.rilievoTitolo ? ' · ' + esc(proprieta.rilievoTitolo) : '') + '</div>';
-        }
-        if (proprieta.descrizione) {
-            righe += '<div class="mt-1">' + esc(proprieta.descrizione) + '</div>';
-        }
-        return righe === '' ? null : '<div class="catageo-popup">' + righe + '</div>';
-    }
-
-    /**
-     * Scarica un tracciato GeoJSON e lo sovrappone alla mappa.
-     *
-     * Restituisce il layer creato, cosi chi chiama puo inquadrarlo insieme al
-     * resto invece di due inquadrature che si sovrascrivono.
-     */
-    /**
-     * Strato Leaflet da una raccolta GeoJSON gia in memoria.
-     *
-     * E separato dallo scaricamento perche non tutti i tracciati arrivano dalla
-     * rete: i punti di un diario sono gia nella pagina che li elenca, e farne
-     * una seconda richiesta significherebbe rileggere lo stesso file due volte.
-     */
-    function costruisciTracciato(dati) {
-        return L.geoJSON(dati, {
-            style: function () { return STILE_TRACCIATO; },
-            pointToLayer: function (elemento, posizione) {
-                return L.circleMarker(posizione, {
-                    radius: 4, color: '#ffffff', weight: 1.5,
-                    fillColor: STILE_TRACCIATO.color, fillOpacity: 0.9
-                });
-            },
-            onEachFeature: function (elemento, strato) {
-                var contenuto = popupTracciato(elemento.properties || {});
-                if (contenuto) { strato.bindPopup(contenuto); }
-            }
-        });
-    }
-
-    function aggiungiTracciato(mappa, url, alFatto) {
-        fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
-            .then(function (risposta) {
-                if (!risposta.ok) { throw new Error('HTTP ' + risposta.status); }
-                return risposta.json();
-            })
-            .then(function (dati) {
-                if (dati.errore) { throw new Error(dati.errore); }
-
-                var strato = costruisciTracciato(dati);
-                strato.addTo(mappa);
-                alFatto(null, strato, dati.catageo || {});
-            })
-            .catch(function (errore) {
-                alFatto(errore, null, null);
-            });
-    }
-
     // --------------------------------------------------------- mappa di scheda
 
     function avviaMappaScheda(contenitore, cfg) {
-        var punto = leggiJson('catageoMappaPunto', null);
-        if (!punto || punto.lat === '' || punto.lon === '') {
+        var dati = leggiJson('catageoMappaPunto', null);
+        if (!dati || dati.lat === '' || dati.lon === '') {
             return;
         }
 
-        var lat = parseFloat(punto.lat);
-        var lon = parseFloat(punto.lon);
+        var lat = parseFloat(dati.lat);
+        var lon = parseFloat(dati.lon);
         if (isNaN(lat) || isNaN(lon)) {
             return;
         }
 
-        var mappa = creaMappa(contenitore, cfg, {
-            zoom: punto.offuscate ? Math.min(cfg.zoomScheda, 12) : cfg.zoomScheda,
+        var mappa = apriMappa(contenitore, cfg, {
+            zoom: dati.offuscate ? Math.min(cfg.zoomScheda, 12) : cfg.zoomScheda,
             // Sulla scheda la rotella scorre la pagina: se zoomasse la mappa,
             // scorrere il documento diventerebbe impossibile.
             scrollWheelZoom: false
         });
-        mappa.setView([lat, lon], mappa.getZoom());
+        if (!mappa) { return; }
 
-        var latlng = L.latLng(lat, lon);
+        var punto = mappa.punto(lat, lon);
+        mappa.centra(punto, mappa.zoomCorrente());
 
-        if (punto.offuscate) {
+        if (dati.offuscate) {
             // Con coordinate offuscate un puntino sarebbe una bugia precisa: si
             // disegna l'area entro cui l'ingresso si trova.
-            L.circle(latlng, {
-                radius: punto.raggio || 1000,
-                color: colore(cfg, punto.natura),
-                weight: 2,
-                fillOpacity: 0.12,
-                dashArray: '5,4'
-            }).addTo(mappa).bindPopup('Posizione approssimata: le coordinate esatte sono riservate.');
+            var cerchio = mappa.cerchioMetri(punto, dati.raggio || 1000, {
+                bordo: colore(cfg, dati.natura),
+                spessore: 2,
+                opacita: 0.12,
+                tratteggio: '5,4'
+            });
+            mappa.gruppo().aggiungi(cerchio);
+            mappa.popup(cerchio, 'Posizione approssimata: le coordinate esatte sono riservate.');
         } else {
-            L.circleMarker(latlng, {
-                radius: 8,
-                color: '#ffffff',
-                weight: 2,
-                fillColor: colore(cfg, punto.natura),
-                fillOpacity: 0.9
-            }).addTo(mappa).bindPopup(
+            var segno = mappa.cerchio(punto, {
+                raggio: 8, bordo: '#ffffff', spessore: 2,
+                riempimento: colore(cfg, dati.natura), opacita: 0.9
+            });
+            mappa.gruppo().aggiungi(segno);
+            mappa.popup(segno,
                 '<div class="catageo-popup"><div class="catageo-popup-titolo">'
-                + esc(punto.nome || '') + '</div><div class="catageo-popup-codice">'
-                + esc(punto.codice || '') + '</div></div>'
-            );
+                + esc(dati.nome || '') + '</div><div class="catageo-popup-codice">'
+                + esc(dati.codice || '') + '</div></div>');
         }
 
         /*
@@ -822,7 +753,8 @@
          * schiacciare le due cose toglierebbe proprio il dato per cui e stato
          * censito.
          */
-        var ingressi = punto.ingressi || [];
+        var ingressi = dati.ingressi || [];
+        var gruppoIngressi = mappa.gruppo();
         for (var i = 0; i < ingressi.length; i++) {
             var ing = ingressi[i];
             var ilat = parseFloat(ing.lat);
@@ -839,17 +771,16 @@
             if (ing.stato) { righe.push(esc(ing.stato)); }
             if (ing.progressiva) { righe.push('progressiva ' + esc(ing.progressiva) + ' m'); }
 
-            L.circleMarker([ilat, ilon], {
-                radius: 5,
-                color: '#ffffff',
-                weight: 2,
-                fillColor: perduto ? '#dc2626' : (sbarrato ? '#d97706' : '#16a34a'),
-                fillOpacity: 0.9
-            }).addTo(mappa).bindPopup(
+            var segnoIngresso = mappa.cerchio(mappa.punto(ilat, ilon), {
+                raggio: 5, bordo: '#ffffff', spessore: 2,
+                riempimento: perduto ? '#dc2626' : (sbarrato ? '#d97706' : '#16a34a'),
+                opacita: 0.9
+            });
+            mappa.popup(segnoIngresso,
                 '<div class="catageo-popup"><div class="catageo-popup-titolo">'
                 + esc(ing.nome || 'Ingresso') + '</div><div>'
-                + righe.join(' · ') + '</div></div>'
-            );
+                + righe.join(' · ') + '</div></div>');
+            gruppoIngressi.aggiungi(segnoIngresso);
         }
 
         aggiungiCoordinate(mappa);
@@ -863,12 +794,12 @@
                 if (errore || !strato) {
                     return; // la mappa col solo ingresso resta valida
                 }
-                var limiti = strato.getBounds();
-                if (limiti.isValid()) {
+                var limiti = strato.riquadro();
+                if (mappa.riquadroValido(limiti)) {
                     // Si estende l'inquadratura al tracciato tenendo dentro
                     // l'ingresso: inquadrare solo il tracciato lo perderebbe.
-                    limiti.extend(latlng);
-                    mappa.fitBounds(limiti, { padding: [25, 25], maxZoom: cfg.zoomScheda });
+                    mappa.adattaVista(mappa.estendiRiquadro(limiti, punto),
+                        { margine: 25, zoomMassimo: cfg.zoomScheda });
                 }
                 window.CATAGEO.tracciati = meta;
             });
@@ -876,7 +807,7 @@
 
         window.CATAGEO = window.CATAGEO || {};
         window.CATAGEO.mappa = mappa;
-        window.CATAGEO.punto = latlng;
+        window.CATAGEO.punto = punto;
     }
 
     // ------------------------------------------------------------------ avvio

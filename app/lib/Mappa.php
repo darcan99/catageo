@@ -16,12 +16,14 @@ declare(strict_types=1);
  *                  Nessun URL viene inventato dal codice: i servizi WMS si
  *                  dichiarano in configurazione, cosi chi installa sa esattamente
  *                  a quali server esterni l'applicativo si collega.
- *  Versione .....: 0.6.0
+ *  Versione .....: 1.2.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.2.0  2026-08-07  D.Candela  Provider selezionabile, chiave API, elenco
+ *                                degli script e origini della CSP (fase 4b).
  *  0.6.0  2026-08-05  D.Candela  Prima stesura (fase 4).
  * ============================================================================
  */
@@ -30,6 +32,73 @@ final class Mappa
 {
     /** Tipi di layer gestiti dal front-end. */
     public const TIPI = ['tms', 'wms'];
+
+    /** Provider cartografici realizzati (7.1.1, fase 4b). */
+    public const PROVIDER = ['osm', 'google'];
+
+    /** Dominio da cui Google serve la propria API JavaScript. */
+    public const ORIGINE_GOOGLE = 'https://maps.googleapis.com';
+
+    /**
+     * Origini aggiuntive richieste da Google Maps oltre a quella dell'API.
+     *
+     * I tile, i font e le immagini dei controlli arrivano da domini diversi
+     * da quello dello script: senza elencarli la mappa si carica e resta
+     * grigia, con errori di Content-Security-Policy in console e nessuna
+     * spiegazione in pagina.
+     */
+    public const ORIGINI_GOOGLE = [
+        'https://maps.googleapis.com',
+        'https://maps.gstatic.com',
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
+        'https://*.googleapis.com',
+        'https://*.ggpht.com',
+    ];
+
+    /**
+     * Provider configurato, ridotto a uno di quelli realizzati.
+     *
+     * Un valore inventato in configurazione ricade su OpenStreetMap invece
+     * di lasciare la pagina senza mappa: e la scelta prudente, ed e anche
+     * l'unica che non richiede una chiave.
+     */
+    public static function provider(): string
+    {
+        $provider = strtolower(trim(Config::testo('mappa.provider', 'osm')));
+
+        return in_array($provider, self::PROVIDER, true) ? $provider : 'osm';
+    }
+
+    /** Chiave API del provider, vuota se non configurata. */
+    public static function chiaveApi(): string
+    {
+        return trim(Config::testo('mappa.chiaveApi', ''));
+    }
+
+    /**
+     * True se il provider Google e configurato **e** utilizzabile.
+     *
+     * Senza chiave l'API di Google disegna una mappa in filigrana con un
+     * cartello di errore: peggio di nessuna mappa, perche sembra un guasto
+     * dell'applicativo. In quel caso si resta su OpenStreetMap e lo si dice.
+     */
+    public static function googleAttivo(): bool
+    {
+        return self::provider() === 'google' && self::chiaveApi() !== '';
+    }
+
+    /**
+     * Indirizzo dello script dell'API di Google Maps.
+     *
+     * Si chiede solo la libreria di base: "places" e le altre pesano e qui
+     * non servono.
+     */
+    public static function scriptGoogle(): string
+    {
+        return self::ORIGINE_GOOGLE . '/maps/api/js?v=weekly&language=it&region=IT&key='
+            . rawurlencode(self::chiaveApi());
+    }
 
     /**
      * Colore del marker per natura della cavita.
@@ -114,7 +183,47 @@ final class Mappa
             'base'     => self::baseLayers(),
             'overlay'  => self::overlayLayers(),
             'colori'   => self::COLORI_NATURA,
+            // Il browser sceglie l'implementazione da questo valore: se la
+            // chiave manca resta 'osm', cosi il ripiego e gia deciso qui e
+            // non nel JavaScript, che non saprebbe perche.
+            'provider' => self::googleAttivo() ? 'google' : 'osm',
         ];
+    }
+
+    /**
+     * Script da caricare, nell'ordine, per avere la mappa in pagina.
+     *
+     * Sta qui e non nelle pagine perche l'elenco era ripetuto in cinque
+     * punti: con l'arrivo del secondo provider sarebbero diventati cinque
+     * posti in cui ricordarsi la stessa condizione, e il quinto sarebbe
+     * rimasto indietro.
+     *
+     * Leaflet si carica **sempre**, anche con Google attivo: e il ripiego
+     * se l'API di Google non arriva, e una pagina senza mappa e peggio di
+     * centoquaranta kilobyte non usati.
+     *
+     * @return string[]
+     */
+    public static function scriptBrowser(): array
+    {
+        $script = [];
+
+        if (self::googleAttivo()) {
+            // Prima di tutto e senza async: le implementazioni si scelgono
+            // al DOMContentLoaded, e a quel punto google.maps deve esserci.
+            $script[] = self::scriptGoogle();
+        }
+
+        $script[] = 'assets/vendor/leaflet-1.9.4/leaflet.js';
+        $script[] = 'assets/js/catageo-mappa-api.js';
+
+        if (self::googleAttivo()) {
+            $script[] = 'assets/js/catageo-mappa-google.js';
+        }
+
+        $script[] = 'assets/js/catageo-mappa.js';
+
+        return $script;
     }
 
     /**
@@ -131,6 +240,19 @@ final class Mappa
     public static function originiEsterne(): array
     {
         $origini = [];
+
+        /*
+         * Con il provider Google i domini non si ricavano dai layer: la
+         * mappa la disegna la loro API, che scarica tile, font e immagini
+         * dei controlli da host suoi. E la deroga documentata al vincolo
+         * "nessuna CDN" (16.1), e vale solo quando quel provider e attivo:
+         * chi resta su OpenStreetMap conserva la policy stretta.
+         */
+        if (self::googleAttivo()) {
+            foreach (self::ORIGINI_GOOGLE as $origine) {
+                $origini[$origine] = true;
+            }
+        }
 
         foreach (array_merge(self::baseLayers(), self::overlayLayers()) as $layer) {
             $url = str_replace('{s}.', '*.', (string) $layer['url']);

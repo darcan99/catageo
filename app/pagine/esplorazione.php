@@ -200,7 +200,7 @@ if ($azione === 'vedi' && $prog > 0) {
 
     if ($conCoordinate !== []) {
         $cssPagina = ['assets/vendor/leaflet-1.9.4/leaflet.css', 'assets/css/catageo-mappa.css'];
-        $jsPagina  = ['assets/vendor/leaflet-1.9.4/leaflet.js', 'assets/js/catageo-mappa.js'];
+        $jsPagina  = Mappa::scriptBrowser();
     }
     $jsPagina[] = 'assets/js/catageo-media.js';
     ?>

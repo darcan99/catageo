@@ -67,7 +67,7 @@ $fasi = [
     ['3',  'Ipogei: scheda, censimento, indice',               'fatta'],
     ['—',  'Coordinate: gradi, UTM, Gauss-Boaga, ED50',        'fatta'],
     ['4',  'Mappa: Leaflet/OSM, marker, WMS',                  'fatta'],
-    ['4b', 'Provider Google Maps alternativo',                 'da fare'],
+    ['4b', 'Provider Google Maps alternativo',                 'fatta'],
     ['5',  'Allegati, foto con miniature, video, metadati',    'fatta'],
     ['6',  'Rilievi 2D/3D, KML su mappa, viewer three.js',     'fatta'],
     ['6b', 'Geologia e layer cartografici tematici',           'da fare'],

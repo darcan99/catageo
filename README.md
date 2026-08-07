@@ -36,7 +36,7 @@
 | 3 | Ipogei: scheda standard, censimento, indice, storico dei codici | ✅ fatto |
 | — | Coordinate: gradi, sessagesimali, UTM, Gauss-Boaga, ED50, con conversione verificata contro proj4js | ✅ fatto |
 | 4 | Mappa Leaflet/OSM, marker, raggruppamento, layer WMS, mappa di scheda | ✅ fatto |
-| 4b | Provider Google Maps alternativo | ⏳ da fare |
+| 4b | Provider Google Maps alternativo, su un'astrazione con due implementazioni | ✅ fatto |
 | 5 | Allegati, foto con miniature, video, consegna mediata, metadati EXIF/GPS | ✅ fatto |
 | 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ✅ fatto |
 | 7 | Esplorazioni: diari di uscita, partecipanti anche fuori anagrafica, punti georiferiti, cronologia e filtri | ✅ fatto |

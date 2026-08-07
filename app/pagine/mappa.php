@@ -28,11 +28,10 @@ $cssPagina = [
     'assets/vendor/leaflet-1.9.4/leaflet.css',
     'assets/css/catageo-mappa.css',
 ];
-$jsPagina = [
-    'assets/vendor/leaflet-1.9.4/leaflet.js',
-    'assets/vendor/proj4-2.21.0/proj4.min.js',
-    'assets/js/catageo-mappa.js',
-];
+$jsPagina = array_merge(
+    ['assets/vendor/proj4-2.21.0/proj4.min.js'],
+    Mappa::scriptBrowser()
+);
 
 $cataloghi = Cataloghi::elenco();
 
