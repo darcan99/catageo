@@ -5,8 +5,8 @@ declare(strict_types=1);
  *  CATAGEO — Catasto Ipogei
  * ============================================================================
  *  File .........: app/view/modale-media.php
- *  Descrizione ..: Finestra per guardare una foto o un video senza lasciare la
- *                  pagina.
+ *  Descrizione ..: Finestra per guardare una foto, un video o un documento
+ *                  senza lasciare la pagina.
  *
  *                  Aprire ogni immagine in una scheda nuova costringe a tornare
  *                  indietro dopo ogni sguardo, e in una galleria di venti foto
@@ -15,12 +15,13 @@ declare(strict_types=1);
  *                  E una vista condivisa fra la scheda dell'ipogeo e la pagina
  *                  di gestione: due finestre uguali scritte due volte finirebbero
  *                  per divergere alla prima modifica.
- *  Versione .....: 0.7.1
+ *  Versione .....: 1.3.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.3.0  2026-08-07  D.Candela  Ospita anche i documenti (PDF).
  *  0.7.1  2026-08-05  D.Candela  Prima stesura.
  * ============================================================================
  */

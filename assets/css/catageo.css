@@ -372,6 +372,23 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
     margin: 0 auto;
 }
 
+/* Un documento nella finestra (i PDF degli allegati).
+   L'altezza va detta: un <iframe> non ha dimensione propria e senza questa
+   regola si presenterebbe nei 300x150 predefiniti, cioe una finestrella
+   inutilizzabile in mezzo al nero. Il fondo torna chiaro perche un PDF ha
+   pagine bianche con margini trasparenti, e il nero delle foto le farebbe
+   sembrare ritagliate male. */
+.catageo-media-documento {
+    background-color: var(--bs-body-bg);
+}
+
+.catageo-media-documento .catageo-media-contenuto {
+    width: 100%;
+    height: 78vh;
+    max-height: none;
+    border: 0;
+}
+
 /* A schermo intero il contenitore deve riempire davvero lo schermo: senza,
    resta della dimensione che aveva nella finestra, centrato nel nero. */
 .catageo-media-corpo:fullscreen {
@@ -382,6 +399,10 @@ form .card:focus-within > .card-header:not([class*="bg-"]) {
 .catageo-media-corpo:fullscreen .catageo-media-contenuto {
     max-height: 100vh;
     max-width: 100vw;
+}
+
+.catageo-media-documento:fullscreen .catageo-media-contenuto {
+    height: 100vh;
 }
 
 /* Riga dei dati sotto una miniatura: deve stare su una riga sola e non far

@@ -1493,6 +1493,12 @@ In testa alla scheda una **barra di avvisi** raccoglie ciò che chi programma un
 
 Upload multiplo con progressivo automatico, metadati compilabili, controllo MIME reale (`finfo`) oltre all'estensione, download **sempre mediato** da `scarica.php?codice=…&sez=AL&prog=1` che verifica i permessi e forza `Content-Disposition`.
 
+**I PDF si aprono nella finestra dei media**, come le foto e i video, invece di scaricarsi: un allegato che si consulta di continuo — la scheda catastale di origine, la relazione di scavo — non deve costringere a un giro nella cartella dei download a ogni sguardo. Si usa un `<iframe>` verso `scarica.php?…&inline=1` e il lettore PDF del browser: un `<object>` sarebbe bloccato dalla CSP (`object-src 'none'`), e portarsi dentro una libreria di rendering violerebbe il vincolo «zero dipendenze» (§2). Chi non ha un lettore integrato trova il pulsante di scaricamento, che resta sempre.
+
+**La decisione di quali file si aprono nella finestra si prende sul file, non sulla sezione** (`catageoFinestraPer()` in `app/view/parti-media.php`). Sulla sezione sembrava ragionevole finché le sezioni erano omogenee, ma non lo sono: la configurazione ammette il TIFF fra le foto e il MOV fra i video, che nessun browser disegna. Per quelli la finestra si apriva su un riquadro rotto mentre il browser scaricava il file di nascosto — il difetto è stato trovato proprio realizzando questa funzione.
+
+L'elenco delle estensioni ammesse in finestra **deve coincidere** con i MIME che `scarica.php` accetta di consegnare in linea. Sono due liste in due file, e nessuno impedisce di toccarne una sola: quando divergono, la finestra si apre vuota e il file si scarica alle spalle dell'utente. La suite `prova-finestra-documenti.ps1` legge le due liste dai sorgenti e verifica che si corrispondano.
+
 ### 9.3 Foto
 
 Galleria con miniature (`_mini/`), lightbox, riordino, scelta della copertina, geotag opzionale (letto da EXIF se presente, in fase 2), rotazione automatica da EXIF `Orientation`. Se `gd` non è disponibile si servono le immagini originali con dimensionamento CSS e avviso in diagnostica.

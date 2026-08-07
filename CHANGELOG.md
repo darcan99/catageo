@@ -6,6 +6,38 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.3.0] — 2026-08-07
+
+### Aggiunto
+- **I PDF degli allegati si leggono nella finestra**, come le foto e i video,
+  invece di scaricarsi. Un allegato che si consulta di continuo — la scheda
+  catastale di origine, la relazione di scavo — non deve costringere a un giro
+  nella cartella dei download a ogni sguardo. Restano il pulsante per scaricare
+  l'originale e quello per lo schermo intero.
+
+### Note di progetto
+- **Un `<iframe>` e non un `<object>`**: la CSP dell'applicativo ha
+  `object-src 'none'`, quindi un `<object>` verrebbe bloccato e la finestra
+  resterebbe vuota senza spiegare perche. Si usa il lettore PDF del browser:
+  rifarlo qui vorrebbe dire portarsi dentro una libreria, contro il vincolo
+  «zero dipendenze».
+- **L'iframe si ferma alla chiusura** come gia faceva il video: un PDF di venti
+  megabyte continuerebbe ad arrivare anche a finestra chiusa.
+- **Quali file si aprono nella finestra si decide sul FILE, non sulla sezione.**
+  L'elenco delle estensioni deve coincidere con i MIME che scarica.php consegna
+  in linea: sono due liste in due file, e quando divergono la finestra si apre
+  vuota mentre il file si scarica di nascosto. La prova legge entrambe dai
+  sorgenti e verifica che si corrispondano.
+
+### Corretto
+- **Le foto in formato TIFF aprivano una finestra rotta.** La configurazione
+  ammette il TIFF fra le foto, ma nessun browser lo disegna e scarica.php non
+  lo consegna in linea: la finestra si apriva su un'immagine spezzata mentre il
+  file si scaricava di nascosto. Difetto preesistente, emerso decidendo sul
+  file invece che sulla sezione; vale anche per MOV e AVI fra i video. Ora quei
+  collegamenti dichiarano che scaricano, invece di promettere una vista che non
+  possono dare.
+
 ## [1.2.1] — 2026-08-07
 
 ### Corretto

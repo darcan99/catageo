@@ -1533,9 +1533,10 @@ if ($azione === 'scheda' && $codice !== '') {
                 <?php $p = (int) $foto['progressivo']; ?>
                 <div class="col-6 col-md-4 col-xl-3">
                   <div class="card h-100">
-                    <a href="<?= Testo::esc($urlFile($p, false, true)) ?>"
+                    <?php $inLinea = catageoFinestraPer($foto) !== ''; ?>
+                    <a href="<?= Testo::esc($urlFile($p, false, $inLinea)) ?>"
                        <?= catageoAttributiMedia($foto, $codiceCorrente, $sigla) ?>
-                       title="Guarda l'immagine">
+                       title="<?= $inLinea ? 'Guarda l&#39;immagine' : 'Scarica il file: il browser non sa mostrare questo formato' ?>">
                       <img src="<?= Testo::esc($urlFile($p, true, true)) ?>"
                            alt="<?= Testo::esc((string) $foto['titolo']) ?>"
                            class="card-img-top catageo-miniatura" loading="lazy">
@@ -1588,12 +1589,17 @@ if ($azione === 'scheda' && $codice !== '') {
                                 <i class="bi bi-<?= Risorse::tridimensionale($risorsa) ? 'badge-3d' : 'file-earmark-ruled' ?>"></i>
                                 <?= Testo::esc((string) $risorsa['file']) ?>
                               </a>
-                            <?php elseif ($vista === 'video'): ?>
-                              <?php // Il video si guarda nella finestra: prima
-                                    // c'era solo il nome del file da scaricare. ?>
+                            <?php elseif (($modo = catageoFinestraPer($risorsa)) !== ''): ?>
+                              <?php
+                              /* Si guarda nella finestra: prima c'era solo il
+                                 nome del file da scaricare. Vale per i video e
+                                 per i PDF fra gli allegati, e l'icona dice
+                                 quale delle due cose sta per succedere. */
+                              $icona = ['documento' => 'file-earmark-text', 'video' => 'play-circle'][$modo] ?? 'image';
+                              ?>
                               <a href="<?= Testo::esc($urlFile($p, false, true)) ?>"
                                  <?= catageoAttributiMedia($risorsa, $codiceCorrente, $sigla) ?>>
-                                <i class="bi bi-play-circle"></i>
+                                <i class="bi bi-<?= $icona ?>"></i>
                                 <?= Testo::esc((string) $risorsa['file']) ?>
                               </a>
                             <?php else: ?>

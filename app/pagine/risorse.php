@@ -64,11 +64,6 @@ $anteprima  = Sezioni::anteprima($sigla);
 $puoGestire = Auth::puo('carica_risorse');
 $ritorno    = 'index.php?p=risorse&codice=' . urlencode($codice) . '&sez=' . $sigla;
 
-// La finestra dei media serve solo dove c'e qualcosa da guardare.
-if (in_array($anteprima, ['immagine', 'video'], true)) {
-    $jsPagina = ['assets/js/catageo-media.js'];
-}
-
 /**
  * Coordinata scritta a mano, ricondotta a gradi decimali o alla stringa vuota.
  *
@@ -243,12 +238,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once CATAGEO_ROOT . '/app/view/parti-media.php';
 
 $risorse   = Risorse::elenco($codice, $sigla);
+
+/*
+ * La finestra dei media serve solo dove c'e qualcosa da guardare, e a
+ * deciderlo non basta la sezione: fra gli allegati un PDF si legge nella
+ * finestra e un DOCX accanto a lui si puo solo scaricare. Si guarda quindi
+ * cosa c'e davvero dentro la sezione.
+ *
+ * Sta DOPO il require: catageoFinestraPer() la definisce parti-media.php, e
+ * chiamarla prima faceva morire la pagina con «funzione non definita».
+ */
+$jsPagina = [];
+foreach ($risorse as $unaRisorsa) {
+    if (catageoFinestraPer($unaRisorsa) !== '') {
+        $jsPagina = ['assets/js/catageo-media.js'];
+        break;
+    }
+}
 $titolo    = $etichetta . ' — ' . $codice;
 $ammesse   = Sezioni::chiaveEstensioni($sigla) !== ''
     ? Config::estensioniAmmesse(Sezioni::chiaveEstensioni($sigla))
     : [];
 $maxUpload = Config::dimensioneMaxUpload();
-$conFinestra = in_array($anteprima, ['immagine', 'video'], true);
+
 
 /** Indirizzo di consegna di una risorsa. */
 $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
@@ -402,10 +414,16 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
       <?php $prog = (int) $foto['progressivo']; ?>
       <div class="col-6 col-md-4 col-xl-3">
         <div class="card h-100">
-          <?php // href resta valido: senza JavaScript il file si apre comunque. ?>
-          <a href="<?= Testo::esc($url($prog, false, true)) ?>"
+          <?php
+          /* href resta valido: senza JavaScript il file si apre comunque.
+             Con inline=1 solo se il server lo consegna davvero in linea:
+             la configurazione ammette il TIFF fra le foto, e per quello
+             «inline» diventa uno scaricamento travestito da «guarda». */
+          $inLinea = catageoFinestraPer($foto) !== '';
+          ?>
+          <a href="<?= Testo::esc($url($prog, false, $inLinea)) ?>"
              <?= catageoAttributiMedia($foto, $codice, $sigla) ?>
-             title="Guarda l'immagine">
+             title="<?= $inLinea ? 'Guarda l&#39;immagine' : 'Scarica il file: il browser non sa mostrare questo formato' ?>">
             <img src="<?= Testo::esc($url($prog, true, true)) ?>"
                  alt="<?= Testo::esc((string) $foto['titolo']) ?>"
                  class="card-img-top catageo-miniatura" loading="lazy">
@@ -499,10 +517,16 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
                       <i class="bi bi-<?= Risorse::tridimensionale($risorsa) ? 'badge-3d' : 'file-earmark-ruled' ?>"></i>
                       <?= Testo::esc((string) $risorsa['file']) ?>
                     </a>
-                  <?php elseif ($conFinestra): ?>
+                  <?php elseif (($modo = catageoFinestraPer($risorsa)) !== ''): ?>
+                    <?php
+                    /* L'icona dice cosa succede al clic: un documento si
+                       legge, un video si guarda. Un'icona sola per entrambi
+                       prometterebbe la cosa sbagliata a meta degli allegati. */
+                    $icona = ['documento' => 'file-earmark-text', 'video' => 'play-circle'][$modo] ?? 'image';
+                    ?>
                     <a href="<?= Testo::esc($url($prog, false, true)) ?>"
                        <?= catageoAttributiMedia($risorsa, $codice, $sigla) ?>>
-                      <i class="bi bi-play-circle"></i>
+                      <i class="bi bi-<?= $icona ?>"></i>
                       <?= Testo::esc((string) $risorsa['file']) ?>
                     </a>
                   <?php else: ?>
@@ -781,6 +805,6 @@ $inModifica   = $daModificare > 0 && $puoGestire
   </div>
 <?php endif; ?>
 
-<?php if ($conFinestra): ?>
+<?php if ($jsPagina !== []): ?>
   <?php require CATAGEO_ROOT . '/app/view/modale-media.php'; ?>
 <?php endif; ?>

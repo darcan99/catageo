@@ -240,6 +240,18 @@ I rilievi con un tracciato geografico possono comparire sulla mappa generale.
 **Video.** Si caricano e si guardano nella finestra dei media, oppure si
 registra il solo collegamento a un video ospitato altrove.
 
+**Allegati.** I **PDF si leggono nella finestra**, senza scaricarli e senza
+lasciare la pagina: si apre il lettore del browser, con le sue frecce e la sua
+ricerca. Il pulsante per scaricare il file originale resta in alto a destra, e
+il tasto per lo schermo intero pure — utile su una tavola grande. Gli altri
+formati (DOC, XLS, ZIP…) restano uno scaricamento: nessun browser li mostra, e
+fingere che li mostri vorrebbe dire aprire una finestra vuota mentre il file
+arriva di nascosto nella cartella dei download.
+
+Lo stesso vale in senso opposto fra le foto: la configurazione ammette il
+**TIFF**, che nessun browser disegna. Per quelle immagini il collegamento dice
+apertamente che scarica, invece di promettere una vista che non può dare.
+
 Il download passa sempre per l'applicativo, che controlla i permessi: un file
 riservato non è raggiungibile scoprendone l'indirizzo.
 

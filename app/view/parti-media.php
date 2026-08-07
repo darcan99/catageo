@@ -15,17 +15,63 @@ declare(strict_types=1);
  *                  disegna. Stanno insieme perche le due pagine devono mostrare
  *                  le stesse cose, e duplicarle vorrebbe dire vederle divergere
  *                  alla prima modifica.
- *  Versione .....: 0.7.1
+ *  Versione .....: 1.3.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.3.0  2026-08-07  D.Candela  I PDF si aprono nella finestra; la scelta si fa
+ *                                sul file e non sulla sezione.
  *  0.7.1  2026-08-05  D.Candela  Prima stesura.
  * ============================================================================
  */
 
 defined('CATAGEO_ROOT') or exit('Accesso diretto non consentito.');
+
+/**
+ * Estensioni che si possono mostrare dentro la finestra, con il modo in cui
+ * vanno mostrate.
+ *
+ * L'elenco NON e una preferenza estetica: deve coincidere con i tipi che
+ * scarica.php accetta di consegnare in linea. Se qui comparisse un formato che
+ * li non passa, la finestra si aprirebbe vuota e il browser scaricherebbe il
+ * file alle spalle dell'utente — che e esattamente il comportamento che questa
+ * finestra esiste per evitare. Quando si tocca la lista in scarica.php si
+ * tocca anche questa.
+ */
+const CATAGEO_FINESTRA_PER_ESTENSIONE = [
+    'jpg'  => 'immagine', 'jpeg' => 'immagine', 'png' => 'immagine',
+    'gif'  => 'immagine', 'webp' => 'immagine', 'bmp' => 'immagine',
+    'mp4'  => 'video',    'webm' => 'video',    'ogg' => 'video', 'ogv' => 'video',
+    'pdf'  => 'documento',
+];
+
+/**
+ * Come va aperta una risorsa nella finestra, o '' se non si puo aprire.
+ *
+ * La scelta si fa sul FILE e non sulla sezione. Sulla sezione sembrava
+ * ragionevole finche le sezioni erano omogenee, ma non lo sono: fra le foto la
+ * configurazione ammette il TIFF, che nessun browser disegna, e fra i video il
+ * MOV e l'AVI. Per quelli la finestra si apriva su un riquadro rotto mentre il
+ * browser scaricava il file di nascosto. Guardare il file copre anche il caso
+ * opposto, cioe il PDF in mezzo agli allegati, che ora si legge senza uscire
+ * dalla pagina.
+ *
+ * @param array<string,mixed> $risorsa
+ */
+function catageoFinestraPer(array $risorsa): string
+{
+    $estensione = strtolower((string) pathinfo((string) $risorsa['file'], PATHINFO_EXTENSION));
+
+    /*
+     * Un SVG e un documento XML che puo contenere script: scarica.php lo
+     * consegna sempre come allegato, mai in linea. Non compare nella lista
+     * qui sopra, ma vale la pena dirlo dove qualcuno potrebbe pensare di
+     * aggiungercelo.
+     */
+    return CATAGEO_FINESTRA_PER_ESTENSIONE[$estensione] ?? '';
+}
 
 /**
  * Indirizzo di consegna di una risorsa.
@@ -68,8 +114,14 @@ function catageoUrlMappaEsterna(array $risorsa): string
  */
 function catageoAttributiMedia(array $risorsa, string $codice, string $sigla): string
 {
+    $tipo = catageoFinestraPer($risorsa);
+    if ($tipo === '') {
+        // Niente attributi: il collegamento resta quello che era e il file si
+        // scarica. Meglio del nulla di una finestra che non sa cosa mostrare.
+        return '';
+    }
+
     $prog = (int) $risorsa['progressivo'];
-    $tipo = Sezioni::anteprima($sigla) === 'video' ? 'video' : 'immagine';
 
     $sottotitolo = Sezioni::riferimento($sigla, $prog);
     if ((string) $risorsa['data'] !== '') {
