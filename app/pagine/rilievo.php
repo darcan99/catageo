@@ -98,7 +98,7 @@ if ($inMappa) {
   <div>
     <h1><?= Testo::esc((string) $rilievo['titolo']) ?></h1>
     <p class="text-body-secondary mb-0">
-      <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('RI', $prog)) ?></span>
+      <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('RI', $prog)) ?></span>
       · <span class="catageo-codice"><?= Testo::esc($codice) ?></span>
       <?= Testo::esc((string) $scheda['identificazione']['nome']) ?>
     </p>

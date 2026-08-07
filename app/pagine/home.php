@@ -56,8 +56,13 @@ $numeroUtenti = count(Utenti::elenco());
  * Stato delle fasi.
  *
  * ATTENZIONE: lo stesso elenco compare in README.md e nel piano di ANALISI.md.
- * Sono tre copie, e questa e gia rimasta indietro una volta di tre fasi: a fine
- * fase vanno aggiornate tutte e tre insieme, con il CHANGELOG.
+ * Sono tre copie, e questa e rimasta indietro DUE volte: la prima di tre fasi,
+ * la seconda sulla 6b, che qui risultava da fare mentre era in produzione da
+ * due giorni. A fine fase vanno aggiornate tutte e tre insieme, con il
+ * CHANGELOG.
+ *
+ * prova-web.ps1 confronta ora questo elenco con la tabella del README e
+ * fallisce se divergono: l avviso da solo non e bastato.
  */
 $fasi = [
     ['0',  'Struttura, configurazione, diagnostica',           'fatta'],
@@ -70,7 +75,7 @@ $fasi = [
     ['4b', 'Provider Google Maps alternativo',                 'fatta'],
     ['5',  'Allegati, foto con miniature, video, metadati',    'fatta'],
     ['6',  'Rilievi 2D/3D, KML su mappa, viewer three.js',     'fatta'],
-    ['6b', 'Geologia e layer cartografici tematici',           'da fare'],
+    ['6b', 'Geologia, geoportali, compilazione assistita',   'fatta'],
     ['7',  'Esplorazioni: diari, partecipanti, cronologia',    'fatta'],
     ['7b', 'Bibliografia: opere, citazioni, export BibTeX',   'fatta'],
     ['7c', 'Dati scientifici: serie, import, grafici SVG',     'fatta'],
@@ -81,7 +86,6 @@ $fasi = [
     ['9b', 'Import CSV massivo, con anteprima',                'fatta'],
     ['10', 'Stampa, manuale, dati di esempio, rilascio',      'fatta'],
     ['12', 'Estensioni del modello: esplorativo, aree, complessi', 'fatta'],
-    ['11', 'Acquisizione da fonti pubbliche (post-release)',   'da fare'],
 ];
 ?>
 

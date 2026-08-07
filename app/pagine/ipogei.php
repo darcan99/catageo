@@ -1072,7 +1072,7 @@ if ($azione === 'scheda' && $codice !== '') {
                         <?php foreach ($diari as $d): ?>
                           <?php $pd = (int) $d['progressivo']; ?>
                           <tr>
-                            <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('ES', $pd)) ?></span></td>
+                            <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('ES', $pd)) ?></span></td>
                             <td><?= Testo::esc((string) $d['dataInizio']) ?></td>
                             <td>
                               <a href="index.php?p=esplorazione&amp;codice=<?= urlencode($codiceCorrente) ?>&amp;azione=vedi&amp;prog=<?= $pd ?>">
@@ -1137,7 +1137,7 @@ if ($azione === 'scheda' && $codice !== '') {
                   <div class="card-body">
                     <?php foreach ($fonti as $fonte): ?>
                       <div class="catageo-voce-biblio">
-                        <span class="catageo-valore">
+                        <span class="catageo-valore catageo-riferimento">
                           <?= Testo::esc(Sezioni::riferimento('BB', (int) $fonte['progressivo'])) ?>
                         </span>
                         <?= Testo::esc(Bibliografia::citazione($fonte)) ?>
@@ -1212,7 +1212,7 @@ if ($azione === 'scheda' && $codice !== '') {
                         <?php foreach ($serieVisibili as $s): ?>
                           <?php $ps = (int) $s['progressivo']; ?>
                           <tr>
-                            <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('SC', $ps)) ?></span></td>
+                            <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('SC', $ps)) ?></span></td>
                             <td>
                               <a href="index.php?p=scientifici&amp;codice=<?= urlencode($codiceCorrente) ?>&amp;azione=serie&amp;prog=<?= $ps ?>">
                                 <?= Testo::esc((string) $s['titolo']) ?>
@@ -1276,7 +1276,7 @@ if ($azione === 'scheda' && $codice !== '') {
                     <div class="card-body">
                       <?php foreach ($colonieScheda as $colonia): ?>
                         <div class="catageo-voce-biblio">
-                          <span class="catageo-valore"><?= Testo::esc((string) $colonia['id']) ?></span>
+                          <span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $colonia['id']) ?></span>
                           <?= Testo::esc((string) $colonia['nome']) ?>
                           <em><?= Testo::esc((string) $colonia['specie']) ?></em>
                           <span class="catageo-nota">
@@ -1311,7 +1311,7 @@ if ($azione === 'scheda' && $codice !== '') {
                     <div class="card-body">
                       <?php foreach ($osservazioniScheda as $voce): ?>
                         <div class="catageo-voce-biblio">
-                          <span class="catageo-valore"><?= Testo::esc((string) $voce['id']) ?></span>
+                          <span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $voce['id']) ?></span>
                           <em><?= Testo::esc((string) $voce['nomeScientifico']) ?></em>
                           <?= Testo::esc((string) $voce['nomeComune']) ?>
                           <?php if ((string) $voce['specieProtetta'] === '1'): ?>
@@ -1443,7 +1443,7 @@ if ($azione === 'scheda' && $codice !== '') {
                       <div class="card-body">
                         <?php foreach ($evid as $evidenza): ?>
                           <div class="catageo-voce-biblio">
-                            <span class="catageo-valore">
+                            <span class="catageo-valore catageo-riferimento">
                               <?= Testo::esc(Sezioni::riferimento('AR', (int) $evidenza['progressivo'])) ?>
                             </span>
                             <strong><?= Testo::esc(Archeologia::TIPI_EVIDENZA[(string) $evidenza['tipo']] ?? '') ?></strong>
@@ -1573,7 +1573,7 @@ if ($azione === 'scheda' && $codice !== '') {
                     <?php foreach ($contenuti as $risorsa): ?>
                       <?php $p = (int) $risorsa['progressivo']; ?>
                       <tr>
-                        <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $p)) ?></span></td>
+                        <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento($sigla, $p)) ?></span></td>
                         <td>
                           <?= Testo::esc((string) $risorsa['titolo']) ?>
                           <?php if ((string) $risorsa['categoriaAllegato'] !== ''): ?>

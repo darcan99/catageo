@@ -496,7 +496,7 @@ $url = static fn (int $prog, bool $mini = false, bool $inline = false): string
             $presente = Risorse::percorsoFile($codice, $sigla, $prog) !== null;
             ?>
             <tr>
-              <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $prog)) ?></span></td>
+              <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento($sigla, $prog)) ?></span></td>
               <td>
                 <?= Testo::esc((string) $risorsa['titolo']) ?>
                 <?php if ((string) $risorsa['riservatezza'] === 'riservata'): ?>
@@ -606,7 +606,7 @@ $inModifica   = $daModificare > 0 && $puoGestire
   <div class="card mt-4">
     <div class="card-header">
       <h2 class="h6 mb-0">
-        Dati di <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento($sigla, $daModificare)) ?></span>
+        Dati di <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento($sigla, $daModificare)) ?></span>
       </h2>
     </div>
     <div class="card-body">

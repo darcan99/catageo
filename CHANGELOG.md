@@ -6,6 +6,34 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.3.2] — 2026-08-08
+
+### Modificato
+- **I riferimenti di sezione hanno un colore proprio** (`OS001`, `BB001`,
+  `AL003`). In una tabella stanno in una colonna loro e si distinguono da
+  soli; in un elenco stanno davanti al titolo, sulla stessa riga, e in
+  monospaziato dello stesso colore si leggevano attaccati a cio che segue:
+  «BB001 Rossi M.», «OS001 Rhinolophus». Il colore e quello dei collegamenti,
+  gia scurito per essere leggibile sul fondo di una scheda: il primario di
+  Bootstrap vale 3,35:1 li sopra, sotto la soglia. E lo stesso trattamento che
+  il codice catastale ha nell'intestazione, cosi l'interfaccia dice «questo e
+  un codice» sempre nello stesso modo. Misurato fra 4,69:1 e 7,00:1 sul fondo
+  nelle cinque combinazioni di tema e tavolozza.
+- Il riferimento prende una classe propria (`.catageo-riferimento`) invece di
+  essere colorato caso per caso: e lo stesso oggetto ovunque compaia, e
+  chiamarlo per nome in un punto solo evita che fra sei mesi meta dei
+  riferimenti sia colorata e meta no.
+
+### Documentazione
+- **Tolta la fase 11** dal piano di sviluppo: l'acquisizione di dati da fonti
+  esterne si tratta separatamente. Resta scritto in §15 che i dati dei catasti
+  regionali non sono automaticamente riutilizzabili e a cosa serve
+  `<licenzaDati>`, perche riguarda l'applicativo.
+- **Corretta la tabella di stato della cartografia** (§7.2.1), ferma alla fase
+  4: dava per «da fare» i layer geologici preconfigurati (fatti nella 6b) e i
+  tracciati KML (fatti nella 6, ma solo sulla mappa della scheda). Le righe
+  ancora aperte sono state riscritte dicendo cosa c'e e cosa manca davvero.
+
 ## [1.3.1] — 2026-08-08
 
 ### Corretto

@@ -209,7 +209,7 @@ if ($azione === 'vedi' && $prog > 0) {
       <div>
         <h1><?= Testo::esc((string) $diario['titolo']) ?></h1>
         <p class="text-body-secondary mb-0">
-          <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('ES', $prog)) ?></span>
+          <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('ES', $prog)) ?></span>
           · <span class="catageo-codice"><?= Testo::esc($codice) ?></span>
           <?= Testo::esc($nomeIpogeo) ?>
         </p>
@@ -415,7 +415,7 @@ if ($azione === 'vedi' && $prog > 0) {
                       : Risorse::trova($codice, $parti['sigla'], $parti['progressivo']);
                   ?>
                   <li>
-                    <span class="catageo-valore"><?= Testo::esc((string) $voce['riferimento']) ?></span>
+                    <span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $voce['riferimento']) ?></span>
                     <?php if ($risorsa === null): ?>
                       <span class="text-danger catageo-nota">non più presente</span>
                     <?php elseif ($voce['sigla'] === 'RI'): ?>
@@ -883,7 +883,7 @@ $titolo = 'Esplorazioni — ' . $codice;
           <?php foreach ($diari as $d): ?>
             <?php $p = (int) $d['progressivo']; ?>
             <tr>
-              <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('ES', $p)) ?></span></td>
+              <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('ES', $p)) ?></span></td>
               <td><?= Testo::esc((string) $d['dataInizio']) ?></td>
               <td>
                 <a href="index.php?p=esplorazione&amp;codice=<?= urlencode($codice) ?>&amp;azione=vedi&amp;prog=<?= $p ?>">

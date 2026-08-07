@@ -5,12 +5,14 @@
  *  Descrizione ..: Personalizzazioni sopra Bootstrap 5.3. Si usano le variabili
  *                  CSS native di Bootstrap, cosi che il tema chiaro/scuro
  *                  funzioni senza ricompilare Sass.
- *  Versione .....: 1.3.1
+ *  Versione .....: 1.3.2
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.3.2  2026-08-08  D.Candela  Colore proprio per i riferimenti di
+ *                                sezione.
  *  1.3.1  2026-08-08  D.Candela  Il rientro sporgente non esce piu dai
  *                                riquadri annidati (etichette).
  *  1.2.0  2026-08-07  D.Candela  Riga di intestazione delle tabelle a
@@ -655,6 +657,30 @@ tr.catageo-riga-attenzione { background-color: rgba(var(--bs-warning-rgb), 0.10)
     font-family: var(--bs-font-monospace);
     font-weight: 600;
     letter-spacing: 0.02em;
+}
+
+/* Riferimento di sezione (OS001, AL003, BB012).
+ *
+ * In una tabella sta in una colonna sua e si distingue da solo; in un elenco
+ * sta invece davanti al titolo, sulla stessa riga, e in monospaziato dello
+ * stesso colore si legge attaccato a cio che segue: «OS001 Rhinolophus». Serve
+ * un colore, non un altro peso: il grassetto lo farebbe pesare piu del nome
+ * della specie, che e l'informazione vera.
+ *
+ * Il colore e quello dei collegamenti e non il primario di Bootstrap. Il
+ * primario (#0d6efd) e stato misurato a 3,35:1 sul fondo di una scheda, sotto
+ * la soglia; la variabile dei link e gia stata scurita apposta per essere
+ * leggibile sia sul bianco della pagina sia sul fondo del box. E lo stesso
+ * trattamento che il codice catastale ha nell'intestazione della scheda, quindi
+ * l'interfaccia dice «questo e un codice» sempre nello stesso modo. */
+.catageo-riferimento {
+    color: rgb(var(--bs-link-color-rgb));
+}
+
+/* Dentro un collegamento il riferimento non si ricolora: sarebbe blu su blu, e
+   soprattutto direbbe due volte la stessa cosa. */
+a .catageo-riferimento {
+    color: inherit;
 }
 
 /* Intestazione di pagina con titolo e azioni sulla stessa riga. */

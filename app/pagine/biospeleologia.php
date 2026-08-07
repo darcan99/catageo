@@ -913,7 +913,7 @@ $titolo       = 'Biospeleologia — ' . $codice;
           <?php foreach ($colonie as $colonia): ?>
             <?php $critico = Biospeleologia::inPeriodoCritico($colonia); ?>
             <tr>
-              <td><span class="catageo-valore"><?= Testo::esc((string) $colonia['id']) ?></span></td>
+              <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $colonia['id']) ?></span></td>
               <td>
                 <a href="index.php?p=biospeleologia&amp;codice=<?= urlencode($codice) ?>&amp;azione=colonia&amp;id=<?= urlencode((string) $colonia['id']) ?>">
                   <?= Testo::esc((string) $colonia['nome']) ?>
@@ -994,7 +994,7 @@ $titolo       = 'Biospeleologia — ' . $codice;
         <tbody>
           <?php foreach ($osservazioni as $voce): ?>
             <tr>
-              <td><span class="catageo-valore"><?= Testo::esc((string) $voce['id']) ?></span></td>
+              <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $voce['id']) ?></span></td>
               <td><?= Testo::esc((string) $voce['data']) ?></td>
               <td>
                 <?php if ((string) $voce['nomeScientifico'] !== ''): ?>

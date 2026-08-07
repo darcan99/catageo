@@ -15,6 +15,7 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.3.2  2026-08-08  D.Candela  Riferimenti di sezione a colore proprio.
  *  1.3.1  2026-08-08  D.Candela  Etichette dentro il proprio riquadro.
  *  1.3.0  2026-08-07  D.Candela  PDF nella finestra dei media.
  *  1.2.1  2026-08-07  D.Candela  Intestazioni delle tabelle a contrasto.
@@ -50,7 +51,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '1.3.1');
+define('CATAGEO_VERSIONE', '1.3.2');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');

@@ -1388,9 +1388,10 @@ Il PHP produce sempre gli stessi dati (JSON dei punti, GeoJSON dei tracciati, el
 | Lettura delle coordinate sotto il puntatore | fatto, **non previsto in analisi** | gradi decimali e UTM, con fuso ricavato dalla longitudine |
 | Aggiunta layer WMS a runtime dall'interfaccia | **da fare** | oggi si dichiarano in `config.xml`; l'interfaccia di gestione va con la fase 9 (strumenti ADM) |
 | Cursore opacità per layer | **da fare** | l'attributo `opacita` è già letto e applicato, manca il comando |
-| Cerchio di ricerca per raggio, trascinabile | **da fare** | fase 8, insieme alla ricerca geografica |
-| Tracciato KML dei rilievi, punti dei diari | **da fare** | fasi 6 e 7. `window.CATAGEO.mappa` è il punto d'innesto già predisposto |
-| Layer tematici geologici preconfigurati | **da fare** | fase 6b: gli URL dei servizi vanno verificati uno per uno prima di scriverli in `config.xml.dist` (§6.16.1) |
+| Cerchio di ricerca per raggio, trascinabile | **da fare** | la ricerca per raggio c'e (fase 8), si imposta dai campi; manca il cerchio da trascinare in mappa |
+| Tracciato KML dei rilievi | fatto | fase 6, sulla mappa della **scheda** (`?p=tracciato`); sulla mappa d'insieme i tracciati non ci sono ancora |
+| Punti dei diari sulla mappa generale | **da fare** | la fase 7 li mostra nella pagina del diario, non nella mappa d'insieme |
+| Layer tematici geologici preconfigurati | fatto | fase 6b, `v1.2.0`: 26 layer in `config.xml.dist`, verificati uno per uno con un GetMap sul proprio territorio (§7.2.3) |
 | Marker distinguibili per catalogo | **da fare** | oggi il catalogo si filtra ma non si distingue nel simbolo; il colore è impegnato dalla natura, servirà una seconda variabile visiva |
 
 #### 7.2.2 Configurazione dei layer
@@ -1604,7 +1605,7 @@ Ricostruzione indici · verifica integrità archivio (XML non validi, file orfan
 **Scostamenti assunti in fase 9b** (2026-08-06):
 
 - **L'anteprima chiama il validatore vero**, `Ipogeo::valida()`, invece di ripetere le sue regole. Il primo tentativo le duplicava e divergeva subito: dichiarava importabili righe che la scrittura avrebbe rifiutato. Un'anteprima che valida in modo diverso dalla scrittura da fiducia proprio dove non deve, e per restare allineata deve chiamare lo stesso codice, non somigliargli.
-- **Si importano solo gli ipogei.** Risorse, esplorazioni, bibliografie e serie di misure hanno gia i loro percorsi di caricamento, e ognuna avrebbe una mappatura sua. Un import completo di un catasto altrui e materia della fase 11.
+- **Si importano solo gli ipogei.** Risorse, esplorazioni, bibliografie e serie di misure hanno gia i loro percorsi di caricamento, e ognuna avrebbe una mappatura sua. Un import completo di un catasto altrui e materia a se, da trattare separatamente.
 - **L'import crea, non aggiorna.** Una riga il cui codice esiste gia viene saltata e dichiarata: mai sovrascritta. Aggiornare in massa schede gia inserite significherebbe decidere quali campi vincono, e su un archivio compilato a mano nell'arco di anni quella decisione non puo prenderla un file CSV.
 - **Le schede importate nascono `bozza`** se il file non dice altrimenti: sono dati che nessuno ha ancora guardato, e pubblicarli d'ufficio li mescolerebbe a quelli verificati.
 - **Il limite e 2000 righe per file**, e il percorso e a due passi obbligati (caricamento con mappatura, poi anteprima) prima che si possa confermare. Senza anteprima la conferma viene rifiutata.
@@ -1903,13 +1904,12 @@ Altre convenzioni:
 | **9b** | Import CSV massivo di ipogei: mappatura delle colonne, anteprima riga per riga con la validazione vera, nessuna sovrascrittura | Un CSV sporco importato per le sole righe valide, con motivo e numero di riga per le altre |
 | **10** | Rifinitura: stampa scheda, manuale utente, guida di installazione, dati di esempio, tag `v1.0.0` | Release installabile |
 | **12** | *(post-1.0.0)* Estensioni del modello (§9.17): stato esplorativo, verifica sul campo, ingressi come scheda, complessi, aree con perimetro, percorribilita strutturata, report di completezza | Ricerca «cavita che proseguono e non riviste da N anni» — **fatta**, `v1.1.0` |
-| **11** | *(post-sviluppo)* Acquisizione dati da fonti pubbliche: censimento delle fonti attendibili, verifica delle licenze, importatori dedicati | Un catalogo popolato da fonte esterna, con `<origine>` tracciata |
 
-**Ordine di esecuzione dopo il rilascio 1.0.0**: **12** (`v1.1.0`), poi **4b** e **6b** (`v1.2.0`), infine **11**. La 12 e venuta prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione. La 4b e stata anticipata alla 6b perche la sezione geologica si appoggia ai layer cartografici, e conveniva che l'astrazione del provider fosse gia in piedi.
+**Ordine di esecuzione dopo il rilascio 1.0.0**: **12** (`v1.1.0`), poi **4b** e **6b** (`v1.2.0`). La 12 e venuta prima perche cambia il modello dati, e farlo con gli archivi piccoli costa una modifica di schema mentre farlo dopo costa una migrazione. La 4b e stata anticipata alla 6b perche la sezione geologica si appoggia ai layer cartografici, e conveniva che l'astrazione del provider fosse gia in piedi.
 
 Al termine di ogni fase: commit, aggiornamento `CHANGELOG.md`, incremento delle versioni dei file toccati.
 
-**Nota sulla fase 11**: è deliberatamente successiva al rilascio e ha un prerequisito non tecnico. I dati dei catasti speleologici regionali e delle banche dati di enti pubblici **non sono automaticamente riutilizzabili**: molti sono coperti da licenze restrittive o da accordi fra federazioni, e le ubicazioni delle cavità sono spesso riservate proprio per scelta di tutela. Prima di scrivere qualunque importatore va verificata la licenza di ciascuna fonte e, dove serve, ottenuta l'autorizzazione: il campo `<licenzaDati>` in `catalogo.xml` (§6.2) esiste per registrare questa verifica. L'alternativa — scaricare dati altrui perché tecnicamente accessibili — esporrebbe il progetto e chi lo installa, e per un catasto pubblico su GitHub è un rischio da non correre.
+**L'acquisizione di dati da fonti esterne non fa parte di questo piano** e si tratta separatamente. Una cosa resta però scritta qui, perché riguarda l'applicativo e non quel lavoro: i dati dei catasti regionali e delle banche dati di enti pubblici **non sono automaticamente riutilizzabili** — molti sono coperti da licenze restrittive o da accordi fra federazioni, e le ubicazioni delle cavità sono spesso riservate proprio per tutela. Il campo `<licenzaDati>` in `catalogo.xml` (§6.2) esiste per registrare, catalogo per catalogo, con quale titolo quei dati stanno lì.
 
 ---
 
@@ -1964,7 +1964,6 @@ Nessuno bloccante per l'avvio degli sviluppi. Si procede con i default indicati 
 2. **Serie di codifica reali del catasto del Lazio**: quante serie servono e con quali criteri e prefissi? Si può definire anche dopo, dall'interfaccia di configurazione del catalogo, prima di censire il primo ipogeo.
 3. **Vocabolari precaricati**: `grandezze.xml` e `periodi_storici.xml` sono compilati con la mia proposta (§6.4). Vanno riletti da te e da chi si occupa di monitoraggi: sono modificabili in ogni momento, ma partire con un vocabolario corretto evita di dover riclassificare dati già inseriti.
 4. **Determinazione tassonomica in biospeleologia**: serve un elenco chiuso di specie precaricato (almeno per i chirotteri italiani) o si lascia il nome scientifico libero? *Default: campo libero con suggerimento dai valori già inseriti nell'archivio, che si auto-arricchisce senza imporre una lista da manutenere.*
-5. **Fase 11**: le fonti pubbliche da cui importare dati vanno individuate insieme, con verifica delle licenze prima di scrivere codice (vedi nota in §15).
 6. **Resa visiva del provider Google**: verificabile solo con una chiave API valida. Con una chiave finta l'API si carica e l'implementazione gira — costruisce la mappa, registra lo sfondo, proietta le coordinate — ma Google non disegna la propria cornice, quindi legenda e lettura coordinate risultano registrate nei suoi controlli e non innestate nel DOM.
 7. **Layer dei geoportali**: gli endpoint verificati il 2026-08-07 (§7.2.3) sono di enti pubblici che li spostano senza preavviso. Non c'è un controllo automatico: la suite `prova-geoportali.ps1` li interroga a ogni giro e li elenca a parte, contati separatamente dalle verifiche su CATAGEO, perché un ente che spegne un servizio non è una regressione dell'applicativo. Se un layer smette di rispondere, la riga da correggere è in `config.xml.dist` e nel `config.xml` delle installazioni.
 8. **Ortografia dei vocabolari**: le chiavi memorizzate negli archivi restano senza accento (`per porosita`, `zonaCavita`) perché sono scritte nell'XML delle schede già salvate. Le etichette che l'utente legge sono corrette. Cambiare anche le chiavi richiederebbe una migrazione degli archivi esistenti: si può fare, ma è una fase a sé.

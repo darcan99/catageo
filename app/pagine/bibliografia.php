@@ -489,7 +489,7 @@ foreach ($voci as $voce) {
             <div class="d-flex justify-content-between gap-3">
               <div class="flex-grow-1">
                 <div>
-                  <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('BB', $p)) ?></span>
+                  <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('BB', $p)) ?></span>
                   <?= Testo::esc(Bibliografia::citazione($voce)) ?>
                 </div>
 

@@ -277,7 +277,7 @@ if ($azione === 'import' && $prog > 0 && $puoImportare) {
       <div>
         <h1>Importazione delle letture</h1>
         <p class="text-body-secondary mb-0">
-          <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('SC', $prog)) ?></span>
+          <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('SC', $prog)) ?></span>
           <?= Testo::esc((string) $serie['titolo']) ?> ·
           file <span class="catageo-valore"><?= Testo::esc((string) $sosta['nome']) ?></span>
         </p>
@@ -423,7 +423,7 @@ if ($azione === 'serie' && $prog > 0) {
       <div>
         <h1><?= Testo::esc((string) $serie['titolo']) ?></h1>
         <p class="text-body-secondary mb-0">
-          <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('SC', $prog)) ?></span>
+          <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('SC', $prog)) ?></span>
           · <span class="catageo-codice"><?= Testo::esc($codice) ?></span> <?= Testo::esc($nomeIpogeo) ?>
           <?php if ((string) $serie['riservatezza'] === 'riservata'): ?>
             <span class="badge text-bg-warning"><i class="bi bi-eye-slash"></i> riservata</span>
@@ -1009,7 +1009,7 @@ $titolo = 'Dati scientifici — ' . $codice;
               <?php foreach ($serie as $s): ?>
                 <?php $p = (int) $s['progressivo']; ?>
                 <tr>
-                  <td><span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('SC', $p)) ?></span></td>
+                  <td><span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('SC', $p)) ?></span></td>
                   <td>
                     <a href="index.php?p=scientifici&amp;codice=<?= urlencode($codice) ?>&amp;azione=serie&amp;prog=<?= $p ?>">
                       <?= Testo::esc((string) $s['titolo']) ?>
@@ -1071,7 +1071,7 @@ $titolo = 'Dati scientifici — ' . $codice;
               <li class="mb-2">
                 <div class="d-flex justify-content-between gap-2">
                   <div>
-                    <span class="catageo-valore"><?= Testo::esc((string) $punto['id']) ?></span>
+                    <span class="catageo-valore catageo-riferimento"><?= Testo::esc((string) $punto['id']) ?></span>
                     <?= Testo::esc((string) $punto['nome']) ?>
                     <?php if ((string) $punto['descrizione'] !== ''): ?>
                       <div class="catageo-nota"><?= Testo::esc((string) $punto['descrizione']) ?></div>

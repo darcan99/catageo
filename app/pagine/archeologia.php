@@ -550,7 +550,7 @@ $secondari = array_values(array_filter(
               <div class="d-flex justify-content-between gap-3">
                 <div class="flex-grow-1">
                   <div>
-                    <span class="catageo-valore"><?= Testo::esc(Sezioni::riferimento('AR', $p)) ?></span>
+                    <span class="catageo-valore catageo-riferimento"><?= Testo::esc(Sezioni::riferimento('AR', $p)) ?></span>
                     <strong><?= Testo::esc(Archeologia::TIPI_EVIDENZA[(string) $evidenza['tipo']] ?? '') ?></strong>
                     <?php if ((string) $evidenza['zonaCavita'] !== ''): ?>
                       <span class="catageo-nota">· <?= Testo::esc((string) $evidenza['zonaCavita']) ?></span>

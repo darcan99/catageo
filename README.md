@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-**Versione 1.3.1** — tutto quello che l'elenco qui sopra descrive è realizzato e provato, comprese la **sezione geologia** (fase 6b) con 26 layer cartografici preconfigurati per l'Italia centrale e la compilazione assistita dalla cartografia, e il **provider Google Maps** alternativo a OpenStreetMap (fase 4b).
+**Versione 1.3.2** — tutto quello che l'elenco qui sopra descrive è realizzato e provato, comprese la **sezione geologia** (fase 6b) con 26 layer cartografici preconfigurati per l'Italia centrale e la compilazione assistita dalla cartografia, e il **provider Google Maps** alternativo a OpenStreetMap (fase 4b).
 
 Due limiti dichiarati. La **resa visiva del provider Google** non è stata confermata: serve una chiave API valida, e con una chiave finta l'implementazione gira ma Google non disegna la propria cornice. I **layer dei geoportali** sono di enti pubblici che spostano gli endpoint senza preavviso: sono stati verificati uno per uno il 2026-08-07, e la suite di prova li interroga a ogni giro contandoli separatamente, perché un ente che spegne un servizio non è una regressione dell'applicativo.
 
@@ -41,6 +41,7 @@ Due limiti dichiarati. La **resa visiva del provider Google** non è stata confe
 | 4b | Provider Google Maps alternativo, su un'astrazione con due implementazioni | ✅ fatto |
 | 5 | Allegati, foto con miniature, video, consegna mediata, metadati EXIF/GPS | ✅ fatto |
 | 6 | Rilievi 2D e 3D, KML sulla mappa, viewer three.js | ✅ fatto |
+| 6b | Geologia: sezione dedicata, 26 layer cartografici preconfigurati per l'Italia centrale, compilazione assistita da GetFeatureInfo | ✅ fatto |
 | 7 | Esplorazioni: diari di uscita, partecipanti anche fuori anagrafica, punti georiferiti, cronologia e filtri | ✅ fatto |
 | 7b | Bibliografia: catalogo generale delle opere, tre forme di voce, citazioni per sigla, export BibTeX | ✅ fatto |
 | 7c | Dati scientifici: punti di misura, serie CSV, import da datalogger, statistiche, grafici SVG lato server | ✅ fatto |
@@ -51,7 +52,6 @@ Due limiti dichiarati. La **resa visiva del provider Google** non è stata confe
 | 9b | Import CSV massivo, con mappatura delle colonne e anteprima riga per riga | ✅ fatto |
 | 10 | Stampa della scheda, manuale utente, guida di installazione, dati di esempio, `v1.0.0` | ✅ fatto |
 | 12 | *(post-1.0.0)* Estensioni del modello: stato esplorativo, verifica sul campo, ingressi come scheda, complessi, aree speleologiche con perimetro, percorribilita strutturata, report di completezza | ✅ fatto |
-| 11 | *(post-release)* Acquisizione da fonti pubbliche, previa verifica delle licenze | ⏳ da fare |
 
 Il documento di analisi completo è in [docs/ANALISI.md](docs/ANALISI.md): architettura, standard di nomenclatura, modello dati XML, moduli funzionali, sicurezza e piano di sviluppo in fasi. Le verifiche eseguite sono documentate in [docs/prove/](docs/prove/), con l'indicazione esplicita di ciò che **non** coprono.
 
