@@ -128,7 +128,8 @@ $totaleVisibili = IndiceIpogei::conta(Visibilita::filtroIndice());
   </div>
 
   <div id="catageoMappa" class="catageo-mappa"
-       data-catageo-geojson="index.php?p=geojson"></div>
+       data-catageo-geojson="index.php?p=geojson"
+       data-catageo-perimetri="index.php?p=area-geojson"></div>
 
   <div class="catageo-mappa-stato mt-2 text-body-secondary">
     <span id="catageoMappaVisibili"></span>

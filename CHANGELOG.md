@@ -50,6 +50,13 @@ Fase 12 (§9.17): estensioni del modello, in corso.
   tipologia, sviluppo, foto, rilievi, esplorazioni, bibliografia, stato
   esplorativo — le schede ordinate dalla piu incompleta, e lo scarico in CSV.
 
+### Corretto
+- **Nessun KML veniva accettato come perimetro.** `Tracciato::aGeoJson()` deduce
+  il formato dall'estensione del percorso, e il file temporaneo di PHP non ne
+  ha: ogni caricamento finiva in «formato non convertibile». Ora si copia in un
+  file con l'estensione giusta prima di convertire, e lo si toglie anche se la
+  conversione fallisce.
+
 ### Note di progetto
 - **Tre stati e non un booleano**: si, no, oppure «non si sa», che e il valore
   predefinito. Su un catasto ricostruito da fonti eterogenee «non lo sappiamo»

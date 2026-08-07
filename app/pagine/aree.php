@@ -45,6 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'attivo'      => !empty($_POST['attivo']),
     ];
 
+    /*
+     * Il perimetro si tratta a parte e dopo il salvataggio dei campi: e un
+     * file, non un valore, e un errore nel caricamento non deve far perdere
+     * le modifiche gia scritte nel modulo.
+     */
+    $id = '';
+    $fileP = $_FILES['perimetro'] ?? null;
+    $haPerimetro = is_array($fileP) && (int) ($fileP['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+
     try {
         switch ($operazione) {
             case 'crea':
@@ -63,6 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'elimina':
                 $id = (string) ($_POST['id'] ?? '');
                 Aree::elimina($id);
+                // Il perimetro segue l'area: lasciarlo produrrebbe un file
+                // orfano che la verifica di integrita segnalerebbe poi.
+                PerimetroArea::rimuovi($id);
                 Log::modifica('elimina', '', '', 'aree', $id);
                 Auth::messaggio('successo', 'Area eliminata.');
                 break;
@@ -70,6 +82,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             default:
                 throw new AnagraficaEccezione('Operazione non riconosciuta.');
         }
+
+        // --- perimetro, dopo che i campi sono stati salvati
+        if ($operazione !== 'elimina' && $id !== '') {
+            if (!empty($_POST['rimuoviPerimetro'])) {
+                PerimetroArea::rimuovi($id);
+                Auth::messaggio('info', 'Perimetro rimosso.');
+            } elseif ($haPerimetro) {
+                try {
+                    $verificato = Upload::verifica($fileP, 'perimetri');
+                    $esito = PerimetroArea::salva($id, $verificato);
+                    Auth::messaggio('successo',
+                        'Perimetro caricato: ' . number_format((int) $esito['vertici'], 0, ',', '.') . ' vertici.');
+                } catch (UploadEccezione $e) {
+                    // I campi sono gia salvati: il perimetro fallito e un
+                    // avviso, non un errore che annulla il resto.
+                    Auth::messaggio('avviso', 'Campi salvati, ma il perimetro no: ' . $e->getMessage());
+                }
+            }
+        }
+
         header('Location: index.php?p=aree');
         exit;
 
@@ -123,7 +155,8 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
           <h2 class="h6 mb-0"><?= $m !== null ? 'Modifica area' : 'Nuova area' ?></h2>
         </div>
         <div class="card-body">
-          <form method="post" action="index.php?p=aree" class="needs-validation" novalidate>
+          <form method="post" action="index.php?p=aree" class="needs-validation" novalidate
+                enctype="multipart/form-data">
             <?= Auth::campoToken() ?>
             <input type="hidden" name="operazione" value="<?= $m !== null ? 'aggiorna' : 'crea' ?>">
             <?php if ($m !== null): ?>
@@ -190,6 +223,54 @@ if ($azione === 'modifica' && $idRichiesto !== '') {
                   la mappa, non a delimitare l'area. L'appartenenza di una cavita
                   si dichiara sulla sua scheda, non qui.
                 </div>
+              </div>
+
+              <?php
+              /*
+               * Il perimetro (9.17.5). Facoltativo, e utile dove l'area **ha**
+               * confini veri: per una cava il perimetro esiste ed e un dato,
+               * per un settore carsico e una convenzione che cambia con la
+               * conoscenza. Si accettano GeoJSON e KML/KMZ; lo shapefile no,
+               * perche e binario multi-file e QGIS lo converte in due clic.
+               */
+              $haGia = $m !== null && PerimetroArea::esiste((string) $m['id']);
+              ?>
+              <div class="col-12">
+                <hr class="my-1">
+                <label for="perimetro" class="form-label">
+                  Perimetro
+                  <?php if ($haGia): ?>
+                    <span class="badge text-bg-success">presente</span>
+                  <?php endif; ?>
+                </label>
+                <input type="file" class="form-control" id="perimetro" name="perimetro"
+                       accept=".geojson,.json,.kml,.kmz">
+                <div class="catageo-nota">
+                  <strong>GeoJSON</strong> oppure <strong>KML/KMZ</strong>, fino a
+                  <?= Testo::esc(Testo::dimensione(PerimetroArea::LIMITE_BYTE)) ?>.
+                  Uno shapefile si converte in GeoJSON da QGIS con
+                  «Esporta → Salva gli elementi come». Il perimetro e facoltativo:
+                  serve dove l'area ha confini veri — il recinto di una cava — non
+                  dove sono una convenzione d'uso, come in un settore carsico.
+                  <?php if ($haGia): ?>
+                    <br>Caricando un nuovo file si sostituisce quello presente.
+                  <?php endif; ?>
+                </div>
+                <?php if ($haGia): ?>
+                  <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" value="1"
+                           id="rimuoviPerimetro" name="rimuoviPerimetro">
+                    <label class="form-check-label" for="rimuoviPerimetro">
+                      Rimuovi il perimetro esistente
+                    </label>
+                  </div>
+                  <div class="mt-2">
+                    <a class="btn btn-sm btn-outline-secondary"
+                       href="index.php?p=area-geojson&amp;id=<?= urlencode((string) $m['id']) ?>">
+                      <i class="bi bi-download"></i> Scarica il GeoJSON
+                    </a>
+                  </div>
+                <?php endif; ?>
               </div>
 
               <div class="col-12">

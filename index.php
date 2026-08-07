@@ -96,6 +96,7 @@ $pagine = [
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
     'aree'         => ['file' => 'aree.php',         'permesso' => 'anagrafiche',        'titolo' => 'Aree speleologiche'],
     'complessi'    => ['file' => 'complessi.php',    'permesso' => 'anagrafiche',        'titolo' => 'Complessi'],
+    'area-geojson' => ['file' => 'area-geojson.php', 'permesso' => 'consulta',           'titolo' => 'Perimetro area', 'grezza' => true],
     'opere'        => ['file' => 'opere.php',        'permesso' => 'anagrafiche',        'titolo' => 'Catalogo delle opere'],
     'vocabolari'   => ['file' => 'vocabolari.php',   'permesso' => 'anagrafiche',        'titolo' => 'Vocabolari'],
     'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],

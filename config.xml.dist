@@ -92,6 +92,11 @@
     <estensioni sezione="video">mp4,webm,ogg,mov,avi</estensioni>
     <estensioni sezione="rilievi">pdf,dxf,dwg,svg,png,jpg,kml,kmz,gpx,ply,obj,stl,gltf,glb,th,th2,3d,tro,plt</estensioni>
     <estensioni sezione="scientifici">csv,txt,xls,xlsx,ods</estensioni>
+
+    <!-- Perimetri delle aree speleologiche (9.17.5). Niente shapefile: e un
+         formato binario multi-file, e QGIS lo converte in GeoJSON in due
+         clic con "Esporta . Salva gli elementi come". -->
+    <estensioni sezione="perimetri">geojson,json,kml,kmz</estensioni>
     <miniatureLarghezza>400</miniatureLarghezza>
     <nomiFileAscii>0</nomiFileAscii>
   </upload>

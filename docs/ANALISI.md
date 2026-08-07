@@ -1681,7 +1681,21 @@ Il committente ha chiesto di poter definire un'area **da shapefile** (§9.17.5).
 | **KML/KMZ** | quasi nullo | c'è già `Tracciato`, che converte KML in GeoJSON per i rilievi; anche KMZ, dove l'estensione `zip` è presente |
 | **Shapefile** `.shp` nativo | alto | formato binario multi-file (`.shp` + `.shx` + `.dbf`, spesso `.prj`), richiede un parser binario scritto a mano e la **riproiezione** dal sistema dichiarato nel `.prj` — che nei dati italiani è quasi sempre un grid nazionale, non WGS84 |
 
-Nessuno di questi è un ostacolo insormontabile, ma il terzo è un modulo a sé con una superficie d'errore propria, per un formato che QGIS converte negli altri due in due clic. La proposta è realizzare **GeoJSON e KML/KMZ subito** e trattare lo shapefile nativo come decisione separata, sapendo che senza di esso chi ha uno shapefile deve fare una conversione.
+Nessuno di questi è un ostacolo insormontabile, ma il terzo è un modulo a sé con una superficie d'errore propria, per un formato che QGIS converte negli altri due in due clic.
+
+**Decisione del committente** (2026-08-07): **GeoJSON e KML/KMZ**, shapefile nativo escluso.
+
+**Realizzazione** (`PerimetroArea`, `?p=area-geojson`):
+
+- **Il perimetro non sta in `aree.xml` ma in un file suo**, `dati/aree/AS001.geojson`. Il poligono di una cava puo valere migliaia di coordinate, e infilarle nell'anagrafica la renderebbe illeggibile a mano — che e il vincolo su cui il progetto e costruito. Ogni perimetro resta apribile da solo con qualunque strumento cartografico.
+- **Si conserva la conversione, non il file di origine.** Il KML originale sarebbe un secondo file da tenere allineato che nessuno rileggerebbe.
+- **Tetto di 50.000 vertici, e nessuna semplificazione automatica.** Un perimetro con centomila vertici non si disegna e non serve, ma semplificarlo d'ufficio sposterebbe un confine che potrebbe essere catastale: si rifiuta e si dice di semplificarlo prima.
+- **Un caricamento fallito non annulla i campi gia salvati**: il perimetro e un file, non un valore, e chi ha appena corretto il nome dell'area non deve perderlo perche il GeoJSON era sbagliato.
+- **Il perimetro segue l'area quando viene eliminata**, altrimenti resterebbe un file orfano.
+- **Non e un dato riservato**: e cartografia di inquadramento, non la posizione di una cavita, e chi puo consultare puo vederlo.
+- Sulla mappa generale i perimetri stanno **sotto i marker** e in un layer spegnibile: sono uno sfondo, e se coprissero i puntini nasconderebbero le cavita che l'area serve a raggruppare.
+
+**Difetto trovato in prova.** `Tracciato::aGeoJson()` deduce il formato **dall'estensione del percorso**, e il file temporaneo di PHP non ne ha: ogni KML veniva rifiutato con «formato non convertibile». Si copia in un file con l'estensione giusta prima di convertirlo, e lo si toglie in `finally` — anche a conversione fallita, altrimenti la cartella temporanea si riempirebbe dei tentativi andati male.
 
 #### 9.17.8 Cosa non si prende
 

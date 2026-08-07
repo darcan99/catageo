@@ -153,8 +153,18 @@
             }
         });
 
-        if (Object.keys(sfondi).length > 1 || Object.keys(tematici).length > 0) {
-            L.control.layers(sfondi, tematici, { collapsed: true }).addTo(mappa);
+        /*
+         * Il controllo dei layer si conserva sulla mappa: i perimetri delle
+         * aree arrivano dopo, con una richiesta asincrona, e senza un
+         * riferimento non avrebbero dove aggiungersi.
+         *
+         * Si crea anche quando c'e un solo sfondo e nessun tematico, purche la
+         * pagina possa aggiungere overlay a caricamento avvenuto: un controllo
+         * con una voce sola e piu utile di un layer che non si puo spegnere.
+         */
+        if (Object.keys(sfondi).length > 1 || Object.keys(tematici).length > 0
+            || opzioni.overlayDifferiti) {
+            mappa.catageoControlloLayer = L.control.layers(sfondi, tematici, { collapsed: true }).addTo(mappa);
         }
 
         L.control.scale({ imperial: false, metric: true }).addTo(mappa);
@@ -403,7 +413,12 @@
 
     function avviaMappaElenco(contenitore, cfg) {
         var urlDati = contenitore.getAttribute('data-catageo-geojson');
-        var mappa = creaMappa(contenitore, cfg, { zoom: cfg.zoom });
+        var mappa = creaMappa(contenitore, cfg, {
+            zoom: cfg.zoom,
+            // I perimetri delle aree arrivano dopo, via fetch: il controllo
+            // dei layer deve esistere gia per poterli accogliere.
+            overlayDifferiti: !!contenitore.getAttribute('data-catageo-perimetri')
+        });
         var strato = L.layerGroup().addTo(mappa);
 
         var elementi = [];
@@ -416,6 +431,52 @@
         var nature = leggiJson('catageoMappaNature', {});
         aggiungiLegenda(mappa, cfg, nature);
         aggiungiCoordinate(mappa);
+
+        /*
+         * Perimetri delle aree speleologiche, dove esistono. Vanno sotto i
+         * marker — si aggiungono per primi — perche sono uno sfondo: se
+         * coprissero i puntini nasconderebbero proprio le cavita che l'area
+         * serve a raggruppare.
+         *
+         * Il layer si aggiunge al selettore invece di essere sempre acceso:
+         * su un catasto carsico i perimetri non ci sono quasi mai, e un
+         * controllo che accende un layer vuoto e solo rumore.
+         */
+        var urlPerimetri = contenitore.getAttribute('data-catageo-perimetri');
+        if (urlPerimetri) {
+            fetch(urlPerimetri, { credentials: 'same-origin' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (dati) {
+                    if (!dati || !dati.features || !dati.features.length) {
+                        return;
+                    }
+                    var strato = L.geoJSON(dati, {
+                        style: {
+                            color: '#7c3aed',
+                            weight: 2,
+                            fillOpacity: 0.07,
+                            dashArray: '6,4'
+                        },
+                        onEachFeature: function (feature, layer) {
+                            var prop = (feature && feature.properties) || {};
+                            if (prop.areaNome) {
+                                layer.bindPopup(
+                                    '<div class="catageo-popup"><div class="catageo-popup-titolo">'
+                                    + esc(prop.areaNome) + '</div><div>Area speleologica</div></div>'
+                                );
+                            }
+                        }
+                    });
+                    strato.addTo(mappa);
+                    if (mappa.catageoControlloLayer) {
+                        mappa.catageoControlloLayer.addOverlay(strato, 'Perimetri delle aree');
+                    }
+                })
+                .catch(function () {
+                    // Una mappa senza perimetri resta una mappa valida: il
+                    // guasto non deve togliere anche i marker.
+                });
+        }
 
         // ------------------------------------------------------ filtri client
         var campoTesto = document.getElementById('mappaFiltroTesto');
