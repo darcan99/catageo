@@ -89,7 +89,7 @@ final class Ricerca
     public const CRITERI = [
         'testo' => '', 'nelleDescrizioni' => '0',
         'cataloghi' => [], 'natura' => '', 'tipologia' => '', 'sottotipologia' => '',
-        'stato' => '', 'regione' => '', 'provincia' => '', 'comune' => '',
+        'stato' => '', 'regione' => '', 'provincia' => '', 'comune' => '', 'area' => '',
         'statoAccesso' => '', 'statoScheda' => '',
         // Stato esplorativo (9.17.1): e la ricerca per cui quei campi esistono.
         'esplorata' => '', 'prosegue' => '',
@@ -318,7 +318,7 @@ final class Ricerca
         // --- attributi a corrispondenza esatta
         foreach (['natura' => 'natura', 'tipologia' => 'tipologia',
                   'sottotipologia' => 'sottotipologia', 'stato' => 'stato',
-                  'regione' => 'regione', 'provincia' => 'provincia',
+                  'regione' => 'regione', 'provincia' => 'provincia', 'area' => 'area',
                   'statoAccesso' => 'stato_accesso', 'statoScheda' => 'stato_scheda'] as $criterio => $colonna) {
             if ((string) $c[$criterio] === '') {
                 continue;

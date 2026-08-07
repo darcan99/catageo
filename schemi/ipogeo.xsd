@@ -231,6 +231,10 @@
               <xs:element name="provincia" type="xs:string" minOccurs="0"/>
               <xs:element name="comune"    type="xs:string" minOccurs="0"/>
               <xs:element name="localita"  type="xs:string" minOccurs="0"/>
+              <!-- Area speleologica (9.17.5): riferimento all'anagrafica
+                   dati/aree.xml. Indipendente dai confini amministrativi,
+                   che restano perche servono per altro. -->
+              <xs:element name="area"      type="tCodiceOVuoto" minOccurs="0"/>
               <xs:element name="indirizzo" type="xs:string" minOccurs="0"/>
 
               <xs:element name="coordinate">

@@ -246,6 +246,26 @@ if ($vista === 'mappa' && $righe !== []) {
                 <input type="text" class="form-control" id="comune" name="comune"
                        value="<?= Testo::esc((string) $criteri['comune']) ?>">
               </div>
+              <?php
+              // L'area sta accanto ai criteri amministrativi e non al posto
+              // loro: sono modi diversi di collocare la stessa cavita, e chi
+              // cerca puo volerli combinare.
+              $areeDisponibili = Aree::elenco(true);
+              ?>
+              <?php if ($areeDisponibili !== []): ?>
+                <div class="col-md-3">
+                  <label for="area" class="form-label">Area speleologica</label>
+                  <select class="form-select" id="area" name="area">
+                    <option value="">Qualunque</option>
+                    <?php foreach ($areeDisponibili as $areaVoce): ?>
+                      <option value="<?= Testo::esc((string) $areaVoce['id']) ?>"
+                              <?= (string) $criteri['area'] === (string) $areaVoce['id'] ? 'selected' : '' ?>>
+                        <?= Testo::esc(Aree::etichetta($areaVoce)) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              <?php endif; ?>
 
               <div class="col-md-3">
                 <label for="statoAccesso" class="form-label">Stato di accesso</label>

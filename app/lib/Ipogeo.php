@@ -100,6 +100,10 @@ final class Ipogeo
                 'comune'     => '',
                 'localita'   => '',
                 'indirizzo'  => '',
+                // Area speleologica (9.17.5): raggruppamento geografico con
+                // un nome, indipendente dai confini amministrativi. E il modo
+                // in cui uno speleologo colloca una cavita.
+                'area'       => '',
                 'coordinate' => [
                     // Forma canonica: gradi decimali WGS84. E l'unica su cui
                     // lavorano mappa, ricerca per raggio ed esportazioni.
@@ -1168,7 +1172,7 @@ final class Ipogeo
         Xml::aggiungi($ub, 'stato', (string) $s['ubicazione']['statoNome'], [
             'codice' => strtoupper((string) $s['ubicazione']['stato']),
         ]);
-        foreach (['regione', 'provincia', 'comune', 'localita', 'indirizzo'] as $campo) {
+        foreach (['regione', 'provincia', 'comune', 'localita', 'indirizzo', 'area'] as $campo) {
             Xml::imposta($ub, $campo, (string) $s['ubicazione'][$campo]);
         }
 
@@ -1342,7 +1346,7 @@ final class Ipogeo
             $s['ubicazione']['stato']     = $stato->getAttribute('codice') ?: 'IT';
             $s['ubicazione']['statoNome'] = trim($stato->textContent);
         }
-        foreach (['regione', 'provincia', 'comune', 'localita', 'indirizzo'] as $campo) {
+        foreach (['regione', 'provincia', 'comune', 'localita', 'indirizzo', 'area'] as $campo) {
             $s['ubicazione'][$campo] = Xml::testo($doc, '/ipogeo/ubicazione/' . $campo);
         }
         foreach (['latitudine', 'longitudine', 'quota', 'precisione', 'metodo', 'dataRilevamento',

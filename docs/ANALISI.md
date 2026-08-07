@@ -1610,7 +1610,15 @@ Nuova entità con codice proprio, elenco delle cavità che vi appartengono e tot
 
 Un raggruppamento geografico con un nome, indipendente dai confini amministrativi. «Alto Chiascio» è il modo in cui uno speleologo colloca una cavità, e non coincide con regione, provincia o comune — che restano, perché servono per altro.
 
-Nuova anagrafica, con l'area assegnabile alla scheda e usabile come criterio di ricerca e come filtro di mappa.
+Nuova anagrafica (`dati/aree.xml`, `Aree`), con l'area assegnabile alla scheda e usabile come criterio di ricerca.
+
+**Scelte assunte** (2026-08-07):
+
+- **L'area non ha una geometria.** Disegnarne il perimetro sembrerebbe più preciso e sarebbe una precisione finta: i confini di un'area speleologica sono d'uso e non di cartografia, cambiano con la conoscenza del carsismo, e un poligono sbagliato escluderebbe cavità che tutti considerano dentro. Si registra un punto indicativo, che serve a inquadrare la mappa e a nient'altro.
+- **L'appartenenza è dichiarata sulla scheda dell'ipogeo, non nell'area.** È un dato della cavità, e tenerlo in due posti significherebbe doverlo tenere allineato.
+- **L'area non sostituisce regione, provincia e comune**, che restano perché servono per altro: la provincia serve a chi scrive a un ente, l'area a chi programma un'uscita. Nella ricerca stanno accanto e si combinano.
+- **Il nome è unico**, imposto sia da `Aree::valida()` sia dallo schema: è la sola cosa che identifica un'area in un elenco, e due «Alto Chiascio» renderebbero ambiguo ogni rimando.
+- **Un'area assegnata a qualche ipogeo non si cancella**, si disattiva: una voce cancellata sotto le schede che la citano lascia rimandi rotti, che l'integrità segnalerebbe dopo invece di impedirli prima. Disattivata sparisce dalle scelte e resta leggibile su chi la cita già.
 
 #### 9.17.6 Report di completezza
 

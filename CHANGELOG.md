@@ -21,6 +21,12 @@ Fase 12 (§9.17): estensioni del modello, in corso.
 - **Ricerca** su entrambi, con il filtro «non verificata da N anni». La query
   che giustifica la fase — *le cavita che proseguono e che non rivede nessuno
   da cinque anni* — ora si scrive in un indirizzo.
+- **Aree speleologiche**: nuova anagrafica per i raggruppamenti geografici
+  con un nome proprio, indipendenti dai confini amministrativi. «Alto
+  Chiascio» e il modo in cui uno speleologo colloca una cavita, e non
+  coincide con regione, provincia o comune, che restano perche servono per
+  altro. Assegnabile in scheda, cercabile, e mostrata per nome anche in
+  stampa.
 - **Report di completezza** nella pagina Strumenti, distinto dalla verifica di
   integrita: quella dice se l'archivio e **corretto**, questo dice se e
   **finito**. Una colonna per voce — coordinate, posizione verificata, comune,
@@ -42,6 +48,11 @@ Fase 12 (§9.17): estensioni del modello, in corso.
 - **Il report rispetta la riservatezza** come la consultazione, e la tabella a
   video si ferma alle 200 schede piu incomplete dichiarandolo; il CSV le
   contiene tutte.
+- **Un'area non ha un perimetro**, solo un punto indicativo. I confini di
+  un'area speleologica sono d'uso e non di cartografia: un poligono sbagliato
+  escluderebbe cavita che tutti considerano dentro.
+- **Un'area assegnata a qualche ipogeo non si cancella**, si disattiva: una
+  voce cancellata sotto le schede che la citano lascia rimandi rotti.
 
 ## [1.0.0] — 2026-08-07
 

@@ -296,6 +296,17 @@ function catageoStampaEsploratore(string $id): string
     return $voce === null ? $id . ' (non in anagrafica)' : Esploratori::etichetta($voce);
 }
 
+/** Nome dell'area speleologica, dal suo identificativo. */
+function catageoStampaArea(string $id): string
+{
+    if (trim($id) === '') {
+        return '';
+    }
+    $voce = Aree::trova($id);
+
+    return $voce === null ? $id . ' (non in anagrafica)' : Aree::etichetta($voce);
+}
+
 /** Nome leggibile di un gruppo speleologico, dal suo identificativo. */
 function catageoStampaGruppo(string $id): string
 {
@@ -488,6 +499,7 @@ header('Content-Type: text/html; charset=utf-8');
             'Provincia' => (string) $scheda['ubicazione']['provincia'],
             'Comune'    => (string) $scheda['ubicazione']['comune'],
             'Localita'  => (string) $scheda['ubicazione']['localita'],
+            'Area speleologica' => catageoStampaArea((string) ($scheda['ubicazione']['area'] ?? '')),
             'Indirizzo' => (string) $scheda['ubicazione']['indirizzo'],
         ]); ?>
       </div>

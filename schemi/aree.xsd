@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/aree.xsd
+   Descrizione ..: Schema di validazione di dati/aree.xml, l'anagrafica delle
+                   aree speleologiche (9.17.5).
+
+                   Un'area e un raggruppamento geografico con un nome proprio,
+                   indipendente dai confini amministrativi: "Alto Chiascio" e
+                   il modo in cui uno speleologo colloca una cavita.
+
+                   Nessuna geometria. Un perimetro sembrerebbe piu preciso e
+                   sarebbe una precisione finta: i confini di un'area
+                   speleologica sono di uso e non di cartografia, e un poligono
+                   sbagliato escluderebbe cavita che tutti considerano dentro.
+                   Si registra un punto indicativo, che serve a inquadrare la
+                   mappa e a nient'altro.
+
+                   Note sui tipi, come negli altri schemi del progetto:
+                   - i campi facoltativi sono xs:string, perche l'applicativo
+                     scrive elementi vuoti quando il dato manca e xs:string e
+                     l'unico tipo che ammette la stringa vuota;
+                   - le coordinate hanno un pattern che ammette il vuoto e la
+                     virgola decimale; l'intervallo e verificato da
+                     Aree::valida();
+                   - "attivo" e 0/1 e non xs:boolean, perche l'applicativo
+                     scrive sempre queste due cifre.
+   Versione .....: 1.1.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   1.1.0  2026-08-07  D.Candela  Prima stesura (fase 12).
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tIdArea">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="AS[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTestoObbligatorio">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tProvinciaOVuota">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Z]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tNumeroOVuoto">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[+\-]?[0-9]+([.,][0-9]+)?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="aree">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="area" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <!-- xs:all: l'archivio deve restare modificabile a mano, e un
+                 ordine diverso degli elementi non e un errore di contenuto. -->
+            <xs:all>
+              <xs:element name="nome"        type="tTestoObbligatorio"/>
+              <xs:element name="regione"     type="xs:string"        minOccurs="0"/>
+              <xs:element name="provincia"   type="tProvinciaOVuota" minOccurs="0"/>
+              <!-- Massiccio e litologia sono testo libero: la nomenclatura dei
+                   massicci non e normalizzata e cambia da regione a regione. -->
+              <xs:element name="massiccio"   type="xs:string"        minOccurs="0"/>
+              <xs:element name="litologia"   type="xs:string"        minOccurs="0"/>
+              <xs:element name="latitudine"  type="tNumeroOVuoto"    minOccurs="0"/>
+              <xs:element name="longitudine" type="tNumeroOVuoto"    minOccurs="0"/>
+              <xs:element name="descrizione" type="xs:string"        minOccurs="0"/>
+              <xs:element name="note"        type="xs:string"        minOccurs="0"/>
+              <xs:element name="attivo"      type="tBooleano01"      minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="id" type="tIdArea" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string"/>
+    </xs:complexType>
+
+    <!-- I vincoli di identita stanno dentro la dichiarazione dell'elemento e
+         non a livello di schema, dove non sono ammessi.
+
+         L'identificativo e unico perche e il riferimento che le schede degli
+         ipogei scrivono: due aree con lo stesso id renderebbero ambiguo ogni
+         rimando. Il nome e unico perche e la sola cosa che identifica un'area
+         in un elenco. -->
+    <xs:key name="chiaveIdArea">
+      <xs:selector xpath="area"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:unique name="unicitaNomeArea">
+      <xs:selector xpath="area"/>
+      <xs:field xpath="nome"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

@@ -153,6 +153,7 @@ function datiSchedaDaPost(): array
             'provincia' => (string) ($_POST['provincia'] ?? ''),
             'comune'    => (string) ($_POST['comune'] ?? ''),
             'localita'  => (string) ($_POST['localita'] ?? ''),
+            'area'      => (string) ($_POST['area'] ?? ''),
             'indirizzo' => (string) ($_POST['indirizzo'] ?? ''),
             'coordinate' => coordinateDaPost(),
             'cartografia' => [
@@ -562,6 +563,14 @@ if ($azione === 'scheda' && $codice !== '') {
                       'Provincia' => (string) $scheda['ubicazione']['provincia'],
                       'Comune'    => (string) $scheda['ubicazione']['comune'],
                       'Localita'  => (string) $scheda['ubicazione']['localita'],
+                      // L'area si risolve in nome: sulla scheda un AS003 non
+                      // dice niente a nessuno.
+                      'Area speleologica' => (static function () use ($scheda): string {
+                          $id = (string) ($scheda['ubicazione']['area'] ?? '');
+                          if ($id === '') { return ''; }
+                          $voce = Aree::trova($id);
+                          return $voce === null ? $id . ' (non in anagrafica)' : Aree::etichetta($voce);
+                      })(),
                   ];
                   foreach ($ubicazione as $etichetta => $valore): ?>
                     <dt class="col-sm-5 fw-normal text-body-secondary"><?= $etichetta ?></dt>
@@ -1742,6 +1751,23 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   <label for="localita" class="form-label">Localita</label>
                   <input type="text" class="form-control" id="localita" name="localita" maxlength="120"
                          value="<?= $v('localita', $s['ubicazione']['localita']) ?>">
+                </div>
+                <div class="col-md-6">
+                  <label for="area" class="form-label">Area speleologica</label>
+                  <select class="form-select" id="area" name="area">
+                    <option value="">—</option>
+                    <?php $areaCorrente = (string) ($_POST['area'] ?? ($s['ubicazione']['area'] ?? '')); ?>
+                    <?php foreach (Aree::elenco(true) as $areaVoce): ?>
+                      <option value="<?= Testo::esc((string) $areaVoce['id']) ?>"
+                              <?= $areaCorrente === (string) $areaVoce['id'] ? 'selected' : '' ?>>
+                        <?= Testo::esc(Aree::etichetta($areaVoce)) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <div class="catageo-nota">
+                    Si gestiscono dalle anagrafiche. Non sostituisce comune e
+                    provincia: e il modo in cui la cavita si colloca fra speleologi.
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <label for="indirizzo" class="form-label">Indirizzo</label>

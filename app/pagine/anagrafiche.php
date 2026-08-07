@@ -7,12 +7,13 @@ declare(strict_types=1);
  *  File .........: app/pagine/anagrafiche.php
  *  Descrizione ..: Indice delle anagrafiche, con il conteggio delle voci di
  *                  ciascuna e l'accesso alle rispettive gestioni.
- *  Versione .....: 0.2.0
+ *  Versione .....: 1.1.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.1.0  2026-08-07  D.Candela  Riquadro delle aree speleologiche (fase 12).
  *  0.2.0  2026-08-04  D.Candela  Prima stesura (fase 2).
  * ============================================================================
  */
@@ -40,6 +41,14 @@ $schede = [
         'descrizione' => 'Persone censite, con appartenenza storicizzata ai gruppi.',
         'conteggio'   => Esploratori::conta(),
         'attive'      => Esploratori::conta(true),
+    ],
+    [
+        'url'         => 'index.php?p=aree',
+        'titolo'      => 'Aree speleologiche',
+        'icona'       => 'bi-bounding-box',
+        'descrizione' => 'Raggruppamenti geografici con un nome, indipendenti dai confini amministrativi: e il modo in cui uno speleologo colloca una cavita.',
+        'conteggio'   => Aree::conta(),
+        'attive'      => Aree::conta(true),
     ],
     [
         'url'         => 'index.php?p=opere',
