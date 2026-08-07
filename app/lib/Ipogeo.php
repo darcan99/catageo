@@ -163,6 +163,11 @@ final class Ipogeo
                 'sottotipologia' => '',
                 'codiciEsterni'  => [],   // [{ente, catasto, codice}]
                 'codiciStorici'  => [],   // [{codice, catalogo, nomeCatalogo, dal, al, motivo, utente}]
+                // Complesso di appartenenza (9.17.4): riferimento a
+                // dati/complessi.xml. E un'altra cosa dai <collegamenti>,
+                // che dicono che due cavita comunicano: qui si dice che
+                // questa cavita e parte di un oggetto che ha un nome.
+                'complesso'      => '',
             ],
             'ubicazione' => [
                 'stato'      => 'IT',
@@ -1209,6 +1214,7 @@ final class Ipogeo
         Xml::imposta($ident, 'natura', (string) $s['identificazione']['natura']);
         Xml::imposta($ident, 'tipologia', (string) $s['identificazione']['tipologia']);
         Xml::imposta($ident, 'sottotipologia', (string) $s['identificazione']['sottotipologia']);
+        Xml::imposta($ident, 'complesso', (string) ($s['identificazione']['complesso'] ?? ''));
 
         $esterni = Xml::aggiungi($ident, 'codiciEsterni');
         foreach ((array) $s['identificazione']['codiciEsterni'] as $voce) {
@@ -1399,6 +1405,7 @@ final class Ipogeo
         $s['identificazione']['natura']         = Xml::testo($doc, '/ipogeo/identificazione/natura');
         $s['identificazione']['tipologia']      = Xml::testo($doc, '/ipogeo/identificazione/tipologia');
         $s['identificazione']['sottotipologia'] = Xml::testo($doc, '/ipogeo/identificazione/sottotipologia');
+        $s['identificazione']['complesso']      = Xml::testo($doc, '/ipogeo/identificazione/complesso');
 
         foreach (Xml::elenco($doc, '/ipogeo/identificazione/sinonimi/sinonimo') as $nodo) {
             $s['identificazione']['sinonimi'][] = trim($nodo->textContent);

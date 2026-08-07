@@ -51,6 +51,14 @@ $schede = [
         'attive'      => Aree::conta(true),
     ],
     [
+        'url'         => 'index.php?p=complessi',
+        'titolo'      => 'Complessi',
+        'icona'       => 'bi-diagram-2',
+        'descrizione' => 'Insiemi di cavita che formano un sistema unico e hanno un nome proprio. Sviluppo e dislivello si sommano dalle schede, non si digitano.',
+        'conteggio'   => Complessi::conta(),
+        'attive'      => Complessi::conta(true),
+    ],
+    [
         'url'         => 'index.php?p=opere',
         'titolo'      => 'Catalogo delle opere',
         'icona'       => 'bi-journals',

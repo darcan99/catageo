@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================
+   CATAGEO - Catasto Ipogei
+  ============================================================================
+   File .........: schemi/complessi.xsd
+   Descrizione ..: Schema di validazione di dati/complessi.xml, l'anagrafica
+                   dei complessi (9.17.4).
+
+                   Un complesso e un insieme di cavita che formano un sistema
+                   unico, con un nome proprio. Non ha un codice catastale: e
+                   una decisione del committente, e la ragione e che consumare
+                   progressivi del catasto per un oggetto che non e una cavita
+                   brucerebbe numeri che poi mancano alle cavita vere.
+
+                   Resta un "codice" proprio facoltativo e libero, utile
+                   soprattutto sulle cavita artificiali, dove chi cataloga
+                   spesso ha gia una convenzione sua per numerare i complessi.
+
+                   L'appartenenza non e scritta qui ma sulla scheda della
+                   cavita: e un dato della cavita, e tenerlo in due posti
+                   vorrebbe dire doverlo tenere allineato. Per lo stesso motivo
+                   qui non ci sono totali: si sommano dalle schede.
+   Versione .....: 1.1.0
+   Sviluppatore .: Dario Candela <darcan99@gmail.com>
+   Licenza ......: GNU GPL v3.0 - vedi LICENSE
+   Copyright ....: (c) 2026 Dario Candela
+  ............................................................................
+   CRONOLOGIA
+   1.1.0  2026-08-07  D.Candela  Prima stesura (fase 12).
+  ============================================================================
+
+   NB: nei commenti XML non possono comparire due trattini consecutivi, quindi
+   i separatori usano punti al posto della riga di trattini.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ............................................. tipi base ............ -->
+
+  <xs:simpleType name="tIdComplesso">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="CX[0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tTestoObbligatorio">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Codice proprio: libero, perche e una convenzione di chi cataloga e non
+       una codifica del catasto. Ammette barra e spazio, che ricorrono nelle
+       numerazioni usate per gli acquedotti e le cave. -->
+  <xs:simpleType name="tCodiceProprio">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="|[A-Za-z0-9._\-/ ]{1,40}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tNaturaComplesso">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="carsico"/>
+      <xs:enumeration value="artificiale"/>
+      <!-- Misto non e un riempitivo: una cava che intercetta un sistema
+           carsico e il caso in cui le due nature coesistono davvero. -->
+      <xs:enumeration value="misto"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="tBooleano01">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ............................................. struttura ............ -->
+
+  <xs:element name="complessi">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="complesso" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="nome"        type="tTestoObbligatorio"/>
+              <xs:element name="codice"      type="tCodiceProprio"    minOccurs="0"/>
+              <xs:element name="natura"      type="tNaturaComplesso"  minOccurs="0"/>
+              <xs:element name="regione"     type="xs:string"         minOccurs="0"/>
+              <xs:element name="descrizione" type="xs:string"         minOccurs="0"/>
+              <xs:element name="note"        type="xs:string"         minOccurs="0"/>
+              <xs:element name="attivo"      type="tBooleano01"       minOccurs="0"/>
+            </xs:all>
+            <xs:attribute name="id" type="tIdComplesso" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="versioneSchema" type="xs:string"/>
+    </xs:complexType>
+
+    <xs:key name="chiaveIdComplesso">
+      <xs:selector xpath="complesso"/>
+      <xs:field xpath="@id"/>
+    </xs:key>
+    <xs:unique name="unicitaNomeComplesso">
+      <xs:selector xpath="complesso"/>
+      <xs:field xpath="nome"/>
+    </xs:unique>
+  </xs:element>
+
+</xs:schema>

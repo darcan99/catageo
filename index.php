@@ -18,8 +18,8 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
- *  1.1.0  2026-08-07  D.Candela  Rotte del report di completezza e delle aree
- *                                speleologiche.
+ *  1.1.0  2026-08-07  D.Candela  Rotte del report di completezza, delle aree
+ *                                speleologiche e dei complessi.
  *  1.0.0  2026-08-07  D.Candela  Rotta della scheda da stampare.
  *  0.16.0 2026-08-06  D.Candela  Rotta dell'importazione massiva.
  *  0.15.0 2026-08-06  D.Candela  Rotte degli strumenti e del backup.
@@ -95,6 +95,7 @@ $pagine = [
     'gruppi'       => ['file' => 'gruppi.php',       'permesso' => 'anagrafiche',        'titolo' => 'Gruppi speleologici'],
     'esploratori'  => ['file' => 'esploratori.php',  'permesso' => 'anagrafiche',        'titolo' => 'Esploratori'],
     'aree'         => ['file' => 'aree.php',         'permesso' => 'anagrafiche',        'titolo' => 'Aree speleologiche'],
+    'complessi'    => ['file' => 'complessi.php',    'permesso' => 'anagrafiche',        'titolo' => 'Complessi'],
     'opere'        => ['file' => 'opere.php',        'permesso' => 'anagrafiche',        'titolo' => 'Catalogo delle opere'],
     'vocabolari'   => ['file' => 'vocabolari.php',   'permesso' => 'anagrafiche',        'titolo' => 'Vocabolari'],
     'cataloghi'    => ['file' => 'cataloghi.php',    'permesso' => 'gestisci_cataloghi', 'titolo' => 'Cataloghi'],

@@ -267,6 +267,22 @@ if ($vista === 'mappa' && $righe !== []) {
                 </div>
               <?php endif; ?>
 
+              <?php $complessiDisponibili = Complessi::elenco(true); ?>
+              <?php if ($complessiDisponibili !== []): ?>
+                <div class="col-md-3">
+                  <label for="complesso" class="form-label">Complesso</label>
+                  <select class="form-select" id="complesso" name="complesso">
+                    <option value="">Qualunque</option>
+                    <?php foreach ($complessiDisponibili as $cx): ?>
+                      <option value="<?= Testo::esc((string) $cx['id']) ?>"
+                              <?= (string) $criteri['complesso'] === (string) $cx['id'] ? 'selected' : '' ?>>
+                        <?= Testo::esc(Complessi::etichetta($cx)) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              <?php endif; ?>
+
               <div class="col-md-3">
                 <label for="statoAccesso" class="form-label">Stato di accesso</label>
                 <select class="form-select" id="statoAccesso" name="statoAccesso">

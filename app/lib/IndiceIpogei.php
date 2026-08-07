@@ -35,7 +35,7 @@ final class IndiceIpogei
 {
     /** Intestazione: unica fonte dell'ordine delle colonne. */
     public const INTESTAZIONE = [
-        'catalogo', 'codice', 'nome', 'natura', 'tipologia', 'sottotipologia', 'stato',
+        'catalogo', 'codice', 'nome', 'natura', 'tipologia', 'sottotipologia', 'complesso', 'stato',
         'regione', 'provincia', 'comune', 'localita', 'area', 'lat', 'lon', 'quota',
         'sviluppo', 'dislivello', 'stato_accesso', 'riservatezza', 'stato_scheda',
         'n_allegati', 'n_foto', 'n_video', 'n_rilievi', 'n_esplorazioni', 'n_biblio',
@@ -283,6 +283,7 @@ final class IndiceIpogei
             'natura'          => (string) $scheda['identificazione']['natura'],
             'tipologia'       => (string) $scheda['identificazione']['tipologia'],
             'sottotipologia'  => (string) $scheda['identificazione']['sottotipologia'],
+            'complesso'       => (string) ($scheda['identificazione']['complesso'] ?? ''),
             'stato'           => (string) $scheda['ubicazione']['stato'],
             'regione'         => (string) $scheda['ubicazione']['regione'],
             'provincia'       => (string) $scheda['ubicazione']['provincia'],

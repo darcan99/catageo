@@ -296,6 +296,17 @@ function catageoStampaEsploratore(string $id): string
     return $voce === null ? $id . ' (non in anagrafica)' : Esploratori::etichetta($voce);
 }
 
+/** Nome del complesso, dal suo identificativo. */
+function catageoStampaComplesso(string $id): string
+{
+    if (trim($id) === '') {
+        return '';
+    }
+    $voce = Complessi::trova($id);
+
+    return $voce === null ? $id . ' (non in anagrafica)' : Complessi::etichetta($voce);
+}
+
 /** Nome dell'area speleologica, dal suo identificativo. */
 function catageoStampaArea(string $id): string
 {
@@ -482,6 +493,7 @@ header('Content-Type: text/html; charset=utf-8');
             'Codici esterni' => implode('; ', $esterni),
             'Codici storici' => implode('; ', $storici),
             'Tipologia'      => Tipologie::percorsoLeggibile((string) $scheda['identificazione']['tipologia']),
+            'Complesso'      => catageoStampaComplesso((string) ($scheda['identificazione']['complesso'] ?? '')),
         ]);
         ?>
       </div>

@@ -202,6 +202,10 @@
               <xs:element name="natura"         type="tCodiceTassonomia"/>
               <xs:element name="tipologia"      type="tCodiceTassonomia"/>
               <xs:element name="sottotipologia" type="tCodiceTassonomia" minOccurs="0"/>
+              <!-- Complesso di appartenenza (9.17.4): riferimento a
+                   dati/complessi.xml. Diverso dai <collegamenti>, che
+                   dicono che due cavita comunicano. -->
+              <xs:element name="complesso"      type="tCodiceOVuoto" minOccurs="0"/>
               <xs:element name="sinonimi" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>

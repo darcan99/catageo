@@ -1625,7 +1625,15 @@ Oggi le relazioni fra ipogei sono un grafo: `<collegamenti>` con codice e tipo d
 
 Quindi: **nessun codice assegnato da una serie di codifica**, che consumerebbe progressivi del catasto per un oggetto che non e una cavita. Il complesso e un'anagrafica come le aree (§9.17.5), con un identificativo interno e un **codice proprio facoltativo**, campo libero, per chi — tipicamente su cavita artificiali — vuole numerare i propri complessi con una convenzione sua.
 
-L'appartenenza si dichiara sulla scheda della cavita, come per l'area. Totali **calcolati e non digitati**: uno sviluppo complessivo scritto a mano diverge dalla somma delle schede al primo aggiornamento.
+L'appartenenza si dichiara sulla scheda della cavita, come per l'area. Totali **calcolati e non digitati**: uno sviluppo complessivo scritto a mano diverge dalla somma delle schede al primo aggiornamento, e da quel momento nessuno sa piu a quale dei due numeri credere.
+
+**Scelte assunte** (2026-08-07):
+
+- **Nome e codice proprio sono entrambi unici.** Sono i due modi con cui si nomina un complesso, e un doppione renderebbe ambiguo il riferimento in scheda e in bibliografia.
+- **Il codice proprio ammette barra e spazio** (`ACQ/07`): non e una codifica del catasto ma la convenzione di chi cataloga, e quelle usate per acquedotti e cave li contengono.
+- **La natura ha un valore «misto»** oltre a carsico e artificiale, e non e un riempitivo: una cava che intercetta un sistema carsico e il caso in cui le due nature coesistono davvero, ed e frequente proprio dove il catasto serve di piu.
+- **I totali si sommano dalle sole schede visibili a chi guarda.** Un totale comprensivo direbbe, per differenza, quante cavita riservate esistono. Il filtro conta perche i totali compaiono anche **sulla scheda della singola cavita**, che legge anche un USR: nella sola pagina dell'anagrafica sarebbe stato un controllo mai esercitato, dato che quella pagina richiede il permesso `anagrafiche`.
+- **La somma si legge dall'indice in streaming**, non aprendo le schede: e un conteggio che serve anche solo per disegnare un elenco, e mille XML aperti per una pagina renderebbero il complesso inutilizzabile su un catasto vero.
 
 #### 9.17.5 Aree speleologiche
 

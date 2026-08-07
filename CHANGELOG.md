@@ -21,6 +21,14 @@ Fase 12 (§9.17): estensioni del modello, in corso.
 - **Ricerca** su entrambi, con il filtro «non verificata da N anni». La query
   che giustifica la fase — *le cavita che proseguono e che non rivede nessuno
   da cinque anni* — ora si scrive in un indirizzo.
+- **Complessi**: nuova anagrafica per gli insiemi di cavita che formano un
+  sistema unico e hanno un nome proprio — la cosa di cui si parla in
+  letteratura, mentre le schede sono il modo in cui il catasto la registra.
+  **Nessun codice catastale**: consumare progressivi per un oggetto che non e
+  una cavita brucerebbe numeri che poi mancano alle cavita vere. Resta un
+  codice proprio facoltativo e libero, per chi — tipicamente sulle
+  artificiali — ha gia una numerazione sua. Sviluppo, dislivello e numero di
+  cavita si **sommano dalle schede** e non si digitano.
 - **Aree speleologiche**: nuova anagrafica per i raggruppamenti geografici
   con un nome proprio, indipendenti dai confini amministrativi. «Alto
   Chiascio» e il modo in cui uno speleologo colloca una cavita, e non

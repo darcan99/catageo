@@ -143,6 +143,7 @@ function datiSchedaDaPost(): array
             'natura'         => (string) ($_POST['natura'] ?? ''),
             'tipologia'      => (string) ($_POST['tipologia'] ?? ''),
             'sottotipologia' => (string) ($_POST['sottotipologia'] ?? ''),
+            'complesso'      => (string) ($_POST['complesso'] ?? ''),
         ],
         'ubicazione' => [
             'stato'     => (string) ($_POST['stato'] ?? 'IT'),
@@ -560,6 +561,28 @@ if ($azione === 'scheda' && $codice !== '') {
                       'Regione'   => (string) $scheda['ubicazione']['regione'],
                       'Provincia' => (string) $scheda['ubicazione']['provincia'],
                       'Comune'    => (string) $scheda['ubicazione']['comune'],
+                      /*
+                       * Il complesso si mostra con i suoi totali, sommati dalle
+                       * sole schede che chi guarda puo vedere. E qui che il
+                       * filtro di riservatezza serve davvero: la scheda la
+                       * legge anche un USR, e un totale comprensivo direbbe
+                       * per differenza quante cavita riservate esistono.
+                       */
+                      'Complesso' => (static function () use ($scheda): string {
+                          $id = (string) ($scheda['identificazione']['complesso'] ?? '');
+                          if ($id === '') { return ''; }
+                          $voce = Complessi::trova($id);
+                          if ($voce === null) { return $id . ' (non in anagrafica)'; }
+                          $totali = Complessi::totali($id);
+                          $etichetta = Complessi::etichetta($voce);
+                          if ($totali['ipogei'] > 1) {
+                              $etichetta .= ' · ' . $totali['ipogei'] . ' cavita';
+                              if ($totali['sviluppo'] > 0) {
+                                  $etichetta .= ', ' . number_format($totali['sviluppo'], 0, ',', '.') . ' m';
+                              }
+                          }
+                          return $etichetta;
+                      })(),
                       'Localita'  => (string) $scheda['ubicazione']['localita'],
                       // L'area si risolve in nome: sulla scheda un AS003 non
                       // dice niente a nessuno.
@@ -1766,6 +1789,24 @@ if ($azione === 'nuovo' || ($azione === 'modifica' && $codice !== '')) {
                   </select>
                   <div class="catageo-nota">
                     La tipologia determina anche quale serie di codifica assegna il codice.
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="complesso" class="form-label">Complesso</label>
+                  <select class="form-select" id="complesso" name="complesso">
+                    <option value="">—</option>
+                    <?php $cxCorrente = (string) ($_POST['complesso'] ?? ($s['identificazione']['complesso'] ?? '')); ?>
+                    <?php foreach (Complessi::elenco(true) as $cx): ?>
+                      <option value="<?= Testo::esc((string) $cx['id']) ?>"
+                              <?= $cxCorrente === (string) $cx['id'] ? 'selected' : '' ?>>
+                        <?= Testo::esc(Complessi::etichetta($cx)) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <div class="catageo-nota">
+                    Il sistema di cui questa cavita fa parte. Diverso dai
+                    collegamenti, che dicono con quali altre comunica.
                   </div>
                 </div>
 
