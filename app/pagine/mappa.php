@@ -37,8 +37,15 @@ $cataloghi = Cataloghi::elenco();
 
 /** Etichette delle nature, per la legenda e per il filtro. */
 $nature = [];
+/*
+ * La legenda mostra anche il glifo della natura, non solo il colore: e la
+ * chiave di lettura dei simboli in mappa (7.2.4), e una legenda di soli
+ * pallini colorati non spiegherebbe cosa sono le forme che si vedono.
+ */
+$iconeNatura = [];
 foreach (Tipologie::perLivello('natura', '', false) as $voce) {
-    $nature[(string) $voce['codice']] = (string) $voce['nome'];
+    $nature[(string) $voce['codice']]     = (string) $voce['nome'];
+    $iconeNatura[(string) $voce['codice']] = Tipologie::icona((string) $voce['codice']);
 }
 
 // Preselezione dal parametro, cosi che i collegamenti dall'elenco portino sulla
@@ -140,5 +147,6 @@ $totaleVisibili = IndiceIpogei::conta(Visibilita::filtroIndice());
   ?>
   <script type="application/json" id="catageoMappaConfig"><?= Testo::escJson(Mappa::perBrowser()) ?></script>
   <script type="application/json" id="catageoMappaNature"><?= Testo::escJson($nature) ?></script>
+  <script type="application/json" id="catageoMappaIconeNatura"><?= Testo::escJson($iconeNatura) ?></script>
 
 <?php endif; ?>

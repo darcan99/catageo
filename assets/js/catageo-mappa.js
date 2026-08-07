@@ -133,20 +133,46 @@
         return ACCESSI_CHIUSI.indexOf(prop.statoAccesso) !== -1;
     }
 
-    /** Simbolo di un singolo ipogeo. */
+    /* Il nome del glifo arriva dal vocabolario delle tipologie e finisce in un
+       attributo class: si accetta solo cio che un nome di icona puo essere.
+       Il server lo ripulisce gia (Tipologie::normalizzaIcona), ma qui il dato
+       ha attraversato la rete e la regola costa una riga. */
+    var ICONA_AMMESSA = /^[a-z0-9-]{1,40}$/;
+
+    function glifo(prop) {
+        var nome = prop.icona || '';
+        return ICONA_AMMESSA.test(nome) ? nome : 'geo-alt-fill';
+    }
+
+    /**
+     * Simbolo di un singolo ipogeo: goccia colorata per natura, glifo per
+     * tipologia.
+     *
+     * Due canali invece di uno. Il colore da solo distingue artificiale da
+     * naturale, ma non dice se quel punto e un acquedotto o una cava, e chi
+     * non percepisce bene la differenza fra arancio e verde non legge nemmeno
+     * quella: era il limite dichiarato in docs/prove/interfaccia.
+     *
+     * Si usa il font delle icone gia presente in pagina invece di un'immagine:
+     * nessun file nuovo, nessuna richiesta in piu, e il simbolo resta nitido a
+     * qualunque ingrandimento.
+     */
     function creaMarker(mappa, cfg, elemento) {
         var prop = elemento.prop;
         var nonAperto = chiuso(prop);
+        var classe = 'catageo-marker'
+                   + (nonAperto ? ' catageo-marker-chiuso' : '')
+                   + (prop.offuscate ? ' catageo-marker-offuscato' : '');
 
-        return mappa.cerchio(elemento.punto, {
-            raggio: 6,
-            bordo: '#ffffff',
-            spessore: 2,
-            opacitaBordo: 0.95,
-            riempimento: colore(cfg, prop.natura),
-            opacita: nonAperto ? 0.25 : 0.9,
-            tratteggio: nonAperto ? '2,2' : null
-        });
+        /* Il colore va in linea e non in una classe: le nature arrivano dalla
+           configurazione e un'installazione puo averne di proprie, quindi non
+           si possono prevedere le classi in un foglio di stile. */
+        var html = '<span class="catageo-marker-corpo" style="background:'
+                 + colore(cfg, prop.natura) + '">'
+                 + '<i class="bi bi-' + glifo(prop) + '" aria-hidden="true"></i>'
+                 + '</span>';
+
+        return mappa.simbolo(elemento.punto, html, classe, 30);
     }
 
     /** Contenuto del popup di un ipogeo. */
@@ -208,19 +234,37 @@
     // -------------------------------------------------------------- controlli
 
     /** Legenda: spiega colori e simboli, altrimenti restano decorazioni. */
-    function aggiungiLegenda(mappa, cfg, nature) {
+    function aggiungiLegenda(mappa, cfg, nature, icone) {
         var div = document.createElement('div');
         div.className = 'catageo-legenda';
+        icone = icone || {};
+
+        /* Il segno della legenda ha la stessa forma del marker in mappa: una
+           legenda con pallini accanto a segnaposto a goccia costringe a un
+           passaggio mentale in piu proprio quando si cerca di capire cosa si
+           sta guardando. */
+        var segno = function (codice) {
+            var nome = icone[codice] || '';
+            return '<span class="catageo-legenda-segno" style="background-color:'
+                 + esc(colore(cfg, codice)) + '">'
+                 + (ICONA_AMMESSA.test(nome) ? '<i class="bi bi-' + nome + '"></i>' : '')
+                 + '</span>';
+        };
 
         var voci = '';
         Object.keys(nature).forEach(function (codice) {
-            voci += '<li><span class="catageo-legenda-segno" style="background-color:'
-                + esc(colore(cfg, codice)) + '"></span>' + esc(nature[codice]) + '</li>';
+            voci += '<li>' + segno(codice) + esc(nature[codice]) + '</li>';
         });
         voci += '<li><span class="catageo-legenda-segno catageo-legenda-segno-chiuso"></span>'
             + 'Ingresso non praticabile</li>';
-        voci += '<li><span class="catageo-legenda-segno" style="background-color:rgba(13,110,253,.85)">'
+        voci += '<li><span class="catageo-legenda-segno catageo-legenda-segno-offuscato"></span>'
+            + 'Posizione approssimata</li>';
+        voci += '<li><span class="catageo-legenda-segno catageo-legenda-segno-gruppo">'
             + '</span>Gruppo di ipogei</li>';
+        /* Senza questa riga il colore si legge come «tutto», e il glifo passa
+           per decorazione. Sono due informazioni diverse e vanno dette. */
+        voci += '<li class="catageo-legenda-nota">Il colore indica la natura,'
+            + ' il simbolo la tipologia.</li>';
 
         div.innerHTML = '<h2>Legenda</h2><ul>' + voci + '</ul>';
         mappa.controlloAngolo('bassoDestra', div);
@@ -441,7 +485,7 @@
         var visibiliInfo = document.getElementById('catageoMappaVisibili');
 
         var nature = leggiJson('catageoMappaNature', {});
-        aggiungiLegenda(mappa, cfg, nature);
+        aggiungiLegenda(mappa, cfg, nature, leggiJson('catageoMappaIconeNatura', {}));
         aggiungiCoordinate(mappa);
 
         /*

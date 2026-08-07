@@ -37,8 +37,9 @@ final class VocabolariPredefiniti
         $albero = [
             'ART' => [
                 'nome' => 'Cavita artificiale',
+                'icona' => 'bricks',
                 'figli' => [
-                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'figli' => [
+                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'icona' => 'droplet-fill', 'figli' => [
                         'ART-IDR-CUN' => 'Cunicolo drenante',
                         'ART-IDR-ACQ' => 'Acquedotto',
                         'ART-IDR-CIS' => 'Cisterna',
@@ -46,62 +47,64 @@ final class VocabolariPredefiniti
                         'ART-IDR-FOG' => 'Fognatura',
                         'ART-IDR-EMI' => 'Emissario',
                     ]],
-                    'ART-EST' => ['nome' => 'Opere estrattive', 'figli' => [
+                    'ART-EST' => ['nome' => 'Opere estrattive', 'icona' => 'minecart-loaded', 'figli' => [
                         'ART-EST-CAV' => 'Cava ipogea',
                         'ART-EST-MIN' => 'Miniera',
                         'ART-EST-POZ' => 'Pozzo di estrazione',
                     ]],
-                    'ART-CUL' => ['nome' => 'Insediamenti e opere di culto', 'figli' => [
+                    'ART-CUL' => ['nome' => 'Insediamenti e opere di culto', 'icona' => 'bank', 'figli' => [
                         'ART-CUL-CAT' => 'Catacomba',
                         'ART-CUL-CHR' => 'Chiesa rupestre',
                         'ART-CUL-IPO' => 'Ipogeo funerario',
                         'ART-CUL-MIT' => 'Mitreo',
                         'ART-CUL-ERE' => 'Eremo',
                     ]],
-                    'ART-ABI' => ['nome' => 'Insediamenti civili', 'figli' => [
+                    'ART-ABI' => ['nome' => 'Insediamenti civili', 'icona' => 'house-door-fill', 'figli' => [
                         'ART-ABI-RUP' => 'Abitato rupestre',
                         'ART-ABI-CAN' => 'Cantina o magazzino',
                         'ART-ABI-NEV' => 'Neviera o ghiacciaia',
                         'ART-ABI-BUT' => 'Butto o pozzo di scarico',
                     ]],
-                    'ART-BEL' => ['nome' => 'Opere belliche', 'figli' => [
+                    'ART-BEL' => ['nome' => 'Opere belliche', 'icona' => 'shield-fill', 'figli' => [
                         'ART-BEL-RIC' => 'Ricovero antiaereo',
                         'ART-BEL-GAL' => 'Galleria militare',
                         'ART-BEL-POS' => 'Postazione fortificata',
                         'ART-BEL-DEP' => 'Deposito munizioni',
                     ]],
-                    'ART-TRA' => ['nome' => 'Opere di transito', 'figli' => [
+                    'ART-TRA' => ['nome' => 'Opere di transito', 'icona' => 'signpost-2-fill', 'figli' => [
                         'ART-TRA-GAL' => 'Galleria stradale o ferroviaria',
                         'ART-TRA-PAS' => 'Passaggio o cunicolo di collegamento',
                     ]],
-                    'ART-ALT' => ['nome' => 'Altro o non determinato', 'figli' => []],
+                    'ART-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'three-dots', 'figli' => []],
                 ],
             ],
             'NAT' => [
                 'nome' => 'Cavita naturale',
+                'icona' => 'triangle-fill',
                 'figli' => [
-                    'NAT-CAR' => ['nome' => 'Carsica', 'figli' => [
+                    'NAT-CAR' => ['nome' => 'Carsica', 'icona' => 'moisture', 'figli' => [
                         'NAT-CAR-GRO' => 'Grotta di dissoluzione',
                         'NAT-CAR-ABI' => 'Abisso o pozzo carsico',
                         'NAT-CAR-RIS' => 'Risorgenza',
                         'NAT-CAR-ING' => 'Inghiottitoio',
                     ]],
-                    'NAT-VUL' => ['nome' => 'Vulcanica', 'figli' => [
+                    'NAT-VUL' => ['nome' => 'Vulcanica', 'icona' => 'fire', 'figli' => [
                         'NAT-VUL-TUB' => 'Tubo di scorrimento lavico',
                         'NAT-VUL-CAM' => 'Camera di degassamento',
                     ]],
-                    'NAT-MAR' => ['nome' => 'Marina o di abrasione', 'figli' => []],
-                    'NAT-TET' => ['nome' => 'Tettonica', 'figli' => []],
-                    'NAT-GLA' => ['nome' => 'Glaciale o nivale', 'figli' => []],
-                    'NAT-ERO' => ['nome' => 'Di erosione o interstrato', 'figli' => []],
-                    'NAT-ALT' => ['nome' => 'Altro o non determinato', 'figli' => []],
+                    'NAT-MAR' => ['nome' => 'Marina o di abrasione', 'icona' => 'tsunami', 'figli' => []],
+                    'NAT-TET' => ['nome' => 'Tettonica', 'icona' => 'activity', 'figli' => []],
+                    'NAT-GLA' => ['nome' => 'Glaciale o nivale', 'icona' => 'snow', 'figli' => []],
+                    'NAT-ERO' => ['nome' => 'Di erosione o interstrato', 'icona' => 'wind', 'figli' => []],
+                    'NAT-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'three-dots', 'figli' => []],
                 ],
             ],
             'MIS' => [
                 'nome' => 'Cavita mista',
+                'icona' => 'intersect',
                 'figli' => [
-                    'MIS-NAT' => ['nome' => 'Naturale adattata dall\'uomo', 'figli' => []],
-                    'MIS-ART' => ['nome' => 'Artificiale che intercetta vuoti naturali', 'figli' => []],
+                    'MIS-NAT' => ['nome' => 'Naturale adattata dall\'uomo', 'icona' => 'intersect', 'figli' => []],
+                    'MIS-ART' => ['nome' => 'Artificiale che intercetta vuoti naturali', 'icona' => 'intersect', 'figli' => []],
                 ],
             ],
         ];
@@ -110,18 +113,20 @@ final class VocabolariPredefiniti
         $radice = $doc->documentElement;
 
         foreach ($albero as $codiceNatura => $natura) {
-            $nodoNatura = Xml::aggiungi($radice, 'natura', null, [
+            $nodoNatura = Xml::aggiungi($radice, 'natura', null, array_filter([
                 'codice' => $codiceNatura,
                 'nome'   => $natura['nome'],
+                'icona'  => $natura['icona'] ?? '',
                 'attivo' => '1',
-            ]);
+            ], static fn (string $v): bool => $v !== ''));
 
             foreach ($natura['figli'] as $codiceTipologia => $tipologia) {
-                $nodoTipologia = Xml::aggiungi($nodoNatura, 'tipologia', null, [
+                $nodoTipologia = Xml::aggiungi($nodoNatura, 'tipologia', null, array_filter([
                     'codice' => $codiceTipologia,
                     'nome'   => $tipologia['nome'],
+                    'icona'  => $tipologia['icona'] ?? '',
                     'attivo' => '1',
-                ]);
+                ], static fn (string $v): bool => $v !== ''));
 
                 foreach ($tipologia['figli'] as $codiceSotto => $nomeSotto) {
                     Xml::aggiungi($nodoTipologia, 'sotto', null, [

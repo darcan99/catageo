@@ -158,14 +158,16 @@ final class Tipologie
      *
      * @throws AnagraficaEccezione
      */
-    public static function crea(string $livello, string $padre, string $codice, string $nome, string $note = ''): string
+    public static function crea(string $livello, string $padre, string $codice, string $nome, string $note = '', string $icona = ''): string
     {
         $codice = self::normalizzaCodice($codice);
         $nome   = trim($nome);
 
         self::valida($livello, $padre, $codice, $nome, null);
 
-        Xml::conLock(self::percorso(), static function () use ($livello, $padre, $codice, $nome, $note): void {
+        $icona = self::normalizzaIcona($icona);
+
+        Xml::conLock(self::percorso(), static function () use ($livello, $padre, $codice, $nome, $note, $icona): void {
             self::assicuraFile();
             $doc = Xml::carica(self::percorso());
 
@@ -178,11 +180,11 @@ final class Tipologie
                 throw new AnagraficaEccezione('Voce superiore non trovata.');
             }
 
-            $nodo = Xml::aggiungi($contenitore, $livello, null, [
-                'codice' => $codice,
-                'nome'   => $nome,
-                'attivo' => '1',
-            ]);
+            $attributi = ['codice' => $codice, 'nome' => $nome, 'attivo' => '1'];
+            if ($icona !== '') {
+                $attributi['icona'] = $icona;
+            }
+            $nodo = Xml::aggiungi($contenitore, $livello, null, $attributi);
             if ($note !== '') {
                 Xml::imposta($nodo, 'note', $note, true);
             }
@@ -201,14 +203,16 @@ final class Tipologie
      *
      * @throws AnagraficaEccezione
      */
-    public static function aggiorna(string $codice, string $nome, string $note = '', bool $attivo = true): void
+    public static function aggiorna(string $codice, string $nome, string $note = '', bool $attivo = true, string $icona = ''): void
     {
         $nome = trim($nome);
         if ($nome === '') {
             throw new AnagraficaEccezione('Il nome è obbligatorio.');
         }
 
-        Xml::conLock(self::percorso(), static function () use ($codice, $nome, $note, $attivo): void {
+        $icona = self::normalizzaIcona($icona);
+
+        Xml::conLock(self::percorso(), static function () use ($codice, $nome, $note, $attivo, $icona): void {
             $doc  = Xml::carica(self::percorso());
             $nodo = self::nodoPerCodice($doc, $codice);
             if ($nodo === null) {
@@ -217,6 +221,11 @@ final class Tipologie
 
             $nodo->setAttribute('nome', $nome);
             $nodo->setAttribute('attivo', $attivo ? '1' : '0');
+            if ($icona === '') {
+                $nodo->removeAttribute('icona');
+            } else {
+                $nodo->setAttribute('icona', $icona);
+            }
             Xml::imposta($nodo, 'note', $note, true);
 
             Xml::salva($doc, self::percorso(), self::xsd());
@@ -284,6 +293,62 @@ final class Tipologie
     }
 
     /**
+     * Icona della voce, ereditata dall'alto se la voce non ne ha una.
+     *
+     * L'ereditarieta e il punto: chi crea una sottotipologia nuova — «Cisterna
+     * a campana» sotto le opere idrauliche — non deve scegliere un'icona
+     * perche la sua cavita compaia in mappa con il simbolo giusto. La sceglie
+     * solo se vuole distinguerla dalle sorelle.
+     *
+     * Si sale di livello, non si scende: una tipologia senza icona prende
+     * quella della natura, e la natura ha sempre la sua nel vocabolario
+     * predefinito. Se anche quella manca decide il chiamante, che sa se sta
+     * disegnando un marker o una legenda.
+     */
+    public static function icona(string $codice): string
+    {
+        $voci = [];
+        foreach (self::elenco() as $v) {
+            $voci[$v['codice']] = $v;
+        }
+
+        $corrente = $codice;
+        // Il limite di giri non e paranoia: il file e modificabile a mano, e un
+        // padre che punta a un figlio farebbe girare questo ciclo per sempre.
+        for ($giri = 0; $giri < count(self::LIVELLI) + 1; $giri++) {
+            if (!isset($voci[$corrente])) {
+                return '';
+            }
+            if (($voci[$corrente]['icona'] ?? '') !== '') {
+                return (string) $voci[$corrente]['icona'];
+            }
+            $corrente = (string) $voci[$corrente]['padre'];
+            if ($corrente === '') {
+                return '';
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Ripulisce un nome di icona.
+     *
+     * Si accetta il solo nome di Bootstrap Icons, senza il prefisso «bi-» e
+     * senza spazi: quel nome finisce dentro un attributo class in pagina, e
+     * lasciarlo passare libero significherebbe permettere di scriverci altre
+     * classi. Non e un'ipotesi di scuola — chi compila i vocabolari e un
+     * amministratore, ma l'XML si puo anche modificare a mano.
+     */
+    private static function normalizzaIcona(string $icona): string
+    {
+        $icona = strtolower(trim($icona));
+        $icona = preg_replace('/^bi-/', '', $icona) ?? $icona;
+
+        return preg_match('/^[a-z0-9-]{1,40}$/', $icona) === 1 ? $icona : '';
+    }
+
+    /**
      * Riferimenti alla voce nelle schede degli ipogei.
      *
      * @return array<string,int>
@@ -334,6 +399,15 @@ final class Tipologie
             'padre'    => $padre,
             'percorso' => $percorso,
             'attivo'   => $nodo->getAttribute('attivo') !== '0',
+            /*
+             * Ripulita in LETTURA e non solo in scrittura. La ripulitura sul
+             * salvataggio protegge chi usa l'interfaccia, ma i vocabolari sono
+             * file XML che si modificano anche a mano — e il progetto lo
+             * incoraggia, e il senso di un archivio leggibile. Un valore
+             * scritto a mano arriverebbe intatto fin dentro l'attributo class
+             * del marker: la prova lo ha dimostrato, non e un'ipotesi.
+             */
+            'icona'    => self::normalizzaIcona($nodo->getAttribute('icona')),
             'note'     => Xml::testo($nodo, 'note'),
         ];
     }

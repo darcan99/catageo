@@ -1417,6 +1417,28 @@ Ogni layer è un elemento `<layer>` sotto `<baseLayers>` (sfondi, mutuamente esc
 
 Le origini dei layer alimentano la **Content-Security-Policy** emessa da `bootstrap.php`: aggiungere un servizio in `config.xml` è sufficiente, la policy si adegua da sé. Il segnaposto `{s}` diventa un carattere jolly di sottodominio. Se la lettura della configurazione cartografica fallisce, la policy resta quella restrittiva e il guasto viene registrato nel log: il sintomo altrimenti sarebbe soltanto una mappa senza sfondo.
 
+#### 7.2.4 Simboli in mappa: colore per natura, glifo per tipologia
+
+Il marker di un ipogeo e una **pastiglia colorata con dentro un glifo**. Sono due canali distinti e dicono due cose diverse:
+
+| Canale | Dice | Da dove viene |
+|---|---|---|
+| **Colore** | la natura: artificiale, naturale, mista | `Mappa::COLORI_NATURA` |
+| **Glifo** | la tipologia: acquedotto, cava, catacomba, grotta carsica… | attributo `icona` della voce di vocabolario |
+| **Contorno** | tratteggiato se l'ingresso non e praticabile, puntinato se la posizione e approssimata | stato di accesso e riservatezza |
+
+Prima il colore era l'unico canale, e in `docs/prove/interfaccia` stava scritto fra i limiti: *«la distinzione fra cavita artificiali e naturali sulla mappa e affidata al colore»*. Con due nature il colore da solo non dice nemmeno cosa sia quel punto, e chi non distingue bene arancio e verde non legge neppure quello.
+
+**Il glifo lo decide il vocabolario, non il codice.** La tassonomia (`natura > tipologia > sotto`) e configurabile da ogni catasto: un set di icone cablato andrebbe bene per il primo e sarebbe sbagliato per il secondo. L'icona e un attributo della voce, e si **eredita salendo**: una sottotipologia nuova compare in mappa con il simbolo della madre senza che chi la crea debba scegliere nulla. Si compila solo per distinguere una voce dalle sorelle.
+
+**Nessun file nuovo.** Si usa il font di Bootstrap Icons, gia self-hosted (vincolo §2, nessuna CDN): il marker e un `<i class="bi bi-…">` dentro un `<span>` colorato, quindi niente immagini da scaricare, niente richieste in piu, e il simbolo resta nitido a qualunque ingrandimento. Il nome del glifo passa da `Tipologie::normalizzaIcona()` **sia in scrittura sia in lettura**: finisce dentro un attributo `class`, e i vocabolari sono file XML che il progetto incoraggia a leggere e correggere a mano.
+
+**Pastiglia e non goccia.** Il simbolo viene ancorato dal proprio centro sulla coordinata: una goccia con la punta in basso direbbe «la posizione e sotto di me», cioe qualche metro piu in la a seconda della scala. Su un catasto la posizione e il dato, e il simbolo non deve raccontarla diversamente da com'e.
+
+La legenda mostra il segno con la stessa forma del marker e dichiara la regola: *«Il colore indica la natura, il simbolo la tipologia»*. Senza quella riga il colore si legge come «tutto» e il glifo passa per decorazione.
+
+---
+
 #### 7.2.3 Layer preconfigurati per l'Italia centrale (fase 6b)
 
 `config.xml.dist` esce con **26 layer già scritti e tutti spenti** (`attivo="0"`): nazionali, più Lazio, Abruzzo, Umbria e Marche. Si accendono dal pannello dei layer quando servono; un'installazione fuori dall'Italia centrale cancella i blocchi regionali che non le servono.

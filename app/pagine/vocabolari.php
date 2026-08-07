@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (string) ($_POST['padre'] ?? ''),
                     (string) ($_POST['codice'] ?? ''),
                     (string) ($_POST['nome'] ?? ''),
-                    (string) ($_POST['note'] ?? '')
+                    (string) ($_POST['note'] ?? ''),
+                    (string) ($_POST['icona'] ?? '')
                 );
                 Log::modifica('crea', '', '', 'tipologie', $codice);
                 Auth::messaggio('successo', 'Voce aggiunta alla tassonomia.');
@@ -68,7 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'tipologia-aggiorna':
                 $codice = (string) ($_POST['codice'] ?? '');
-                Tipologie::aggiorna($codice, (string) ($_POST['nome'] ?? ''), (string) ($_POST['note'] ?? ''), !empty($_POST['attivo']));
+                Tipologie::aggiorna(
+                    $codice,
+                    (string) ($_POST['nome'] ?? ''),
+                    (string) ($_POST['note'] ?? ''),
+                    !empty($_POST['attivo']),
+                    (string) ($_POST['icona'] ?? '')
+                );
                 Log::modifica('modifica', '', '', 'tipologie', $codice);
                 Auth::messaggio('successo', 'Voce aggiornata.');
                 break;
@@ -272,6 +279,23 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
                        maxlength="120" value="<?= Testo::esc($inMod['nome']) ?>">
               </div>
               <div class="mb-3">
+                <label for="icona" class="form-label">Icona in mappa</label>
+                <div class="input-group">
+                  <span class="input-group-text catageo-anteprima-icona">
+                    <i class="bi bi-<?= Testo::esc($inMod['icona'] !== '' ? $inMod['icona'] : Tipologie::icona($inMod['codice'])) ?>"></i>
+                  </span>
+                  <input type="text" class="form-control catageo-valore" id="icona" name="icona"
+                         maxlength="40" placeholder="droplet-fill"
+                         value="<?= Testo::esc($inMod['icona']) ?>">
+                </div>
+                <div class="catageo-nota">
+                  Nome di <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Icons</a>
+                  senza il prefisso <span class="catageo-valore">bi-</span>. Lasciandolo vuoto la voce
+                  eredita l'icona di quella superiore: si compila solo per distinguere una voce
+                  dalle sorelle.
+                </div>
+              </div>
+              <div class="mb-3">
                 <label for="note" class="form-label">Note</label>
                 <textarea class="form-control" id="note" name="note" rows="3"><?= Testo::esc($inMod['note']) ?></textarea>
               </div>
@@ -335,6 +359,12 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
               <div class="mb-3">
                 <label for="nomeNuovo" class="form-label">Nome <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="nomeNuovo" name="nome" required maxlength="120">
+              </div>
+
+              <div class="mb-3">
+                <label for="iconaNuovo" class="form-label">Icona in mappa</label>
+                <input type="text" class="form-control catageo-valore" id="iconaNuovo" name="icona"
+                       maxlength="40" placeholder="lascia vuoto per ereditarla">
               </div>
 
               <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Aggiungi</button>

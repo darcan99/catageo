@@ -18,6 +18,74 @@
  * ============================================================================
  */
 
+/* ------------------------------------------------------------------ marker */
+
+/* Un ipogeo in mappa: pastiglia colorata per NATURA con dentro il glifo della
+   TIPOLOGIA.
+ *
+ * Due canali invece di uno. Il colore da solo dice artificiale o naturale ma
+ * non dice cosa sia quel punto, e chi non distingue bene arancio e verde non
+ * legge nemmeno quello: era il limite dichiarato in docs/prove/interfaccia.
+ *
+ * PASTIGLIA E NON GOCCIA, ed e una scelta di correttezza. Il simbolo viene
+ * ancorato dal suo centro sulla coordinata: una goccia con la punta in basso
+ * direbbe «la posizione e sotto di me», cioe una decina di metri piu in la a
+ * seconda della scala. Su un catasto la posizione e il dato, e un simbolo non
+ * deve raccontarla diversamente da com'e. Una forma simmetrica indica con il
+ * proprio centro, che e dove il punto sta davvero. */
+.catageo-marker {
+    background: none;
+    border: 0;
+}
+
+/* Riempie esattamente il riquadro che la mappa ancora sul punto: 30 px con il
+   bordo compreso. Con box-sizing predefinito il bordo si sommerebbe alla
+   larghezza e il simbolo scivolerebbe di un paio di pixel rispetto alla
+   coordinata — poco, ma su una mappa di catasto e uno scarto che non ha
+   ragione di esistere. */
+.catageo-marker-corpo {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+    color: #fff;
+}
+
+.catageo-marker-corpo > i {
+    font-size: 0.82rem;
+    line-height: 1;
+}
+
+/* Ingresso non praticabile: si vede che c'e ma si vede anche che non si entra.
+   Contorno tratteggiato e non solo trasparenza, perche la sola trasparenza a
+   colpo d'occhio si confonde con un marker lontano. */
+.catageo-marker-chiuso .catageo-marker-corpo {
+    opacity: 0.55;
+    border-style: dashed;
+}
+
+/* Coordinate offuscate: il simbolo dichiara che quel punto e approssimato,
+   invece di lasciarlo credere esatto. */
+.catageo-marker-offuscato .catageo-marker-corpo {
+    border-style: dotted;
+    border-width: 3px;
+}
+
+/* Sopra gli altri quando ci si passa sopra: in un gruppo fitto i simboli si
+   sovrappongono e quello che si sta guardando deve venire davanti. */
+.catageo-marker:hover {
+    z-index: 1000 !important;
+}
+
+.catageo-marker:hover .catageo-marker-corpo {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
 /* ------------------------------------------------------------------ cluster */
 
 /* Il numero dentro il cerchio e l'informazione principale: sfondo pieno e
@@ -129,14 +197,24 @@
     gap: 0.4rem;
 }
 
+/* Il segno della legenda ripete la forma del marker: pastiglia, non pallino.
+   Una legenda che non somiglia a cio che spiega costringe a tradurre. */
 .catageo-legenda-segno {
-    display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 0.35rem;
     border: 2px solid rgba(255, 255, 255, 0.9);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
     flex: 0 0 auto;
+    color: #fff;
+}
+
+.catageo-legenda-segno > i {
+    font-size: 0.6rem;
+    line-height: 1;
 }
 
 /* Ingresso non praticabile: si distingue per il tratteggio, non per il colore,
@@ -144,6 +222,24 @@
 .catageo-legenda-segno-chiuso {
     border-style: dashed;
     background-color: transparent !important;
+}
+
+/* Posizione approssimata: puntinato, come il marker corrispondente. */
+.catageo-legenda-segno-offuscato {
+    border-style: dotted;
+    background-color: transparent !important;
+}
+
+/* Il gruppo e tondo anche in mappa: qui la forma diversa e voluta, perche un
+   gruppo non e una cavita. */
+.catageo-legenda-segno-gruppo {
+    border-radius: 50%;
+    background-color: rgba(13, 110, 253, 0.85);
+}
+
+.catageo-legenda-nota {
+    font-style: italic;
+    opacity: 0.85;
 }
 
 /* ------------------------------------------------- lettura delle coordinate */

@@ -60,6 +60,14 @@ final class Esportazione
             'natura'        => (string) ($riga['natura'] ?? ''),
             'tipologia'     => (string) ($riga['tipologia'] ?? ''),
             'tipologiaNome' => Tipologie::nome((string) ($riga['tipologia'] ?? '')),
+            /*
+             * Il nome del glifo, non il glifo: chi disegna e il browser, che ha
+             * gia il font delle icone. Si risolve qui e non nel JavaScript
+             * perche l'ereditarieta lungo la tassonomia la conosce il
+             * vocabolario, e mandarla al browser vorrebbe dire spedire tutto
+             * l'albero delle tipologie a ogni richiesta della mappa.
+             */
+            'icona'         => Tipologie::icona((string) ($riga['tipologia'] ?? '')),
             'comune'        => (string) ($riga['comune'] ?? ''),
             'localita'      => (string) ($riga['localita'] ?? ''),
             'quota'         => (string) ($riga['quota'] ?? ''),

@@ -485,6 +485,29 @@ mano da `config.xml.dist`.
 
 I rilievi georiferiti (KML/KMZ) si sovrappongono alla mappa.
 
+### I simboli
+
+Ogni cavità è una pastiglia colorata con dentro un simbolo, e le due cose
+dicono cose diverse:
+
+- il **colore** è la natura — arancio artificiale, verde naturale, viola mista;
+- il **simbolo** è la tipologia — una goccia per le opere idrauliche, un
+  carrello per quelle estrattive, uno scudo per le belliche, una fiamma per le
+  cavità vulcaniche, e così via;
+- il **contorno tratteggiato** dice che l'ingresso non è praticabile, quello
+  puntinato che la posizione è approssimata perché le coordinate sono riservate.
+
+I simboli si cambiano dai **vocabolari**, sotto Anagrafiche › Tipologie: ogni
+voce della tassonomia ha un campo «Icona in mappa» che accetta il nome di
+un'icona di [Bootstrap Icons](https://icons.getbootstrap.com/). Lasciandolo
+vuoto la voce **eredita** il simbolo di quella superiore, quindi una
+sottotipologia nuova compare in mappa da subito con il simbolo giusto: si
+compila solo per distinguerla dalle sorelle.
+
+La pastiglia è simmetrica di proposito: il simbolo indica il punto con il
+proprio centro. Un segnaposto a goccia indicherebbe con la punta, e a colpo
+d'occhio si leggerebbe la posizione qualche metro più in là.
+
 Le coordinate mostrate sulla mappa rispettano la riservatezza esattamente come
 la scheda: una cavità a coordinate offuscate compare arrotondata, una riservata
 non compare affatto.

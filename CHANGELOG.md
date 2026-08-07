@@ -6,6 +6,43 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.4.0] — 2026-08-08
+
+### Aggiunto
+- **Simboli in mappa: colore per natura, glifo per tipologia.** Il marker era
+  un pallino colorato, e il colore era l'unico canale: con due nature non
+  diceva nemmeno cosa fosse quel punto, e chi non distingue bene arancio e
+  verde non leggeva neppure quello — era scritto fra i limiti dichiarati in
+  docs/prove/interfaccia. Ora la pastiglia porta dentro il simbolo della
+  tipologia: goccia per le opere idrauliche, carrello per le estrattive, scudo
+  per le belliche, fiamma per le vulcaniche, e cosi via.
+- **Il simbolo lo decide il vocabolario, non il codice**: e un attributo
+  `icona` della voce di tassonomia, e si **eredita salendo**. Una
+  sottotipologia nuova compare in mappa con il simbolo della madre senza che
+  chi la crea scelga nulla; si compila solo per distinguerla dalle sorelle. Un
+  set cablato sarebbe andato bene per il primo catasto e sbagliato per il
+  secondo.
+- Campo **Icona in mappa** nei vocabolari, con anteprima del glifo.
+- Le **cavita miste** hanno finalmente un colore proprio: cadevano nel grigio
+  «natura non indicata».
+- La **legenda** mostra il segno con la stessa forma del marker e dichiara la
+  regola: senza quella riga il colore si legge come «tutto» e il glifo passa
+  per decorazione.
+
+### Note di progetto
+- **Nessun file nuovo**: si usa il font di Bootstrap Icons, gia self-hosted.
+  Niente immagini da scaricare, niente richieste in piu, simbolo nitido a
+  qualunque ingrandimento — e il vincolo «nessuna CDN» resta intatto.
+- **Pastiglia e non goccia.** Il simbolo e ancorato dal proprio centro sulla
+  coordinata: una goccia con la punta in basso direbbe «la posizione e sotto
+  di me». Su un catasto la posizione e il dato. Verificato nel browser che lo
+  scarto fra centro del simbolo e punto sia zero.
+- Il nome del glifo finisce dentro un attributo `class`: si ripulisce **sia in
+  scrittura sia in lettura**. La prima versione lo faceva solo in scrittura, e
+  la prova ha mostrato che un valore scritto a mano nell'XML arrivava intatto
+  fino alla pagina — i vocabolari sono file che il progetto incoraggia a
+  correggere a mano.
+
 ## [1.3.2] — 2026-08-08
 
 ### Modificato

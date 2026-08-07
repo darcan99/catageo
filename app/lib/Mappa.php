@@ -107,9 +107,17 @@ final class Mappa
      * su una mappa affollata: e la prima informazione che serve, quindi e quella
      * codificata nel colore.
      */
+    /*
+     * Il colore dice la NATURA, il glifo dice la tipologia (7.2.4). Sono due
+     * canali distinti di proposito: chi non distingue bene arancio e verde
+     * legge comunque il simbolo, e chi guarda la mappa da lontano vede
+     * comunque due famiglie di colore. Affidare tutto al solo colore era il
+     * limite dichiarato in docs/prove/interfaccia.
+     */
     public const COLORI_NATURA = [
         'ART' => '#c2410c',   // arancio mattone: opera dell'uomo
         'NAT' => '#0f766e',   // verde-acqua: origine naturale
+        'MIS' => '#6d28d9',   // viola: naturale e artificiale insieme
         ''    => '#64748b',   // grigio: natura non indicata
     ];
 
