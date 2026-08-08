@@ -6,6 +6,40 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.8.1] — 2026-08-08
+
+### Modificato
+- **Berretto frigio a contorno**, come nella traccia di chi lo ha chiesto:
+  non una massa piena ma una linea che mostra la **piega**, con una riga
+  orizzontale in basso a fare la falda. Il berretto occupa tutto il riquadro
+  e arriva ai bordi. Pieno, la piega spariva — ed e la piega a distinguere un
+  berretto frigio da un cappuccio qualunque.
+- **Grotta glaciale**: via il semicerchio, che confondeva. E una **linea
+  curva** che disegna l'ingresso della grotta, piu alta e piu stretta di una
+  mezza circonferenza, con l'asterisco del ghiaccio dentro. Un semicerchio e
+  una figura geometrica; l'ingresso di una grotta non lo e.
+
+- **Ogni forma ha il suo stacco.** I tre proietti si toccavano e diventavano
+  una massa sola; ora fra l'uno e l'altro c'e un'unita di vuoto, come fra
+  l'ogiva e il bossolo. Stessa cosa per le linee d'acqua, che si saldavano
+  alle pareti del condotto.
+- **Via le trasparenze.** Erano in due glifi su quaranta — cava e galleria — e
+  sopra una pastiglia colorata si leggevano come sporco invece che come
+  dettaglio. Un insieme in cui due pezzi seguono una regola diversa dagli
+  altri si nota, e si nota come errore. La prova ora rifiuta `opacity`.
+- **Fronte di cava**: una massa sola tagliata a gradoni. Disegnato a banchi
+  staccati diventava un grafico a barre.
+
+### Note di progetto
+- Terzo giro sugli stessi due glifi, e le prime due volte avevo aggiunto
+  dettaglio dove serviva **toglierlo**: prima la figura dentro la cornice, poi
+  la sagoma piena. Un contorno con una piega dice piu di una massa con
+  quattro curve — ma **senza punta non e un cappello**, ed e quello che
+  mancava alla penultima versione.
+- Le tre correzioni di questo rilascio sono la stessa correzione: **due forme
+  che si toccano diventano una forma sola**. Vale per i proietti, per l'acqua
+  contro le pareti e per i gradoni della cava.
+
 ## [1.8.0] — 2026-08-08
 
 ### Aggiunto

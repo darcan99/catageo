@@ -26,7 +26,7 @@
 
 ## Stato del progetto
 
-**Versione 1.8.0** — tutto quello che l'elenco qui sopra descrive è realizzato e provato, comprese la **sezione geologia** (fase 6b) con 26 layer cartografici preconfigurati per l'Italia centrale e la compilazione assistita dalla cartografia, e il **provider Google Maps** alternativo a OpenStreetMap (fase 4b).
+**Versione 1.8.1** — tutto quello che l'elenco qui sopra descrive è realizzato e provato, comprese la **sezione geologia** (fase 6b) con 26 layer cartografici preconfigurati per l'Italia centrale e la compilazione assistita dalla cartografia, e il **provider Google Maps** alternativo a OpenStreetMap (fase 4b).
 
 Due limiti dichiarati. La **resa visiva del provider Google** non è stata confermata: serve una chiave API valida, e con una chiave finta l'implementazione gira ma Google non disegna la propria cornice. I **layer dei geoportali** sono di enti pubblici che spostano gli endpoint senza preavviso: sono stati verificati uno per uno il 2026-08-07, e la suite di prova li interroga a ogni giro contandoli separatamente, perché un ente che spegne un servizio non è una regressione dell'applicativo.
 
