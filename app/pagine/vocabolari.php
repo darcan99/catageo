@@ -16,12 +16,17 @@ declare(strict_types=1);
  *
  *                  In tutti e tre i casi il codice di una voce non e
  *                  modificabile: e il riferimento memorizzato nelle schede.
- *  Versione .....: 0.2.0
+ *  Versione .....: 1.6.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.6.1  2026-08-08  D.Candela  Una colonna «Mappa» vuota su tutte le
+ *                                righe adesso dice perche, e offre il
+ *                                comando che la riempie.
+ *  1.5.0  2026-08-08  D.Candela  Colonna del simbolo risolto e tavolozza
+ *                                dei glifi propri.
  *  0.2.0  2026-08-04  D.Candela  Prima stesura (fase 2).
  * ============================================================================
  */
@@ -216,7 +221,44 @@ if ($voc === 'tipologie') {
   $nature  = Tipologie::perLivello('natura', '', false);
   $tipol   = Tipologie::perLivello('tipologia', '', false);
   $inMod   = $modifica !== '' ? Tipologie::trova($modifica) : null;
+
+  /*
+   * Un archivio nato prima dei glifi non ha nemmeno un'icona, e la colonna
+   * «Mappa» resta vuota su tutte le righe. Una colonna vuota senza spiegazione
+   * e un vicolo cieco: chi la guarda non sa se ha sbagliato lui, se il
+   * simbolo non si vede o se non c'e. Lo si dice, e si dice cosa fare.
+   */
+  $conIcona = 0;
+  foreach ($voci as $v) {
+      if (($v['icona'] ?? '') !== '') {
+          $conIcona++;
+      }
+  }
   ?>
+
+  <?php if ($conIcona === 0 && $voci !== []): ?>
+    <div class="alert alert-info d-flex flex-wrap align-items-center gap-3">
+      <div class="flex-grow-1">
+        <strong>Nessuna voce ha ancora un simbolo per la mappa.</strong>
+        Questo archivio e nato prima dei glifi, e il vocabolario non viene
+        toccato dagli aggiornamenti: le tue voci e le tue scelte restano dove
+        sono. I simboli predefiniti si portano dentro con un comando, che
+        completa solo le voci che ne sono prive.
+      </div>
+      <?php if (Auth::puo('strumenti')): ?>
+        <form method="post" action="index.php?p=strumenti" class="m-0">
+          <?= Auth::campoToken() ?>
+          <input type="hidden" name="operazione" value="iconePredefinite">
+          <input type="hidden" name="ritorno" value="vocabolari">
+          <button type="submit" class="btn btn-primary text-nowrap">
+            <i class="bi bi-palette"></i> Completa i simboli mancanti
+          </button>
+        </form>
+      <?php else: ?>
+        <span class="text-nowrap small">Lo puo fare un amministratore da Strumenti.</span>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
 
   <div class="row g-4">
     <div class="col-lg-7">
@@ -315,8 +357,21 @@ if ($voc === 'tipologie') {
                   <span class="input-group-text catageo-anteprima-icona">
                     <?= Icone::html($inMod['icona'] !== '' ? $inMod['icona'] : Tipologie::icona($inMod['codice'])) ?>
                   </span>
+                  <?php
+                  /*
+                   * Il segnaposto diceva «droplet-fill», che e un nome di icona
+                   * valido: su un campo vuoto si legge come un valore gia
+                   * impostato, e chi guarda crede di avere un simbolo che non
+                   * ha. Un segnaposto deve dire cosa succede se non si scrive
+                   * niente, non fingere un contenuto.
+                   */
+                  $padreMod = (string) ($inMod['padre'] ?? '');
+                  $segnaposto = $padreMod !== ''
+                      ? 'vuoto: eredita da ' . $padreMod
+                      : 'vuoto: nessun simbolo';
+                  ?>
                   <input type="text" class="form-control catageo-valore" id="icona" name="icona"
-                         maxlength="40" placeholder="droplet-fill"
+                         maxlength="40" placeholder="<?= Testo::esc($segnaposto) ?>"
                          value="<?= Testo::esc($inMod['icona']) ?>">
                 </div>
                 <div class="catageo-nota">

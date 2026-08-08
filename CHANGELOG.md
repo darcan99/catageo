@@ -6,6 +6,84 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.7.0] — 2026-08-08
+
+### Modificato
+Dodici glifi ridisegnati su indicazione di chi li usa. Tutti e dodici erano
+sbagliati per la stessa ragione: dicevano la cosa giusta a chi li aveva
+disegnati e un'altra a chi li guardava.
+
+- **Grotta**: la bocca e un **semicerchio** basso e largo. L'arco a tutto sesto
+  e la sagoma di una galleria scavata dall'uomo, e questo glifo deve dire il
+  contrario.
+- **Miniera**: il **carrello sul binario** con il carico che sporge. L'imbocco
+  in galleria diceva «galleria», che e meta del mestiere: il carrello dice che
+  da quel buco si porta fuori qualcosa.
+- **Deposito munizioni**: **tre proietti** in fila. Uno solo si leggeva come
+  una pastiglia; tre allineati sono un deposito, cioe roba in quantita.
+- **Eremo**: **tre torrette con la finestrella** su una base svasata che dice
+  «cima di monte». Via la croce, che lo confondeva con la chiesa rupestre.
+- **Grotta glaciale**: **semicerchio con il fiocco dentro**. Il semicerchio e
+  la bocca, il fiocco dice di che materiale e la volta.
+- **Catacomba**: sotto l'arcosolio ci sono i **tre loculi**. L'arco da solo
+  restava una nicchia qualunque.
+- **Pozzo**: la bocca **vista dall'alto**, con il corso dei mattoni. La sezione
+  non si capiva: due montanti e una traversa sono un tavolo o una porta. Dal
+  sopra un pozzo e un anello di mattoni con il buio in mezzo, ed e cosi che lo
+  si incontra camminando.
+- **Neviera**: il **tronco di cono** in muratura, la bocca in cima, la neve
+  dentro. La bocca sta in alto perche la neve si calava dall'alto.
+- **Mitreo**: la **figura del dio** dentro l'incorniciatura a tre lati. Due
+  podi dentro una volta non dicono niente senza didascalia; il rilievo di culto
+  in fondo all'aula e la cosa per cui un mitreo si riconosce.
+- **Fognatura**: l'acqua e un'**onda**, non un blocco pieno. In un condotto
+  scorre, e una massa piatta diceva «pieno d'acqua», che e un'altra cosa.
+- **Grotta marina**: **tre righe ondulate** al posto della massa d'acqua. E il
+  modo in cui il mare si disegna da sempre, e dice superficie aperta.
+- **Butto**: un **collo d'anfora spezzato** con l'ansa e la frattura. L'anfora
+  intera diceva «recipiente»; un collo rotto dice «scarico», ed e
+  letteralmente cio che si tira su da un butto.
+
+### Note di progetto
+- **Il fiocco di neve non si disegna con due rettangoli incrociati.** Con
+  `fill-rule="evenodd"` due forme sovrapposte si annullano dove si
+  intersecano, e al centro tornerebbe pieno: e lo stesso errore che aveva
+  spezzato la croce dell'eremo nella 1.6.0. I bracci si attaccano al fusto
+  **senza sovrapporsi**.
+- Nessuna di queste correzioni e stata trovata da una prova, e nessuna prova
+  poteva trovarla: le verifiche dicono che un simbolo esiste, che e distinto e
+  che il vocabolario non punta al vuoto. **Se somiglia a quello che nomina lo
+  dice solo chi lo guarda**, ed e il motivo per cui la pagina di prova serve i
+  glifi a tre misure.
+
+## [1.6.1] — 2026-08-08
+
+### Corretto
+- **Una colonna vuota adesso spiega perche lo e.** Su un archivio nato prima
+  dei glifi nessuna voce ha un simbolo, e la colonna «Mappa» del vocabolario
+  restava vuota su tutte le righe senza dire niente. Chi la guardava non
+  poteva sapere se aveva sbagliato lui, se il simbolo non si vedeva o se non
+  c'era: e successo davvero, e la domanda era «perche non vedo le icone
+  assegnate?». Erano assegnate nel codice, non nel suo archivio.
+- Ora l'elenco lo dichiara e **offre il comando sul posto**, dove il problema
+  si vede, invece di rimandare a una pagina che non si sta guardando. Il
+  comando riporta al vocabolario e non agli strumenti, perche il motivo per
+  cui lo si e lanciato era controllare quella colonna.
+- L'avviso **sparisce** quando i simboli ci sono. Un avviso che resta dopo
+  essere stato seguito e peggio di nessun avviso: insegna a ignorarlo.
+- **Il segnaposto del campo «Icona in mappa» diceva il falso.** Era
+  `droplet-fill`, che e un nome di icona valido: su un campo vuoto si legge
+  come un valore gia impostato, e chi guardava credeva di avere un simbolo che
+  non aveva. Ora dice cosa succede a lasciarlo vuoto — «eredita da ART» — che
+  e la sola cosa che quel campo debba spiegare.
+
+### Note di progetto
+- Le prove coprivano il comando e l'ereditarieta, e infatti nessuna e mai
+  fallita: **non coprivano lo stato iniziale**, cioe l'unico che l'utente
+  vedeva. Ora c'e una verifica sull'archivio senza nemmeno un simbolo, che e
+  la condizione in cui si trova ogni installazione esistente il giorno
+  dell'aggiornamento.
+
 ## [1.6.0] — 2026-08-08
 
 ### Aggiunto

@@ -13,12 +13,15 @@ declare(strict_types=1);
  *                  e una correzione automatica che indovina male su un catasto
  *                  di trent'anni fa piu danni del problema. L'unica cosa che si
  *                  offre di rifare e l'indice, che e una cache.
- *  Versione .....: 1.5.1
+ *  Versione .....: 1.6.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.6.1   2026-08-08  D.Candela  Destinazione di ritorno da elenco chiuso:
+ *                                 alcune operazioni si lanciano da dove il
+ *                                 problema si vede.
  *  1.5.1   2026-08-08  D.Candela  Comando «Simboli delle tipologie», per gli
  *                                 archivi nati prima dei glifi.
  *  1.1.0   2026-08-07  D.Candela  Report di completezza delle schede (fase 12).
@@ -98,7 +101,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Auth::messaggio('errore', $e->getMessage());
     }
 
-    header('Location: ' . $ritorno);
+    /*
+     * Di norma si torna agli strumenti. Alcune di queste operazioni si lanciano
+     * pero da dove il problema si vede: i simboli mancanti si notano nel
+     * vocabolario, ed e li che si vuole tornare per controllare che ci siano.
+     * La destinazione e scelta da un elenco chiuso e non dal parametro, che
+     * altrimenti sarebbe un rimando aperto verso qualunque indirizzo.
+     */
+    $destinazioni = ['vocabolari' => 'index.php?p=vocabolari&voc=tipologie'];
+    $dopo = $destinazioni[(string) ($_POST['ritorno'] ?? '')] ?? $ritorno;
+
+    header('Location: ' . $dopo);
     exit;
 }
 

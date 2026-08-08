@@ -12,12 +12,20 @@
                   offriva solo un simbolo METEOROLOGICO — il fiocco di neve,
                   l'onda anomala, il vento — non si usa piu: descrivevano il
                   fenomeno che sta fuori, non la cavita che ha scavato.
-  Versione .....: 1.6.0
+  Versione .....: 1.7.0
   Sviluppatore .: Dario Candela <darcan99@gmail.com>
   Licenza ......: GNU GPL v3.0 — vedi LICENSE
   Copyright ....: (c) 2026 Dario Candela
  ............................................................................
   CRONOLOGIA
+  1.7.0  2026-08-08  D.Candela  Dodici glifi ridisegnati dopo averli
+                                guardati: bocca di grotta a semicerchio,
+                                carrello per la miniera, tre proietti per il
+                                deposito, torrette per l'eremo, loculi nella
+                                catacomba, pozzo visto dall'alto, neviera a
+                                tronco di cono, Mitra nella cornice, onde
+                                al posto delle masse d'acqua, collo d'anfora
+                                spezzato per il butto.
   1.6.0  2026-08-08  D.Candela  Da 14 a 32 glifi: i cinque ipogei
                                 archeologici, il resto delle artificiali e le
                                 naturali che prendevano in prestito un
@@ -50,14 +58,14 @@
   scrive «cat-grotta» e sa che quella e roba nostra.
 -->
 
-  <!-- Ingresso di grotta: un arco scavato alla base di un rilievo a TRE punte.
-       Il triangolo singolo si leggeva come una piramide o una tenda; tre
-       cime sono la sagoma con cui si disegna una montagna da sempre, e
-       l'arco alla base dice che dentro ci si entra. -->
+  <!-- Ingresso di grotta: un rilievo a tre punte con la bocca alla base.
+       La bocca e un SEMICERCHIO basso e largo, non un arco alto: l'arco a
+       tutto sesto e la sagoma di una galleria scavata dall'uomo, e questo
+       glifo deve dire il contrario. -->
   <symbol id="cat-grotta" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
           d="M.2 14.4 4 6.6l2 2L8.4 2.8l3 5.8 1.5-2.2 2.9 8Z
-             M6.1 14.4v-2.2a1.9 1.9 0 0 1 3.8 0v2.2Z"/>
+             M5.4 14.4a2.6 2.6 0 0 1 5.2 0Z"/>
   </symbol>
 
   <!-- Abisso: una spirale conica, larga in alto e stretta in fondo. E il
@@ -175,13 +183,15 @@
        culto», e sulla mappa diventerebbero lo stesso punto.
        ================================================================== -->
 
-  <!-- Catacomba: l'arcosolio, la nicchia ad arco con il sepolcro sotto.
-       E il segno con cui una catacomba si riconosce in fotografia, e si
-       distingue dal colombario, che e una parete di nicchie in griglia. -->
+  <!-- Catacomba: l'arcosolio con i tre loculi sotto l'arco.
+       L'arco da solo restava una nicchia qualunque; i loculi sovrapposti
+       sono cio che si vede camminando in un ambulacro, e distinguono la
+       catacomba dal colombario, che e una griglia di nicchie in parete. -->
   <symbol id="cat-catacomba" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
           d="M1 3h14v12H1Zm2.6 12V9.4a4.4 4.4 0 0 1 8.8 0V15Z"/>
-    <path fill="currentColor" d="M4.2 11.2h7.6V15H4.2z"/>
+    <path fill="currentColor"
+          d="M5.9 9.6h4.2v1.2H5.9zm0 2.4h4.2v1.2H5.9zm0 2.4h4.2v1.2H5.9z"/>
   </symbol>
 
   <!-- Chiesa rupestre: il portale scavato nella rupe, con la croce
@@ -204,37 +214,48 @@
     <path fill="currentColor" d="M7.6 10.6h3V12.4h-3z"/>
   </symbol>
 
-  <!-- Mitreo: la sezione con i due podi laterali e la nicchia in fondo.
-       I podi su cui si stava sdraiati sono l'unico tratto architettonico
-       che tutti i mitrei hanno in comune. -->
+  <!-- Mitreo: la figura del dio dentro l'incorniciatura a tre lati.
+       La sezione con i due podi non si capiva: senza una didascalia, due
+       blocchi dentro una volta non dicono nulla. Il rilievo di culto in
+       fondo all'aula e invece la cosa per cui un mitreo si riconosce, ed e
+       una figura dentro una cornice. -->
   <symbol id="cat-mitreo" viewBox="0 0 16 16">
     <path fill="currentColor"
-          d="M2 15V8.4a6 6 0 0 1 12 0V15h-2.2V8.4a3.8 3.8 0 0 0-7.6 0V15Z"/>
-    <path fill="currentColor" d="M5.4 12.6H7V15H5.4zm3.6 0h1.6V15H9z"/>
+          d="M1.6 15V2.4h12.8V15h-2.4V4.8H4V15Z"/>
+    <path fill="currentColor"
+          d="M8 5.8a1.45 1.45 0 1 1 0 2.9 1.45 1.45 0 0 1 0-2.9Z"/>
+    <path fill="currentColor"
+          d="M8 9.2c1.3 0 2.3 2.2 2.3 5.8H5.7c0-3.6 1-5.8 2.3-5.8Z"/>
   </symbol>
 
-  <!-- Eremo: la cella singola scavata nella rupe, con la croce incisa
-       sopra. Si distingue dalla chiesa rupestre per la misura: una cella
-       sola e piccola, non un portale. -->
+  <!-- Eremo: tre torrette con la finestrella, su una base svasata che dice
+       «cima di monte». L'eremo non e un edificio in pianura: sta in alto e
+       si compone di poche celle addossate, e questo profilo lo dice senza
+       ricorrere a una croce, che lo confondeva con la chiesa rupestre. -->
   <symbol id="cat-eremo" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
-          d="M3.2 15 4.3 6.2 7 1.6l2.2 3.8 1.6-2.4L12.8 15Zm2.8 0v-2.4a1.2 1.2 0 0 1 2.4 0V15Zm.4-4.6h.8v-1h.8v1h.8v.8h-.8v1h-.8v-1h-.8Z"/>
-    <path fill="currentColor" d="M7.6 1.2h.8v5.4h-.8z"/>
-    <path fill="currentColor" d="M6.6 2.4h2.8v.9H6.6z"/>
+          d="M.4 15h15.2l-1.2-2.6h-1V7.6h-2.8v4.8H9.6V3.6H6.4v8.8H5.4V6.4H2.6v6H1.6Z
+             M3.4 8h1.4v1.8H3.4Z
+             M7.3 5.4h1.4v1.8H7.3Z
+             M11.3 9.2h1.4V11h-1.4Z"/>
   </symbol>
 
   <!-- ==================================================================
        IL RESTO DELLE ARTIFICIALI
        ================================================================== -->
 
-  <!-- Miniera: l'imbocco in galleria con il binario che ne esce.
-       Il binario e cio che la separa dalla cava, che invece si vede a
-       gradoni. -->
+  <!-- Miniera: il carrello sul binario, con il carico che sporge.
+       L'imbocco in galleria diceva «galleria», che e la meta del mestiere:
+       il carrello dice che da quel buco si porta fuori qualcosa. -->
   <symbol id="cat-miniera" viewBox="0 0 16 16">
+    <path fill="currentColor"
+          d="M4.4 6.2c.9-1.2 1.8-1.2 2.6 0 .9-1.4 2-1.4 2.9 0 .7-.9 1.6-.9 2.3 0Z"/>
+    <path fill="currentColor" d="M3 6.8h10.4l-1.5 5.2H4.5Z"/>
     <path fill="currentColor" fill-rule="evenodd"
-          d="M1 12.6 4.6 5.6h6.8L15 12.6Zm5 0V9.6a2 2 0 0 1 4 0v3Z"/>
-    <path fill="currentColor" d="m6.4 12.8-.8 2.6h1.3l.6-2.6zm3.2 0 .8 2.6H9.1l-.6-2.6z"/>
-    <path fill="currentColor" d="M5.4 13.3h5.2V14H5.4zm-.5 1.2h6.2v.7H4.9z"/>
+          d="M5.9 11.9a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Zm0 1a.4.4 0 1 0 0 .8.4.4 0 0 0 0-.8Z"/>
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M10.5 11.9a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Zm0 1a.4.4 0 1 0 0 .8.4.4 0 0 0 0-.8Z"/>
+    <path fill="currentColor" d="M.8 14.6h14.4v1.2H.8z"/>
   </symbol>
 
   <!-- Pozzo di estrazione: il castelletto con la puleggia.
@@ -247,21 +268,32 @@
     <path fill="currentColor" d="M6 10.6h4v1H6zm-2.6 3.6h9.2v.9H3.4z"/>
   </symbol>
 
-  <!-- Pozzo: la vera in cima, le pareti, l'acqua in fondo. -->
+  <!-- Pozzo: la bocca vista dall'alto, con il corso dei mattoni.
+       La sezione non si capiva: due montanti e una traversa sono un tavolo o
+       una porta. Dall'alto un pozzo e un anello di mattoni con il buio in
+       mezzo, ed e cosi che lo si incontra camminando. -->
   <symbol id="cat-pozzo" viewBox="0 0 16 16">
-    <path fill="currentColor" d="M5.4 2.2h5.2v2.4H5.4z"/>
-    <path fill="currentColor" fill-rule="evenodd" d="M.6 4.6h14.8V15H.6Zm6 0h3.4v8.2H6.6Z"/>
-    <path fill="currentColor" d="M6.6 11c.6 0 .6.6 1.2.6s.6-.6 1.2-.6.6.6 1 .6v1.6H6.6Z"/>
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M8 1.4a6.6 6.6 0 1 1 0 13.2A6.6 6.6 0 0 1 8 1.4Zm0 3.4a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z
+             M7.65 1.4h.7v3.4h-.7Z
+             M7.65 11.2h.7v3.4h-.7Z
+             M1.4 7.65h3.4v.7H1.4Z
+             M11.2 7.65h3.4v.7h-3.4Z
+             M10.5 10l2.4 2.4-.5.5L10 10.5Z
+             M5.5 10 3.1 12.4l.5.5L6 10.5Z
+             M10.5 6l2.4-2.4-.5-.5L10 5.5Z
+             M5.5 6 3.1 3.6l.5-.5L6 5.5Z"/>
   </symbol>
 
-  <!-- Fognatura: la caditoia sopra, il canale sotto, l'acqua che scorre.
-       La griglia e il tratto che la distingue da ogni altro condotto. -->
+  <!-- Fognatura: la caditoia sopra, il canale, l'onda che scorre sul fondo.
+       L'acqua e un'onda e non un blocco pieno: in un condotto scorre, e una
+       massa piatta diceva «pieno d'acqua», che e un'altra cosa. -->
   <symbol id="cat-fognatura" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
           d="M1.4 2.4h13.2v2.8H1.4Zm2 .8v1.2h1.6V3.2Zm4 0v1.2h1.6V3.2Zm4 0v1.2h1.6V3.2Z"/>
     <path fill="currentColor" d="M1.4 5.8h1.8V15H1.4zm11.4 0h1.8V15h-1.8z"/>
     <path fill="currentColor"
-          d="M3.2 12.2c1.2 0 1.2.8 2.4.8s1.2-.8 2.4-.8 1.2.8 2.4.8 1.2-.8 2.4-.8V15H3.2Z"/>
+          d="M3.2 11.8c1.15 0 1.15 1.3 2.3 1.3s1.15-1.3 2.3-1.3 1.15 1.3 2.3 1.3 1.15-1.3 2.3-1.3v1.3c-1.15 0-1.15 1.3-2.3 1.3s-1.15-1.3-2.3-1.3-1.15 1.3-2.3 1.3-1.15-1.3-2.3-1.3Z"/>
   </symbol>
 
   <!-- Cantina: la volta con la botte. -->
@@ -272,21 +304,32 @@
           d="M5.6 10.2c0-.7 1.1-1.2 2.4-1.2s2.4.5 2.4 1.2v3.6c0 .7-1.1 1.2-2.4 1.2s-2.4-.5-2.4-1.2Zm0 1h4.8v.6H5.6Zm0 1.6h4.8v.6H5.6Z"/>
   </symbol>
 
-  <!-- Neviera: il pozzo cilindrico con il tetto conico e il ghiaccio in
-       fondo. Il tetto e la parte che si vede fuori. -->
+  <!-- Neviera: il tronco di cono in muratura, la bocca in cima, la neve
+       dentro. La bocca sta in alto perche la neve si calava dall'alto e si
+       estraeva dal basso, e il tronco di cono e la sagoma con cui queste
+       costruzioni stanno nel paesaggio. -->
   <symbol id="cat-neviera" viewBox="0 0 16 16">
-    <path fill="currentColor" d="M4.8 6.6 8 3l3.2 3.6Z"/>
-    <path fill="currentColor" fill-rule="evenodd" d="M.6 6.6h14.8V15H.6Zm5 0h4.8v7.6H5.6Z"/>
-    <path fill="currentColor" d="m5.6 10.4 1.2 1.2 1.2-1.2 1.2 1.2 1.2-1.2v3.8H5.6Z"/>
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1.8 15 5.6 5h4.8l3.8 10Z
+             M6.8 5h2.4v2.6H6.8Z
+             M7.65 9h.7v4.8h-.7Z
+             M7.65 10.9 5.6 9.7l-.35.7 2.4 1.4Z
+             M8.35 10.9 10.4 9.7l.35.7-2.4 1.4Z
+             M7.65 12.2 5.6 13.4l-.35-.7 2.4-1.4Z
+             M8.35 12.2l2.05 1.2.35-.7-2.4-1.4Z"/>
   </symbol>
 
-  <!-- Butto: l'anfora rotta. Il butto e il pozzo dove finivano i cocci,
-       e il coccio e il modo in cui lo si riconosce scavando: un pozzo
-       disegnato in sezione sarebbe indistinguibile da tutti gli altri. -->
+  <!-- Butto: un collo d'anfora spezzato, con l'ansa e la frattura in basso.
+       L'anfora intera diceva «recipiente»; un collo rotto dice «scarico»,
+       ed e letteralmente cio che si tira su da un butto. Il butto e il pozzo
+       in cui finivano i cocci, e il coccio e il modo in cui si riconosce
+       scavando: un pozzo in sezione sarebbe uguale a tutti gli altri pozzi. -->
   <symbol id="cat-butto" viewBox="0 0 16 16">
-    <path fill="currentColor" fill-rule="evenodd"
-          d="M5.8 1.2h4.4v1.4H5.8Zm1.1 1.4h2.2v1.7H6.9Zm1.1 1.7c2.6 0 4.6 2.2 4.6 5.1 0 3.1-2 5.6-4.6 5.6s-4.6-2.5-4.6-5.6c0-2.9 2-5.1 4.6-5.1Zm2.4 1 2 1.6-1.2 1.8Z"/>
-    <path fill="currentColor" d="m13.2 11.8 2 1-1.1 1.8z"/>
+    <path fill="currentColor" d="M3.4 1.2h8.2v2H3.4z"/>
+    <path fill="currentColor"
+          d="M11.6 2.4c2.1.3 3.4 1.8 3.4 3.6 0 1.4-.8 2.6-2.1 3.2l-.8-1.5c.8-.4 1.3-1 1.3-1.7 0-.9-.7-1.6-1.8-1.8Z"/>
+    <path fill="currentColor"
+          d="M4.6 3.2h6l-.5 7.6-1 2.6-1-2-1.2 2.8-1-2.4-.9 1.5Z"/>
   </symbol>
 
   <!-- Postazione fortificata: la feritoia nel blocco di calcestruzzo. -->
@@ -295,11 +338,17 @@
           d="M1.6 5.4h12.8l1 9.6H.6Zm2.4 3v2h8v-2Z"/>
   </symbol>
 
-  <!-- Deposito munizioni: il proietto. Dice cosa c'e dentro, che e
-       l'unica cosa che distingue questo vano da un altro vano. -->
+  <!-- Deposito munizioni: tre proietti in fila su un piano.
+       Uno solo si leggeva come una pastiglia o un razzo; tre allineati sono
+       un deposito, cioe roba accatastata in quantita. -->
   <symbol id="cat-deposito" viewBox="0 0 16 16">
-    <path fill="currentColor" fill-rule="evenodd"
-          d="M8 1.4c1.5 1.5 2.3 3.2 2.3 4.9v6.5c0 1-.8 1.8-1.8 1.8H7.5c-1 0-1.8-.8-1.8-1.8V6.3c0-1.7.8-3.4 2.3-4.9Zm-2.3 6h4.6v1.1H5.7Z"/>
+    <path fill="currentColor"
+          d="M3.6 6.6c0-1.3.5-2.5 1.3-3.3.8.8 1.3 2 1.3 3.3v6.2H3.6Z"/>
+    <path fill="currentColor"
+          d="M9.8 6.6c0-1.3.5-2.5 1.3-3.3.8.8 1.3 2 1.3 3.3v6.2H9.8Z"/>
+    <path fill="currentColor"
+          d="M6.6 4.4c0-1.5.5-2.9 1.4-3.8.9.9 1.4 2.3 1.4 3.8v8.4H6.6Z"/>
+    <path fill="currentColor" d="M2.4 13.4h11.2v1.8H2.4z"/>
   </symbol>
 
   <!-- ==================================================================
@@ -309,12 +358,18 @@
        la cavita che quel fenomeno ha scavato.
        ================================================================== -->
 
-  <!-- Grotta marina: l'arco nella falesia, battuto dal mare. -->
+  <!-- Grotta marina: l'arco nella falesia sopra TRE onde.
+       Una massa d'acqua piena diceva «allagato»; tre righe ondulate sono il
+       modo in cui il mare si disegna da sempre, e dicono superficie aperta. -->
   <symbol id="cat-grotta-marina" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
-          d="M1.6 11.8V4.2L5 2l4.6 1.6L14.4 1.8v10Zm4.2 0V9a2.4 2.4 0 0 1 4.8 0v2.8Z"/>
+          d="M1.6 10V3.4L5 1.4l4.6 1.4L14.4 1.2V10Zm4.2 0V7.6a2.4 2.4 0 0 1 4.8 0V10Z"/>
     <path fill="currentColor"
-          d="M.4 12.4c1.5 0 1.5 1.2 3 1.2s1.5-1.2 3-1.2 1.5 1.2 3 1.2 1.5-1.2 3-1.2 1.5 1.2 3 1.2V15H.4Z"/>
+          d="M.4 10.4c1.3 0 1.3.8 2.6.8s1.3-.8 2.6-.8 1.3.8 2.6.8 1.3-.8 2.6-.8 1.3.8 2.6.8v.8c-1.3 0-1.3-.8-2.6-.8s-1.3.8-2.6.8-1.3-.8-2.6-.8-1.3.8-2.6.8-1.3-.8-2.6-.8Z"/>
+    <path fill="currentColor"
+          d="M.4 12.3c1.3 0 1.3.8 2.6.8s1.3-.8 2.6-.8 1.3.8 2.6.8 1.3-.8 2.6-.8 1.3.8 2.6.8v.8c-1.3 0-1.3-.8-2.6-.8s-1.3.8-2.6.8-1.3-.8-2.6-.8-1.3.8-2.6.8-1.3-.8-2.6-.8Z"/>
+    <path fill="currentColor"
+          d="M.4 14.2c1.3 0 1.3.8 2.6.8s1.3-.8 2.6-.8 1.3.8 2.6.8 1.3-.8 2.6-.8 1.3.8 2.6.8v.8c-1.3 0-1.3-.8-2.6-.8s-1.3.8-2.6.8-1.3-.8-2.6-.8-1.3.8-2.6.8-1.3-.8-2.6-.8Z"/>
   </symbol>
 
   <!-- Tettonica: la frattura fra due masse che si sono allontanate.
@@ -333,13 +388,18 @@
           d="M.8 7.6h14.4v3.6H.8Zm2.6 1.8c1.8-1.3 7.8-1.3 9.6 0-1.8 1.3-7.8 1.3-9.6 0Z"/>
   </symbol>
 
-  <!-- Grotta glaciale: la bocca nel ghiaccio, con le stalattiti di
-       ghiaccio al bordo. -->
+  <!-- Grotta glaciale: la bocca a semicerchio con il ghiaccio dentro.
+       Il semicerchio e la bocca, il fiocco dice di che materiale e la volta.
+       I bracci del fiocco si attaccano al fusto senza sovrapporsi: due
+       rettangoli incrociati, con evenodd, si riempirebbero al centro. -->
   <symbol id="cat-glaciale" viewBox="0 0 16 16">
     <path fill="currentColor" fill-rule="evenodd"
-          d="M.8 1.6h14.4v6.6H.8Zm4.6 6.6V6a2.6 2.6 0 0 1 5.2 0v2.2Z"/>
-    <path fill="currentColor"
-          d="M1.2 8.2h1.2l-.6 3.2zm1.6 0H4l-.6 2.2zm1.4 0h1.1l-.55 2.8zM11 8.2h1.1l-.55 2.6zm1.4 0h1.2l-.6 3.4zm1.5 0h1.2l-.6 2.2z"/>
+          d="M1.4 14.2a6.6 6.6 0 0 1 13.2 0Z
+             M7.65 8h.7v5.6h-.7Z
+             M7.65 10.2 5.5 9l-.35.7 2.5 1.4Z
+             M8.35 10.2 10.5 9l.35.7-2.5 1.4Z
+             M7.65 11.6 5.5 12.8l-.35-.7 2.5-1.4Z
+             M8.35 11.6l2.15 1.2.35-.7-2.5-1.4Z"/>
   </symbol>
 
 </svg>

@@ -1,7 +1,7 @@
 # Installazione di CATAGEO
 
 Guida all'installazione, all'aggiornamento e allo spostamento di un archivio.
-Aggiornata a CATAGEO **1.6.0**.
+Aggiornata a CATAGEO **1.7.0**.
 
 CATAGEO gira su un hosting condiviso da pochi euro l'anno. Non serve un
 database, non serve una shell, non serve `mod_rewrite`, non serve Composer:

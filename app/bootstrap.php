@@ -15,6 +15,9 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.7.0  2026-08-08  D.Candela  Dodici glifi ridisegnati su indicazione
+ *                                di chi li usa.
+ *  1.6.1  2026-08-08  D.Candela  Una colonna vuota adesso spiega perche.
  *  1.6.0  2026-08-08  D.Candela  Trentadue glifi: gli ipogei archeologici
  *                                hanno un segno ciascuno.
  *  1.5.1  2026-08-08  D.Candela  Sprite valido come XML, e simboli portati
@@ -58,7 +61,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '1.6.0');
+define('CATAGEO_VERSIONE', '1.7.0');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');
