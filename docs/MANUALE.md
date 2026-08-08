@@ -1,6 +1,6 @@
 # Manuale di CATAGEO
 
-Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.5.1**.
+Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.6.0**.
 
 Per installare, aggiornare o spostare un archivio vedi
 [INSTALLAZIONE.md](INSTALLAZIONE.md). Per le scelte di progetto e il modello
@@ -504,13 +504,22 @@ d'occhio chi ha una scelta propria e chi no.
 
 Aprendo una voce si può cambiarlo. Ci sono due insiemi di simboli:
 
-- i **glifi delle cavità**, disegnati per CATAGEO — ingresso di grotta, abisso,
-  inghiottitoio, risorgenza, cunicolo, cisterna, acquedotto, colombario, cava,
-  rifugio antiaereo, galleria, tubo lavico, concrezioni, abitato rupestre. Si
-  scelgono cliccandoli nella tavolozza sotto il campo;
+- i **glifi delle cavità**, trentadue simboli disegnati per CATAGEO. Ci sono
+  gli ingressi (grotta, abisso, inghiottitoio, risorgenza, grotta marina), le
+  opere idrauliche (cunicolo, cisterna, acquedotto, pozzo, fognatura), le
+  estrattive (cava, miniera, pozzo di estrazione), le civili (abitato rupestre,
+  cantina, neviera, butto), le belliche (rifugio, postazione, deposito), i
+  transiti (galleria), le morfologie (concrezioni) e — la parte che gli altri
+  catasti trattano peggio — i cinque **ipogei archeologici**: catacomba, chiesa
+  rupestre, ipogeo funerario, mitreo, eremo. Si scelgono cliccandoli nella
+  tavolozza sotto il campo, e ciascuno ha il nome sotto;
 - tutte le icone di [Bootstrap Icons](https://icons.getbootstrap.com/), scrivendone
   il nome senza il prefisso `bi-`: utili per quello che non è una cavità in sé,
-  come la fiamma del vulcanismo o il fiocco di neve del glaciale.
+  come la fiamma del vulcanismo.
+
+Se una sottotipologia nuova assomiglia a una che c'è già, **lasciala ereditare**:
+due simboli diversi per due cose che a trenta pixel si assomigliano non
+aggiungono informazione, la tolgono.
 
 **Su un archivio già in uso i simboli non arrivano da soli.** Il vocabolario si
 crea una volta sola, alla prima installazione, e da quel momento è tuo: un

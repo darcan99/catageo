@@ -6,6 +6,55 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.6.0] — 2026-08-08
+
+### Aggiunto
+- **Da 14 a 32 glifi propri.** Diciotto simboli nuovi, disegnati guardandoli:
+  la pagina di prova serve i glifi a 180, 64 e 30 px, e ogni forma e stata
+  corretta finche non si leggeva anche dentro la pastiglia del marker.
+- **I cinque ipogei archeologici hanno un segno ciascuno**: l'arcosolio della
+  catacomba, il portale con la croce della chiesa rupestre, il tumulo con
+  dromos e camera dell'ipogeo funerario, la sezione con i due podi del mitreo,
+  la guglia con la cella dell'eremo. Stanno tutti sotto «opere di culto»:
+  ereditando dalla madre sarebbero finiti in mappa come lo stesso punto, e
+  sono invece cinque cose che un archeologo non confonde mai.
+- Simboli anche per **miniera, pozzo di estrazione, pozzo, fognatura,
+  cantina, neviera, butto, postazione fortificata e deposito munizioni**. Il
+  butto e un'anfora rotta e non un pozzo in sezione: il coccio e il modo in
+  cui lo si riconosce scavando, un pozzo sarebbe indistinguibile dagli altri.
+- **Le naturali non usano piu simboli meteorologici.** Marina, tettonica,
+  glaciale e di erosione prendevano in prestito da Bootstrap l'onda anomala,
+  il tracciato sismico, il fiocco di neve e il vento: descrivono il fenomeno
+  che sta fuori, non la cavita che quel fenomeno ha scavato. Ora sono l'arco
+  nella falesia, la frattura fra due blocchi, la bocca di ghiaccio, il vuoto
+  lenticolare fra due banchi.
+- Dove un glifo esistente andava bene si **riusa**: l'emissario prende il
+  cunicolo drenante, la galleria militare la galleria. Un simbolo nuovo per
+  ogni voce avrebbe prodotto sinonimi grafici, che a 30 px sono rumore.
+
+### Modificato
+- **Ingresso di grotta a tre punte** invece del triangolo singolo, che si
+  leggeva come una piramide o una tenda. Richiesta esplicita.
+- **Abisso a spirale**, larga sopra e stretta sotto: e il gesto con cui si
+  descrive a voce un pozzo che si stringe scendendo. Il vecchio glifo — la
+  bocca in prospettiva — somigliava a un secchio. Richiesta esplicita.
+- La spirale e l'unico glifo fatto di **tratto** e non di massa piena, perche
+  una spirale e una linea per natura. La prova impone un minimo allo spessore
+  cosi la deroga resta una e non diventa un'abitudine.
+- **I commenti dello sprite non vanno piu in pagina.** Nel file spiegano
+  perche ogni glifo e disegnato cosi e servono a chi lo aprira fra dieci anni;
+  passati i trenta simboli erano meta del peso. Diciotto kilobyte sul disco,
+  poco meno di dieci in pagina. Si toglie **solo** quello: nessuna riscrittura
+  dei tracciati, perche un ottimizzatore che sbaglia un arco produce un glifo
+  storto che nessuna prova vede.
+
+### Note di progetto
+- **I glifi si giudicano guardandoli, non leggendo il codice.** Le prove
+  verificano che ogni simbolo esista, che sia XML valido, che il vocabolario
+  non punti a un nome inesistente e che i cinque archeologici siano cinque
+  simboli **diversi** — non che siano belli o riconoscibili. Quello resta un
+  giudizio umano, e la pagina di prova serve a poterlo dare in fretta.
+
 ## [1.5.1] — 2026-08-08
 
 ### Corretto

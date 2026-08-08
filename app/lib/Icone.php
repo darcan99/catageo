@@ -17,12 +17,15 @@ declare(strict_types=1);
  *                  Chi compila un vocabolario scrive un nome solo: se comincia
  *                  per «cat-» e nostro, altrimenti e di Bootstrap. Un nome, due
  *                  fonti, nessuna scelta da spiegare all'utente.
- *  Versione .....: 1.5.0
+ *  Versione .....: 1.6.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.6.0  2026-08-08  D.Candela  I commenti dello sprite restano nel file e
+ *                                non finiscono in pagina: da 14 glifi a 32,
+ *                                erano diventati la meta del peso.
  *  1.5.0  2026-08-08  D.Candela  Prima stesura.
  * ============================================================================
  */
@@ -93,12 +96,24 @@ final class Icone
      * Va emesso una sola volta per pagina, e solo dove i simboli servono: sono
      * un paio di kilobyte, ma su una pagina che non li usa sarebbero due
      * kilobyte di niente.
+     *
+     * I commenti restano nel file e non vanno in pagina. Nel file spiegano
+     * perche ogni glifo e disegnato cosi, e servono a chi lo aprira fra dieci
+     * anni; in pagina sarebbero peso per tutti e utilita per nessuno, visto
+     * che il file e li da leggere. Non si tocca altro: niente riscritture dei
+     * tracciati, perche un ottimizzatore che sbaglia un arco produce un glifo
+     * storto che nessuna prova vede.
      */
     public static function sprite(): string
     {
         $percorso = Percorsi::app(self::FILE);
+        if (!is_file($percorso)) {
+            return '';
+        }
 
-        return is_file($percorso) ? (string) file_get_contents($percorso) : '';
+        $sprite = (string) file_get_contents($percorso);
+
+        return (string) preg_replace('/<!--.*?-->\s*/s', '', $sprite);
     }
 
     /**
