@@ -178,6 +178,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
 ?>
 
+<?php
+/*
+ * Lo sprite dei glifi propri: qui serve alle anteprime dell'elenco e alla
+ * scelta nel modulo. Si emette solo sulla tassonomia, che e l'unico vocabolario
+ * che ha icone: sulle grandezze e sui periodi sarebbero due kilobyte di niente.
+ */
+if ($voc === 'tipologie') {
+    echo Icone::sprite();
+}
+?>
+
 <div class="catageo-intestazione">
   <div>
     <h1>Vocabolari</h1>
@@ -217,6 +228,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
           <table class="table table-sm table-hover catageo-tabella mb-0 align-middle">
             <thead>
               <tr>
+                <th scope="col" class="text-center" style="width:3rem">Mappa</th>
                 <th scope="col">Codice</th>
                 <th scope="col">Voce</th>
                 <th scope="col">Livello</th>
@@ -227,6 +239,25 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
               <?php foreach ($voci as $v): ?>
                 <?php $rientro = $v['livello'] === 'natura' ? 0 : ($v['livello'] === 'tipologia' ? 1 : 2); ?>
                 <tr<?= $v['attivo'] ? '' : ' class="text-body-secondary"' ?>>
+                  <?php
+                  /*
+                   * Il simbolo che la voce usa DAVVERO, cioe quello risolto con
+                   * l'ereditarieta: mostrare solo l'attributo proprio lascerebbe
+                   * vuote quasi tutte le righe e non direbbe cosa si vede in
+                   * mappa, che e l'unica domanda per cui si guarda questa
+                   * colonna. Le voci che lo ereditano si segnano in grigio.
+                   */
+                  $iconaVoce   = Tipologie::icona($v['codice']);
+                  $iconaPropria = ($v['icona'] ?? '') !== '';
+                  ?>
+                  <td class="text-center">
+                    <?php if ($iconaVoce !== ''): ?>
+                      <span class="catageo-anteprima-icona<?= $iconaPropria ? '' : ' text-body-tertiary' ?>"
+                            title="<?= Testo::esc($iconaPropria ? $iconaVoce : $iconaVoce . ' (ereditata)') ?>">
+                        <?= Icone::html($iconaVoce) ?>
+                      </span>
+                    <?php endif; ?>
+                  </td>
                   <td class="catageo-valore"><?= Testo::esc($v['codice']) ?></td>
                   <td style="padding-left:<?= 0.75 + $rientro * 1.5 ?>rem">
                     <?php if ($rientro > 0): ?><i class="bi bi-arrow-return-right text-body-tertiary"></i> <?php endif; ?>
@@ -282,7 +313,7 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
                 <label for="icona" class="form-label">Icona in mappa</label>
                 <div class="input-group">
                   <span class="input-group-text catageo-anteprima-icona">
-                    <i class="bi bi-<?= Testo::esc($inMod['icona'] !== '' ? $inMod['icona'] : Tipologie::icona($inMod['codice'])) ?>"></i>
+                    <?= Icone::html($inMod['icona'] !== '' ? $inMod['icona'] : Tipologie::icona($inMod['codice'])) ?>
                   </span>
                   <input type="text" class="form-control catageo-valore" id="icona" name="icona"
                          maxlength="40" placeholder="droplet-fill"
@@ -290,9 +321,26 @@ $modifica = isset($_GET['modifica']) ? (string) $_GET['modifica'] : '';
                 </div>
                 <div class="catageo-nota">
                   Nome di <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Icons</a>
-                  senza il prefisso <span class="catageo-valore">bi-</span>. Lasciandolo vuoto la voce
-                  eredita l'icona di quella superiore: si compila solo per distinguere una voce
-                  dalle sorelle.
+                  senza il prefisso <span class="catageo-valore">bi-</span>, oppure uno dei glifi
+                  propri delle cavita qui sotto. Lasciandolo vuoto la voce eredita l'icona di
+                  quella superiore: si compila solo per distinguere una voce dalle sorelle.
+                </div>
+                <?php
+                /*
+                 * I glifi propri si scelgono cliccandoli. Sono una dozzina e non
+                 * esistono altrove: chiedere di digitarne il nome a memoria
+                 * significherebbe che nessuno li userebbe, e resterebbero un
+                 * insieme di simboli che c'e ma non si vede.
+                 */
+                ?>
+                <div class="catageo-scelta-icone mt-2">
+                  <?php foreach (Icone::elenco() as $glifo): ?>
+                    <button type="button" class="btn btn-sm btn-outline-secondary catageo-glifo"
+                            data-catageo-icona="<?= Testo::esc($glifo) ?>"
+                            title="<?= Testo::esc($glifo) ?>">
+                      <?= Icone::html($glifo) ?>
+                    </button>
+                  <?php endforeach; ?>
                 </div>
               </div>
               <div class="mb-3">

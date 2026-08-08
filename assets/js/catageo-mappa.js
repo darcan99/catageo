@@ -139,9 +139,29 @@
        ha attraversato la rete e la regola costa una riga. */
     var ICONA_AMMESSA = /^[a-z0-9-]{1,40}$/;
 
+    /** Prefisso dei glifi propri di CATAGEO (vedi Icone::PREFISSO). */
+    var PREFISSO_NOSTRO = 'cat-';
+
     function glifo(prop) {
         var nome = prop.icona || '';
         return ICONA_AMMESSA.test(nome) ? nome : 'geo-alt-fill';
+    }
+
+    /**
+     * HTML di un simbolo, da Bootstrap Icons o dai nostri glifi.
+     *
+     * I nostri arrivano da uno sprite incluso nella pagina, quindi il
+     * riferimento e allo stesso documento. Se lo sprite mancasse — una pagina
+     * che si e dimenticata di includerlo — il <use> non risolve e resta un
+     * riquadro vuoto: e il motivo per cui la prova verifica che lo sprite ci
+     * sia dove i simboli si usano. */
+    function simboloHtml(nome, classe) {
+        classe = 'catageo-icona' + (classe ? ' ' + classe : '');
+        if (nome.indexOf(PREFISSO_NOSTRO) === 0) {
+            return '<svg class="' + classe + '" aria-hidden="true">'
+                 + '<use href="#' + nome + '"></use></svg>';
+        }
+        return '<i class="bi bi-' + nome + ' ' + classe + '" aria-hidden="true"></i>';
     }
 
     /**
@@ -169,7 +189,7 @@
            si possono prevedere le classi in un foglio di stile. */
         var html = '<span class="catageo-marker-corpo" style="background:'
                  + colore(cfg, prop.natura) + '">'
-                 + '<i class="bi bi-' + glifo(prop) + '" aria-hidden="true"></i>'
+                 + simboloHtml(glifo(prop))
                  + '</span>';
 
         return mappa.simbolo(elemento.punto, html, classe, 30);
@@ -247,7 +267,7 @@
             var nome = icone[codice] || '';
             return '<span class="catageo-legenda-segno" style="background-color:'
                  + esc(colore(cfg, codice)) + '">'
-                 + (ICONA_AMMESSA.test(nome) ? '<i class="bi bi-' + nome + '"></i>' : '')
+                 + (ICONA_AMMESSA.test(nome) ? simboloHtml(nome) : '')
                  + '</span>';
         };
 

@@ -149,4 +149,13 @@ $totaleVisibili = IndiceIpogei::conta(Visibilita::filtroIndice());
   <script type="application/json" id="catageoMappaNature"><?= Testo::escJson($nature) ?></script>
   <script type="application/json" id="catageoMappaIconeNatura"><?= Testo::escJson($iconeNatura) ?></script>
 
+  <?php
+  /*
+   * Lo sprite dei glifi propri, incluso nel documento. I marker li disegna il
+   * JavaScript dopo il caricamento, e un <use> risolve solo se il simbolo e
+   * gia nella pagina: senza questa riga la mappa mostrerebbe pastiglie vuote.
+   */
+  echo Icone::sprite();
+  ?>
+
 <?php endif; ?>

@@ -1437,6 +1437,23 @@ Prima il colore era l'unico canale, e in `docs/prove/interfaccia` stava scritto 
 
 La legenda mostra il segno con la stessa forma del marker e dichiara la regola: *«Il colore indica la natura, il simbolo la tipologia»*. Senza quella riga il colore si legge come «tutto» e il glifo passa per decorazione.
 
+##### I due insiemi di simboli
+
+Bootstrap Icons ha il fuoco per il vulcanismo e la neve per il glaciale, e rifarli sarebbe lavoro sprecato. Non ha — e non puo avere — l'ingresso di una grotta, un abisso, una risorgenza, un colombario, il fronte a gradoni di una cava: sono il mestiere di questo archivio e di nessun altro. Quindi gli insiemi sono **due**, in `assets/icone/catageo-icone.svg`, e convivono:
+
+| Nome nel vocabolario | Da dove viene | Come si disegna |
+|---|---|---|
+| `droplet-fill`, `fire`, `snow`… | Bootstrap Icons, gia self-hosted | `<i class="bi bi-…">`, e un font |
+| `cat-grotta`, `cat-abisso`, `cat-cava`… | sprite proprio | `<svg><use href="#cat-…">` |
+
+Chi compila un vocabolario scrive **un nome solo**: se comincia per `cat-` e nostro, altrimenti e di Bootstrap (`Icone::nostra()`). Una fonte sola da spiegare, nessuna scelta da fare.
+
+**Come sono disegnati, e perche cosi.** Riquadro 16×16 come Bootstrap, cosi i due insiemi si mescolano senza che uno sembri piu grande. Forme **piene** e non contorni: il glifo occupa una dozzina di pixel dentro la pastiglia, e a quella misura una linea sottile sparisce — e il motivo per cui Bootstrap ha le varianti `-fill`, e qui siamo sempre in quel caso. `fill="currentColor"` ovunque, cosi il colore lo decide chi li usa. Il vuoto si disegna **con il vuoto**: un ipogeo e un'assenza dentro una massa di roccia, e `fill-rule="evenodd"` ritaglia la sagoma dalla massa invece di contornarla.
+
+**Lo sprite si include nella pagina, non si richiama come file.** Il riferimento esterno funziona — provato in browser, `<use href="file.svg#id">` si risolve e il file arriva con 200 — ma includendolo si ottengono due cose: `currentColor` eredita davvero il colore del contenitore, e non c'e una seconda richiesta prima che i simboli compaiano. Si emette solo dove servono (`Icone::sprite()` in mappa, ricerca e vocabolario delle tipologie): su una pagina che non li usa sarebbero due kilobyte di niente.
+
+**Nel vocabolario si vede cosa si otterra.** L'elenco ha una colonna con il simbolo **risolto**, cioe quello che comparira in mappa, non l'attributo grezzo: mostrare solo l'attributo proprio lascerebbe vuote quasi tutte le righe e non risponderebbe alla sola domanda per cui si guarda quella colonna. Le voci che lo ereditano sono in grigio. Nel modulo di modifica i glifi propri si scelgono **cliccandoli**: sono una dozzina e non esistono altrove, e chiedere di digitarne il nome a memoria significherebbe che nessuno li userebbe.
+
 ---
 
 #### 7.2.3 Layer preconfigurati per l'Italia centrale (fase 6b)

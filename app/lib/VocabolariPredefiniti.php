@@ -39,39 +39,39 @@ final class VocabolariPredefiniti
                 'nome' => 'Cavita artificiale',
                 'icona' => 'bricks',
                 'figli' => [
-                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'icona' => 'droplet-fill', 'figli' => [
-                        'ART-IDR-CUN' => 'Cunicolo drenante',
+                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'icona' => 'cat-acquedotto', 'figli' => [
+                        'ART-IDR-CUN' => ['nome' => 'Cunicolo drenante', 'icona' => 'cat-cunicolo'],
                         'ART-IDR-ACQ' => 'Acquedotto',
-                        'ART-IDR-CIS' => 'Cisterna',
+                        'ART-IDR-CIS' => ['nome' => 'Cisterna', 'icona' => 'cat-cisterna'],
                         'ART-IDR-POZ' => 'Pozzo',
                         'ART-IDR-FOG' => 'Fognatura',
                         'ART-IDR-EMI' => 'Emissario',
                     ]],
-                    'ART-EST' => ['nome' => 'Opere estrattive', 'icona' => 'minecart-loaded', 'figli' => [
+                    'ART-EST' => ['nome' => 'Opere estrattive', 'icona' => 'cat-cava', 'figli' => [
                         'ART-EST-CAV' => 'Cava ipogea',
                         'ART-EST-MIN' => 'Miniera',
                         'ART-EST-POZ' => 'Pozzo di estrazione',
                     ]],
-                    'ART-CUL' => ['nome' => 'Insediamenti e opere di culto', 'icona' => 'bank', 'figli' => [
+                    'ART-CUL' => ['nome' => 'Insediamenti e opere di culto', 'icona' => 'cat-colombario', 'figli' => [
                         'ART-CUL-CAT' => 'Catacomba',
                         'ART-CUL-CHR' => 'Chiesa rupestre',
                         'ART-CUL-IPO' => 'Ipogeo funerario',
                         'ART-CUL-MIT' => 'Mitreo',
                         'ART-CUL-ERE' => 'Eremo',
                     ]],
-                    'ART-ABI' => ['nome' => 'Insediamenti civili', 'icona' => 'house-door-fill', 'figli' => [
+                    'ART-ABI' => ['nome' => 'Insediamenti civili', 'icona' => 'cat-rupestre', 'figli' => [
                         'ART-ABI-RUP' => 'Abitato rupestre',
                         'ART-ABI-CAN' => 'Cantina o magazzino',
                         'ART-ABI-NEV' => 'Neviera o ghiacciaia',
                         'ART-ABI-BUT' => 'Butto o pozzo di scarico',
                     ]],
-                    'ART-BEL' => ['nome' => 'Opere belliche', 'icona' => 'shield-fill', 'figli' => [
+                    'ART-BEL' => ['nome' => 'Opere belliche', 'icona' => 'cat-rifugio', 'figli' => [
                         'ART-BEL-RIC' => 'Ricovero antiaereo',
                         'ART-BEL-GAL' => 'Galleria militare',
                         'ART-BEL-POS' => 'Postazione fortificata',
                         'ART-BEL-DEP' => 'Deposito munizioni',
                     ]],
-                    'ART-TRA' => ['nome' => 'Opere di transito', 'icona' => 'signpost-2-fill', 'figli' => [
+                    'ART-TRA' => ['nome' => 'Opere di transito', 'icona' => 'cat-galleria', 'figli' => [
                         'ART-TRA-GAL' => 'Galleria stradale o ferroviaria',
                         'ART-TRA-PAS' => 'Passaggio o cunicolo di collegamento',
                     ]],
@@ -80,15 +80,15 @@ final class VocabolariPredefiniti
             ],
             'NAT' => [
                 'nome' => 'Cavita naturale',
-                'icona' => 'triangle-fill',
+                'icona' => 'cat-grotta',
                 'figli' => [
-                    'NAT-CAR' => ['nome' => 'Carsica', 'icona' => 'moisture', 'figli' => [
+                    'NAT-CAR' => ['nome' => 'Carsica', 'icona' => 'cat-grotta', 'figli' => [
                         'NAT-CAR-GRO' => 'Grotta di dissoluzione',
-                        'NAT-CAR-ABI' => 'Abisso o pozzo carsico',
-                        'NAT-CAR-RIS' => 'Risorgenza',
-                        'NAT-CAR-ING' => 'Inghiottitoio',
+                        'NAT-CAR-ABI' => ['nome' => 'Abisso o pozzo carsico', 'icona' => 'cat-abisso'],
+                        'NAT-CAR-RIS' => ['nome' => 'Risorgenza', 'icona' => 'cat-risorgenza'],
+                        'NAT-CAR-ING' => ['nome' => 'Inghiottitoio', 'icona' => 'cat-inghiottitoio'],
                     ]],
-                    'NAT-VUL' => ['nome' => 'Vulcanica', 'icona' => 'fire', 'figli' => [
+                    'NAT-VUL' => ['nome' => 'Vulcanica', 'icona' => 'cat-tubo-lavico', 'figli' => [
                         'NAT-VUL-TUB' => 'Tubo di scorrimento lavico',
                         'NAT-VUL-CAM' => 'Camera di degassamento',
                     ]],
@@ -128,12 +128,21 @@ final class VocabolariPredefiniti
                     'attivo' => '1',
                 ], static fn (string $v): bool => $v !== ''));
 
-                foreach ($tipologia['figli'] as $codiceSotto => $nomeSotto) {
-                    Xml::aggiungi($nodoTipologia, 'sotto', null, [
+                /*
+                 * Una sottotipologia e una stringa quando le basta ereditare il
+                 * simbolo della madre, un array quando ne vuole uno suo. Le due
+                 * forme convivono perche la maggioranza non ha bisogno di
+                 * distinguersi, e obbligare tutte all'array riempirebbe l'elenco
+                 * di ripetizioni.
+                 */
+                foreach ($tipologia['figli'] as $codiceSotto => $sotto) {
+                    $dati = is_array($sotto) ? $sotto : ['nome' => $sotto];
+                    Xml::aggiungi($nodoTipologia, 'sotto', null, array_filter([
                         'codice' => $codiceSotto,
-                        'nome'   => $nomeSotto,
+                        'nome'   => $dati['nome'],
+                        'icona'  => $dati['icona'] ?? '',
                         'attivo' => '1',
-                    ]);
+                    ], static fn (string $v): bool => $v !== ''));
                 }
             }
         }

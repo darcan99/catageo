@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<!--
+ ============================================================================
+  CATAGEO — Catasto Ipogei
+ ============================================================================
+  File .........: assets/icone/catageo-icone.svg
+  Descrizione ..: Glifi propri per le cavita, quelli che Bootstrap Icons non
+                  ha e non puo avere: un ingresso di grotta, un abisso, una
+                  risorgenza, una cava ipogea, un colombario.
+                  Si usano insieme a Bootstrap Icons, non al posto: dove
+                  esiste gia un simbolo adatto (fuoco per il vulcanismo, neve
+                  per il glaciale) si usa quello.
+  Versione .....: 1.5.0
+  Sviluppatore .: Dario Candela <darcan99@gmail.com>
+  Licenza ......: GNU GPL v3.0 — vedi LICENSE
+  Copyright ....: (c) 2026 Dario Candela
+ ----------------------------------------------------------------------------
+  CRONOLOGIA
+  1.5.0  2026-08-08  D.Candela  Prima stesura.
+ ============================================================================
+
+  COME SONO FATTI, e perche cosi.
+
+  Riquadro 16x16 come Bootstrap Icons, cosi i due insiemi si mescolano senza
+  che uno risulti piu grande dell'altro.
+
+  Forme PIENE e non contorni sottili. Il glifo si disegna bianco dentro una
+  pastiglia di 30 px e occupa una dozzina di pixel: a quella misura una linea
+  da mezzo pixel sparisce, mentre una massa piena resta leggibile. E il motivo
+  per cui Bootstrap ha le varianti «-fill», e qui siamo sempre in quel caso.
+
+  fill="currentColor" ovunque: il colore lo decide chi usa il glifo, e in mappa
+  cambia con la natura della cavita.
+
+  Il vuoto si disegna con il vuoto. Un ipogeo e un'assenza dentro una massa di
+  roccia, e il modo piu diretto di dirlo e ritagliare la sagoma dalla massa —
+  fill-rule="evenodd" — invece di disegnare un contorno.
+
+  I nomi sono in italiano e senza prefisso «bi-»: chi compila il vocabolario
+  scrive «cat-grotta» e sa che quella e roba nostra.
+-->
+
+  <!-- Ingresso di grotta: un arco scavato nel fianco della montagna.
+       Il profilo del rilievo sopra e cio che lo distingue da una porta. -->
+  <symbol id="cat-grotta" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1 14 8 2l7 12H1Zm4.4 0a2.6 2.6 0 0 1 5.2 0Z"/>
+  </symbol>
+
+  <!-- Abisso: pozzo verticale visto in sezione, con la corda che scende.
+       La bocca in prospettiva dice che si guarda dentro, non davanti. -->
+  <symbol id="cat-abisso" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M2 4c0-1.1 2.7-2 6-2s6 .9 6 2-2.7 2-6 2-6-.9-6-2Zm2.2.9C5.1 5.3 6.4 5.5 8 5.5s2.9-.2 3.8-.6L11 14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1L4.2 4.9Z"/>
+    <path fill="currentColor" d="M7.4 6.6h1.2V13H7.4z" opacity=".55"/>
+  </symbol>
+
+  <!-- Inghiottitoio: l'acqua entra. La freccia punta DENTRO la roccia. -->
+  <symbol id="cat-inghiottitoio" viewBox="0 0 16 16">
+    <path fill="currentColor"
+          d="M1.6 3.2c1.6 0 1.6 1.2 3.2 1.2s1.6-1.2 3.2-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2v1.9c-1.6 0-1.6 1.2-3.2 1.2s-1.6-1.2-3.2-1.2-1.6 1.2-3.2 1.2S3.2 5.1 1.6 5.1Z"/>
+    <path fill="currentColor" d="M7 7.5h2v3.2h2.3L8 14.6 4.7 10.7H7Z"/>
+  </symbol>
+
+  <!-- Risorgenza: l'acqua esce. Stessa grammatica, freccia rovesciata. -->
+  <symbol id="cat-risorgenza" viewBox="0 0 16 16">
+    <path fill="currentColor"
+          d="M1.6 11.1c1.6 0 1.6 1.2 3.2 1.2s1.6-1.2 3.2-1.2 1.6 1.2 3.2 1.2 1.6-1.2 3.2-1.2V13c-1.6 0-1.6 1.2-3.2 1.2s-1.6-1.2-3.2-1.2-1.6 1.2-3.2 1.2S3.2 13 1.6 13Z"/>
+    <path fill="currentColor" d="M9 8.5H7V5.3H4.7L8 1.4l3.3 3.9H9Z"/>
+  </symbol>
+
+  <!-- Cunicolo drenante: sezione a volta con l'acqua sul fondo.
+       E la forma che si vede entrando in un acquedotto antico. -->
+  <symbol id="cat-cunicolo" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M2 14V7a6 6 0 0 1 12 0v7h-2V7a4 4 0 0 0-8 0v7H2Z"/>
+    <path fill="currentColor" d="M4 11.4c1.3 0 1.3.9 2.7.9s1.3-.9 2.6-.9 1.3.9 2.7.9V14H4Z"/>
+  </symbol>
+
+  <!-- Cisterna: vasca voltata, con il pelo dell'acqua e il pozzo di presa. -->
+  <symbol id="cat-cisterna" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1.5 6.5A4.5 4.5 0 0 1 6 2h4a4.5 4.5 0 0 1 4.5 4.5V15h-13Zm2 .2V13h9V6.7A2.7 2.7 0 0 0 9.8 4H6.2a2.7 2.7 0 0 0-2.7 2.7Z"/>
+    <path fill="currentColor" d="M4.5 9.4c1.2 0 1.2.8 2.3.8s1.2-.8 2.3-.8 1.2.8 2.4.8V13h-7Z"/>
+    <path fill="currentColor" d="M7.3 0h1.4v3H7.3z"/>
+  </symbol>
+
+  <!-- Acquedotto: le arcate. Un solo simbolo che nessuno confonde. -->
+  <symbol id="cat-acquedotto" viewBox="0 0 16 16">
+    <path fill="currentColor" d="M0 2h16v2.2H0z"/>
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M0 5h16v10h-2.6V9.9a1.9 1.9 0 0 0-3.8 0V15H6.4V9.9a1.9 1.9 0 0 0-3.8 0V15H0Z"/>
+  </symbol>
+
+  <!-- Colombario: le nicchie scavate nella parete. Dice «ipogeo funerario»
+       senza ricorrere a simboli religiosi, che sarebbero di una sola fede. -->
+  <symbol id="cat-colombario" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1 1h14v14H1Zm2.2 2.4v3.4h3.4V3.4Zm6.2 0v3.4h3.4V3.4ZM3.2 9.2v3.4h3.4V9.2Zm6.2 0v3.4h3.4V9.2Z"/>
+  </symbol>
+
+  <!-- Cava ipogea: il fronte a gradoni lasciato dall'estrazione a banchi. -->
+  <symbol id="cat-cava" viewBox="0 0 16 16">
+    <path fill="currentColor"
+          d="M1 15V11h3.6V7.6h3.6V4.2h3.6V1H15v14Z"/>
+    <path fill="currentColor" d="M1 8.6h2.2v1.5H1zm0-3.4h2.2v1.5H1z" opacity=".55"/>
+  </symbol>
+
+  <!-- Rifugio antiaereo: la volta di protezione con il segnale.
+       Il triangolo e il segno con cui i ricoveri erano indicati sui muri. -->
+  <symbol id="cat-rifugio" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1 15V8a7 7 0 0 1 14 0v7Zm2.3-2.3h9.4V8a4.7 4.7 0 0 0-9.4 0Z"/>
+    <path fill="currentColor" d="M8 5.2l2.6 4.6H5.4Z"/>
+  </symbol>
+
+  <!-- Galleria di transito: il portale con la carreggiata che ci entra. -->
+  <symbol id="cat-galleria" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1 15V8.5a7 7 0 0 1 14 0V15h-2.4V8.5a4.6 4.6 0 0 0-9.2 0V15Z"/>
+    <path fill="currentColor" d="M7.2 9.5h1.6V15H7.2z"/>
+    <path fill="currentColor" d="M4.6 12h1.5v3H4.6zm5.3 0h1.5v3H9.9z" opacity=".55"/>
+  </symbol>
+
+  <!-- Tubo di scorrimento lavico: la galleria tonda con la colata dentro. -->
+  <symbol id="cat-tubo-lavico" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M8 1.5A6.5 6.5 0 1 1 1.5 8 6.5 6.5 0 0 1 8 1.5Zm0 2.2A4.3 4.3 0 1 0 12.3 8 4.3 4.3 0 0 0 8 3.7Z"/>
+    <path fill="currentColor" d="M4.6 9.3c1 0 1 .8 2 .8s1-.8 2-.8 1 .8 2 .8v1.7c-1 0-1-.8-2-.8s-1 .8-2 .8-1-.8-2-.8Z"/>
+  </symbol>
+
+  <!-- Concrezionamento: stalattiti e stalagmiti che si fronteggiano.
+       Serve alle morfologie, non alla tipologia. -->
+  <symbol id="cat-concrezioni" viewBox="0 0 16 16">
+    <path fill="currentColor"
+          d="M1 1h14v1.8h-1.1l-1.1 4.4-1.1-4.4H9.6L8.2 9.3 6.8 2.8H4.6L3.5 6.4 2.4 2.8H1Z"/>
+    <path fill="currentColor"
+          d="M1 15h14v-1.8h-1.4l-1-3-1.1 3H8.9L7.7 10l-1.2 3.2H4.3l-1-2.4-1 2.4H1Z"/>
+  </symbol>
+
+  <!-- Abitato rupestre: le aperture scavate nel banco di tufo. -->
+  <symbol id="cat-rupestre" viewBox="0 0 16 16">
+    <path fill="currentColor" fill-rule="evenodd"
+          d="M1 15 3.4 1h9.2L15 15Zm4-2.6h2.1V8.9a1.05 1.05 0 0 0-2.1 0Zm4.4 0h2.1V8.9a1.05 1.05 0 0 0-2.1 0ZM5.6 6.4h2.1V4.1a1.05 1.05 0 0 0-2.1 0Z"/>
+  </symbol>
+
+</svg>

@@ -169,6 +169,40 @@
             applicaFormato();
         }
 
+        // ------------------------------------------ scelta del glifo (vocabolari)
+        /*
+         * I glifi propri delle cavita si scelgono cliccandoli. Sono una dozzina
+         * e non esistono altrove: chiedere di digitarne il nome a memoria
+         * significherebbe che nessuno li userebbe, e resterebbero un insieme di
+         * simboli che c'e ma non si vede.
+         *
+         * L'anteprima si aggiorna sul posto, cosi si vede cosa si e scelto
+         * senza salvare e tornare indietro.
+         */
+        var sceltaGlifi = document.querySelector('.catageo-scelta-icone');
+        if (sceltaGlifi) {
+            var campoIcona = document.getElementById('icona') || document.getElementById('iconaNuovo');
+            var anteprima  = document.querySelector('.input-group-text.catageo-anteprima-icona');
+
+            sceltaGlifi.addEventListener('click', function (evento) {
+                var pulsante = evento.target.closest('[data-catageo-icona]');
+                if (!pulsante || !campoIcona) { return; }
+
+                campoIcona.value = pulsante.getAttribute('data-catageo-icona');
+                campoIcona.dispatchEvent(new Event('change', { bubbles: true }));
+
+                sceltaGlifi.querySelectorAll('.catageo-glifo').forEach(function (b) {
+                    b.classList.toggle('active', b === pulsante);
+                });
+                if (anteprima) {
+                    // Si copia il simbolo gia disegnato nel pulsante invece di
+                    // ricostruirlo: cosi l'anteprima non puo divergere da cio
+                    // che si e scelto.
+                    anteprima.innerHTML = pulsante.innerHTML;
+                }
+            });
+        }
+
         // ------------------------------------------ validazione dei form Bootstrap
         document.querySelectorAll('form.needs-validation').forEach(function (form) {
             form.addEventListener('submit', function (evento) {

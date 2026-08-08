@@ -6,6 +6,44 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.5.0] — 2026-08-08
+
+### Aggiunto
+- **Un set di glifi disegnati per le cavita**, quelli che Bootstrap Icons non
+  ha e non puo avere: ingresso di grotta, abisso, inghiottitoio, risorgenza,
+  cunicolo drenante, cisterna, acquedotto, colombario, cava ipogea, rifugio
+  antiaereo, galleria, tubo lavico, concrezioni, abitato rupestre. Quattordici
+  simboli in `assets/icone/catageo-icone.svg`.
+- I due insiemi **convivono**: dove Bootstrap ha gia il simbolo adatto — la
+  fiamma del vulcanismo, il fiocco del glaciale — si usa quello. Chi compila un
+  vocabolario scrive un nome solo: se comincia per `cat-` e nostro.
+- **Anteprima nell'elenco dei vocabolari**: una colonna mostra il simbolo che
+  ogni voce usa DAVVERO, cioe risolto con l'ereditarieta. Mostrare l'attributo
+  grezzo lascerebbe vuote quasi tutte le righe e non risponderebbe alla sola
+  domanda per cui si guarda quella colonna. Le voci che ereditano sono in
+  grigio.
+- **Tavolozza dei glifi** nel modulo di modifica: si scelgono cliccandoli, e
+  l'anteprima si aggiorna sul posto. Sono una dozzina e non esistono altrove:
+  chiedere di digitarne il nome a memoria avrebbe significato che nessuno li
+  usava.
+- Glifo proprio anche per alcune **sottotipologie**: un abisso non e una
+  grotta, una risorgenza non e un inghiottitoio, e un occhio speleologico le
+  distingue da lontano.
+
+### Note di progetto
+- **Forme piene, non contorni.** Il glifo occupa una dozzina di pixel dentro la
+  pastiglia: a quella misura una linea sottile sparisce. E il motivo per cui
+  Bootstrap ha le varianti «-fill», e qui siamo sempre in quel caso.
+- **Il vuoto si disegna con il vuoto**: un ipogeo e un'assenza dentro una massa
+  di roccia, e `fill-rule="evenodd"` ritaglia la sagoma dalla massa invece di
+  contornarla.
+- **Lo sprite si include nella pagina.** Il riferimento a un file esterno
+  funziona — provato in browser, il `<use>` si risolve e il file arriva con 200
+  — ma includendolo `currentColor` eredita davvero il colore del contenitore e
+  non c'e una seconda richiesta prima che i simboli compaiano. Si emette solo
+  dove servono: altrove sarebbero due kilobyte di niente, e la prova lo
+  verifica in entrambe le direzioni.
+
 ## [1.4.1] — 2026-08-08
 
 ### Corretto

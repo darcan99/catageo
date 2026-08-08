@@ -497,12 +497,26 @@ dicono cose diverse:
 - il **contorno tratteggiato** dice che l'ingresso non è praticabile, quello
   puntinato che la posizione è approssimata perché le coordinate sono riservate.
 
-I simboli si cambiano dai **vocabolari**, sotto Anagrafiche › Tipologie: ogni
-voce della tassonomia ha un campo «Icona in mappa» che accetta il nome di
-un'icona di [Bootstrap Icons](https://icons.getbootstrap.com/). Lasciandolo
-vuoto la voce **eredita** il simbolo di quella superiore, quindi una
-sottotipologia nuova compare in mappa da subito con il simbolo giusto: si
-compila solo per distinguerla dalle sorelle.
+I simboli si cambiano dai **vocabolari**, sotto Anagrafiche › Tipologie.
+L'elenco ha una colonna **Mappa** con il simbolo che ogni voce usa davvero: le
+voci che lo ereditano dalla voce superiore sono in grigio, così si vede a colpo
+d'occhio chi ha una scelta propria e chi no.
+
+Aprendo una voce si può cambiarlo. Ci sono due insiemi di simboli:
+
+- i **glifi delle cavità**, disegnati per CATAGEO — ingresso di grotta, abisso,
+  inghiottitoio, risorgenza, cunicolo, cisterna, acquedotto, colombario, cava,
+  rifugio antiaereo, galleria, tubo lavico, concrezioni, abitato rupestre. Si
+  scelgono cliccandoli nella tavolozza sotto il campo;
+- tutte le icone di [Bootstrap Icons](https://icons.getbootstrap.com/), scrivendone
+  il nome senza il prefisso `bi-`: utili per quello che non è una cavità in sé,
+  come la fiamma del vulcanismo o il fiocco di neve del glaciale.
+
+Lasciando il campo vuoto la voce **eredita** il simbolo di quella superiore,
+quindi una sottotipologia nuova compare in mappa da subito con il simbolo
+giusto: si compila solo per distinguerla dalle sorelle. Nel vocabolario
+predefinito lo fanno per esempio l'abisso, la risorgenza e l'inghiottitoio, che
+un occhio speleologico distingue da lontano.
 
 La pastiglia è simmetrica di proposito: il simbolo indica il punto con il
 proprio centro. Un segnaposto a goccia indicherebbe con la punta, e a colpo

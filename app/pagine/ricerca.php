@@ -852,6 +852,12 @@ if ($vista === 'mappa' && $righe !== []) {
 
   <script type="application/json" id="catageoMappaConfig"><?= Testo::escJson(Mappa::perBrowser()) ?></script>
 
+  <?php
+  // Anche qui i marker portano i glifi propri: senza lo sprite in pagina il
+  // <use> non risolve e le pastiglie resterebbero vuote.
+  echo Icone::sprite();
+  ?>
+
 <?php endif; ?>
 
 <?php if ($haCriteri && ($esito['apertiPerSpecialistici'] > 0 || $esito['apertiPerDescrizioni'] > 0)): ?>
