@@ -6,6 +6,24 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.4.1] — 2026-08-08
+
+### Corretto
+- **«Apri la scheda» nel popup della mappa era azzurro su blu**: contrasto
+  misurato **1,1:1**, cioe illeggibile. La causa non e una tinta sbagliata ma
+  la specificita CSS: Leaflet colora ogni collegamento dentro la propria mappa
+  con `.leaflet-container a`, che vale una classe piu un elemento, mentre
+  `.btn-primary` e una classe sola. Difetto preesistente, c'era da quando il
+  popup ha un pulsante. Ora e **4,5:1** in entrambi i temi, cioe il valore che
+  quel pulsante ha in tutto il resto dell'applicativo.
+- La correzione restituisce al pulsante il **proprio** colore
+  (`var(--bs-btn-color)`) invece di inchiodarne uno nuovo, cosi vale anche per
+  le varianti che non esistono ancora, e per ogni mappa: elenco, scheda,
+  ricerca, rilievo.
+- `prova-web.ps1` verifica che la regola ci sia. Il contrasto si vede solo nel
+  browser, ma la premessa strutturale si controlla, e senza controllo chi
+  togliesse quella regola riporterebbe il difetto senza accorgersene.
+
 ## [1.4.0] — 2026-08-08
 
 ### Aggiunto

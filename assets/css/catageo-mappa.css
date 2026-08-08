@@ -156,6 +156,36 @@
     min-width: 13rem;
 }
 
+/* Un pulsante dentro la mappa deve restare un pulsante.
+ *
+ * Leaflet colora TUTTI i collegamenti dentro il proprio contenitore con
+ * `.leaflet-container a { color: #0078A8 }`. Quella regola vale una classe piu
+ * un elemento, cioe piu di `.btn-primary`, che e una classe sola: il testo del
+ * pulsante «Apri la scheda» diventava azzurro Leaflet sul fondo blu di
+ * Bootstrap, misurati 1,1:1 — praticamente illeggibile. Non e un caso di
+ * tinta sbagliata ma di specificita, e si corregge con una regola che ne ha
+ * una in piu, restituendo al pulsante il proprio colore invece di
+ * inchiodarne uno nuovo: cosi vale per qualunque variante, anche quelle che
+ * non esistono ancora.
+ *
+ * Vale per ogni mappa dell'applicativo: elenco, scheda, ricerca, rilievo. */
+.leaflet-container a.btn {
+    color: var(--bs-btn-color);
+}
+
+.leaflet-container a.btn:hover {
+    color: var(--bs-btn-hover-color);
+}
+
+.leaflet-container a.btn:focus-visible {
+    color: var(--bs-btn-hover-color);
+}
+
+.leaflet-container a.btn:active,
+.leaflet-container a.btn.active {
+    color: var(--bs-btn-active-color);
+}
+
 .catageo-popup-avviso {
     display: block;
     margin-top: 0.35rem;

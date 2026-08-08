@@ -245,6 +245,45 @@ var testo = r.getBoundingClientRect();
 `text-indent` negativo deve avere accanto l'azzeramento sui discendenti. Non
 sostituisce lo sguardo, ma impedisce che un rientro nuovo nasca già rotto.
 
+### Il pulsante ricolorato dalla libreria della mappa — 2026-08-08
+
+Nel popup di un ipogeo, «Apri la scheda» era **azzurro su blu**: contrasto
+misurato **1,1:1**, cioe illeggibile. Segnalato, non trovato dalla misura —
+che gira sulle pagine, non dentro un popup che esiste solo dopo un clic.
+
+La causa non e una tinta sbagliata ma la **specificita CSS**. Leaflet colora
+tutti i collegamenti dentro la propria mappa:
+
+```css
+.leaflet-container a { color: #0078A8; }   /* una classe + un elemento */
+.btn-primary          { color: #fff;    }   /* una classe sola      */
+```
+
+Il pulsante e un `<a class="btn btn-primary">`, quindi vinceva Leaflet e il
+testo diventava azzurro sul fondo blu di Bootstrap. Difetto **preesistente**:
+c'era da quando il popup ha un pulsante.
+
+La correzione restituisce al pulsante il **proprio** colore invece di
+inchiodarne uno nuovo, cosi vale anche per le varianti che non esistono
+ancora:
+
+```css
+.leaflet-container a.btn { color: var(--bs-btn-color); }
+```
+
+Dopo: **4,5:1** in tema chiaro e scuro, cioe il valore che quel pulsante ha in
+tutto il resto dell'applicativo.
+
+`prova-web.ps1` verifica che la regola ci sia: il contrasto si vede solo nel
+browser, ma la premessa strutturale si puo controllare, e senza controllo chi
+togliesse quella regola riporterebbe il difetto senza accorgersene.
+
+**La lezione, che vale oltre questo caso:** una libreria di terze parti che
+colora per contenitore batte le classi di Bootstrap. Ogni volta che un
+componente dell'applicativo finisce dentro il contenitore di una libreria —
+mappa, visualizzatore 3D — i suoi colori vanno riverificati li dentro, non
+solo in pagina.
+
 ## Esito finale
 
 Nessun elemento sotto soglia, in **entrambi i temi**, su **dieci pagine** misurate
