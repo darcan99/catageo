@@ -6,6 +6,21 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.8.2] — 2026-08-08
+
+### Modificato
+- **Berretto frigio rifatto sulla traccia** di chi lo ha chiesto, disegno alla
+  mano: arco che sale da sinistra, riccio **stretto e schiacciato** in alto, e
+  da li la punta che scende **allungata verso lo spigolo destro** della falda.
+  La falda e una barra a se sotto. Le versioni precedenti sbagliavano tutte lo
+  stesso punto: la punta andava messa **al centro e verso il basso**, non
+  fuori a destra, ed e la punta a rendere frigio un berretto.
+- **Neviera**: pareti piu svasate e contorno da 1,4 a **1,9**, con il fiocco
+  rimpicciolito perche non tocchi il bordo.
+- **Grotta glaciale**: stesso spessore di contorno, per coerenza.
+- **Cava**: rimessa **comera**. Il fronte a gradoni era stato cambiato come
+  ricaduta della rimozione delle trasparenze, e non era stato chiesto.
+
 ## [1.8.1] — 2026-08-08
 
 ### Modificato

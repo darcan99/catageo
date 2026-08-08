@@ -15,6 +15,7 @@ declare(strict_types=1);
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.8.2  2026-08-08  D.Candela  Berretto frigio sulla traccia.
  *  1.8.1  2026-08-08  D.Candela  Berretto e bocca glaciale a contorno.
  *  1.8.0  2026-08-08  D.Candela  Un segno per ogni voce, e glifi che
  *                                riempiono la pastiglia.
@@ -64,7 +65,7 @@ declare(strict_types=1);
 define('CATAGEO_ROOT', str_replace('\\', '/', dirname(__DIR__)));
 
 /** Versione dell'applicativo. Unica fonte di verita per l'interfaccia. */
-define('CATAGEO_VERSIONE', '1.8.1');
+define('CATAGEO_VERSIONE', '1.8.2');
 
 /** Percorso del file di configurazione. */
 define('CATAGEO_CONFIG', CATAGEO_ROOT . '/config.xml');

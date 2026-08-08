@@ -1,6 +1,6 @@
 # Manuale di CATAGEO
 
-Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.8.1**.
+Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.8.2**.
 
 Per installare, aggiornare o spostare un archivio vedi
 [INSTALLAZIONE.md](INSTALLAZIONE.md). Per le scelte di progetto e il modello

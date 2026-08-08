@@ -12,12 +12,16 @@
                   offriva solo un simbolo METEOROLOGICO — il fiocco di neve,
                   l'onda anomala, il vento — non si usa piu: descrivevano il
                   fenomeno che sta fuori, non la cavita che ha scavato.
-  Versione .....: 1.8.1
+  Versione .....: 1.8.2
   Sviluppatore .: Dario Candela <darcan99@gmail.com>
   Licenza ......: GNU GPL v3.0 — vedi LICENSE
   Copyright ....: (c) 2026 Dario Candela
  ............................................................................
   CRONOLOGIA
+  1.8.2  2026-08-08  D.Candela  Berretto sulla traccia: riccio stretto in
+                                alto e punta allungata verso lo spigolo
+                                della falda. Neviera svasata, contorni piu
+                                spessi, cava rimessa comera.
   1.8.1  2026-08-08  D.Candela  Berretto frigio a contorno, che mostra la
                                 piega, e ingresso di grotta glaciale come
                                 linea curva invece che come semicerchio.
@@ -179,7 +183,7 @@
   <!-- Cava ipogea: il fronte a gradoni lasciato dall'estrazione a banchi. -->
   <symbol id="cat-cava" viewBox="0 0 16 16">
     <path fill="currentColor"
-          d="M.6 15.4v-4.2h3.8V7.4h3.8V3.6h3.8V.6h3.4v14.8Z"/>
+          d="M1 15V11h3.6V7.6h3.6V4.2h3.6V1H15v14Z"/>
   </symbol>
 
   <!-- Rifugio antiaereo: la volta di protezione con il segnale.
@@ -269,11 +273,11 @@
        nessun altro dio romano. Chi non lo riconosce non perde nulla: vede un
        simbolo distinto, che e quanto serve a un marker. -->
   <symbol id="cat-mitreo" viewBox="0 0 16 16">
-    <path fill="none" stroke="currentColor" stroke-width="1.5"
-          stroke-linejoin="round" stroke-linecap="round"
-          d="M2 12.2C2 4.8 4.6.8 8.8.8c2.7 0 4.9 1.4 5.8 3.5L15.4 6l-2.9.5c-1.1 1.5-2.6 2.4-3.7 2.8-.9.4-1.2 1.1-1.2 2.9Z"/>
-    <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          d="M1 14.6h14"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.9"
+          stroke-linecap="round"
+          d="M2.9 11.8C2.9 6.5 5.2 3.3 8.4 3.3c2.4 0 4 1.4 4 3.1 0 1.6-1.4 2.8-3.4 3.1"/>
+    <path fill="currentColor" d="M7.8 8.5 11 10 13.8 13.3z"/>
+    <path fill="currentColor" d="M2 13.4h12v2.1H2z"/>
   </symbol>
 
   <!-- Eremo: tre torrette con la finestrella, su una base svasata che dice
@@ -369,15 +373,15 @@
        «costruzione vuota», che e cio che una neviera e: un guscio di
        muratura riempito di neve. -->
   <symbol id="cat-neviera" viewBox="0 0 16 16">
-    <path fill="none" stroke="currentColor" stroke-width="1.4"
+    <path fill="none" stroke="currentColor" stroke-width="1.9"
           stroke-linejoin="round" stroke-linecap="round"
-          d="M6 3.2 1.8 14.8h12.4L10 3.2M6 3.2h.9m2.2 0H10"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(0) scale(0.5) translate(-8 -8)"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(60) scale(0.5) translate(-8 -8)"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(120) scale(0.5) translate(-8 -8)"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(180) scale(0.5) translate(-8 -8)"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(240) scale(0.5) translate(-8 -8)"/>
-    <use href="#cat-fiocco-braccio" transform="translate(8 10.6) rotate(300) scale(0.5) translate(-8 -8)"/>
+          d="M6 3.2.8 15h14.4L10 3.2M6 3.2h.9m2.2 0H10"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(0) scale(0.4) translate(-8 -8)"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(60) scale(0.4) translate(-8 -8)"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(120) scale(0.4) translate(-8 -8)"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(180) scale(0.4) translate(-8 -8)"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(240) scale(0.4) translate(-8 -8)"/>
+    <use href="#cat-fiocco-braccio" transform="translate(8 11) rotate(300) scale(0.4) translate(-8 -8)"/>
   </symbol>
 
   <!-- Butto: collo d'anfora con l'ansa e l'inizio della spalla, spezzato
@@ -459,8 +463,8 @@
        cerchio pieno, con il ghiaccio dentro. Il pieno diceva «massa»; il
        contorno dice «apertura», ed e dentro un'apertura che sta il ghiaccio. -->
   <symbol id="cat-glaciale" viewBox="0 0 16 16">
-    <path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"
-          d="M.9 15.2C1.1 7.4 3.4 2.6 7.7 2.6c4.1 0 7 4.4 7.4 12.6"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+          d="M1 15.2C1.2 7.5 3.5 2.7 7.7 2.7c4 0 6.9 4.4 7.3 12.5"/>
     <use href="#cat-fiocco-braccio" transform="translate(8 10.4) rotate(0) scale(0.42) translate(-8 -8)"/>
     <use href="#cat-fiocco-braccio" transform="translate(8 10.4) rotate(60) scale(0.42) translate(-8 -8)"/>
     <use href="#cat-fiocco-braccio" transform="translate(8 10.4) rotate(120) scale(0.42) translate(-8 -8)"/>
