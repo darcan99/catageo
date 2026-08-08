@@ -39,16 +39,16 @@ final class VocabolariPredefiniti
                 'nome' => 'Cavita artificiale',
                 'icona' => 'bricks',
                 'figli' => [
-                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'icona' => 'cat-acquedotto', 'figli' => [
+                    'ART-IDR' => ['nome' => 'Opere idrauliche', 'icona' => 'cat-idraulica', 'figli' => [
                         'ART-IDR-CUN' => ['nome' => 'Cunicolo drenante', 'icona' => 'cat-cunicolo'],
-                        'ART-IDR-ACQ' => 'Acquedotto',
+                        'ART-IDR-ACQ' => ['nome' => 'Acquedotto', 'icona' => 'cat-acquedotto'],
                         'ART-IDR-CIS' => ['nome' => 'Cisterna', 'icona' => 'cat-cisterna'],
                         'ART-IDR-POZ' => ['nome' => 'Pozzo', 'icona' => 'cat-pozzo'],
                         'ART-IDR-FOG' => ['nome' => 'Fognatura', 'icona' => 'cat-fognatura'],
                         'ART-IDR-EMI' => ['nome' => 'Emissario', 'icona' => 'cat-cunicolo'],
                     ]],
-                    'ART-EST' => ['nome' => 'Opere estrattive', 'icona' => 'cat-cava', 'figli' => [
-                        'ART-EST-CAV' => 'Cava ipogea',
+                    'ART-EST' => ['nome' => 'Opere estrattive', 'icona' => 'cat-picconi', 'figli' => [
+                        'ART-EST-CAV' => ['nome' => 'Cava ipogea', 'icona' => 'cat-cava'],
                         'ART-EST-MIN' => ['nome' => 'Miniera', 'icona' => 'cat-miniera'],
                         'ART-EST-POZ' => ['nome' => 'Pozzo di estrazione', 'icona' => 'cat-pozzo-estrazione'],
                     ]],
@@ -60,22 +60,22 @@ final class VocabolariPredefiniti
                         'ART-CUL-ERE' => ['nome' => 'Eremo', 'icona' => 'cat-eremo'],
                     ]],
                     'ART-ABI' => ['nome' => 'Insediamenti civili', 'icona' => 'cat-rupestre', 'figli' => [
-                        'ART-ABI-RUP' => 'Abitato rupestre',
+                        'ART-ABI-RUP' => ['nome' => 'Abitato rupestre', 'icona' => 'cat-rupestre'],
                         'ART-ABI-CAN' => ['nome' => 'Cantina o magazzino', 'icona' => 'cat-cantina'],
                         'ART-ABI-NEV' => ['nome' => 'Neviera o ghiacciaia', 'icona' => 'cat-neviera'],
                         'ART-ABI-BUT' => ['nome' => 'Butto o pozzo di scarico', 'icona' => 'cat-butto'],
                     ]],
                     'ART-BEL' => ['nome' => 'Opere belliche', 'icona' => 'cat-rifugio', 'figli' => [
-                        'ART-BEL-RIC' => 'Ricovero antiaereo',
+                        'ART-BEL-RIC' => ['nome' => 'Ricovero antiaereo', 'icona' => 'cat-rifugio'],
                         'ART-BEL-GAL' => ['nome' => 'Galleria militare', 'icona' => 'cat-galleria'],
                         'ART-BEL-POS' => ['nome' => 'Postazione fortificata', 'icona' => 'cat-postazione'],
                         'ART-BEL-DEP' => ['nome' => 'Deposito munizioni', 'icona' => 'cat-deposito'],
                     ]],
                     'ART-TRA' => ['nome' => 'Opere di transito', 'icona' => 'cat-galleria', 'figli' => [
-                        'ART-TRA-GAL' => 'Galleria stradale o ferroviaria',
-                        'ART-TRA-PAS' => 'Passaggio o cunicolo di collegamento',
+                        'ART-TRA-GAL' => ['nome' => 'Galleria stradale o ferroviaria', 'icona' => 'cat-galleria'],
+                        'ART-TRA-PAS' => ['nome' => 'Passaggio o cunicolo di collegamento', 'icona' => 'cat-passaggio'],
                     ]],
-                    'ART-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'three-dots', 'figli' => []],
+                    'ART-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'cat-indeterminata', 'figli' => []],
                 ],
             ],
             'NAT' => [
@@ -83,28 +83,28 @@ final class VocabolariPredefiniti
                 'icona' => 'cat-grotta',
                 'figli' => [
                     'NAT-CAR' => ['nome' => 'Carsica', 'icona' => 'cat-grotta', 'figli' => [
-                        'NAT-CAR-GRO' => 'Grotta di dissoluzione',
+                        'NAT-CAR-GRO' => ['nome' => 'Grotta di dissoluzione', 'icona' => 'cat-grotta'],
                         'NAT-CAR-ABI' => ['nome' => 'Abisso o pozzo carsico', 'icona' => 'cat-abisso'],
                         'NAT-CAR-RIS' => ['nome' => 'Risorgenza', 'icona' => 'cat-risorgenza'],
                         'NAT-CAR-ING' => ['nome' => 'Inghiottitoio', 'icona' => 'cat-inghiottitoio'],
                     ]],
                     'NAT-VUL' => ['nome' => 'Vulcanica', 'icona' => 'cat-tubo-lavico', 'figli' => [
-                        'NAT-VUL-TUB' => 'Tubo di scorrimento lavico',
-                        'NAT-VUL-CAM' => 'Camera di degassamento',
+                        'NAT-VUL-TUB' => ['nome' => 'Tubo di scorrimento lavico', 'icona' => 'cat-tubo-lavico'],
+                        'NAT-VUL-CAM' => ['nome' => 'Camera di degassamento', 'icona' => 'cat-camera-gas'],
                     ]],
                     'NAT-MAR' => ['nome' => 'Marina o di abrasione', 'icona' => 'cat-grotta-marina', 'figli' => []],
                     'NAT-TET' => ['nome' => 'Tettonica', 'icona' => 'cat-tettonica', 'figli' => []],
                     'NAT-GLA' => ['nome' => 'Glaciale o nivale', 'icona' => 'cat-glaciale', 'figli' => []],
                     'NAT-ERO' => ['nome' => 'Di erosione o interstrato', 'icona' => 'cat-interstrato', 'figli' => []],
-                    'NAT-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'three-dots', 'figli' => []],
+                    'NAT-ALT' => ['nome' => 'Altro o non determinato', 'icona' => 'cat-indeterminata', 'figli' => []],
                 ],
             ],
             'MIS' => [
                 'nome' => 'Cavita mista',
-                'icona' => 'intersect',
+                'icona' => 'cat-mista',
                 'figli' => [
-                    'MIS-NAT' => ['nome' => 'Naturale adattata dall\'uomo', 'icona' => 'intersect', 'figli' => []],
-                    'MIS-ART' => ['nome' => 'Artificiale che intercetta vuoti naturali', 'icona' => 'intersect', 'figli' => []],
+                    'MIS-NAT' => ['nome' => 'Naturale adattata dall\'uomo', 'icona' => 'cat-mista-naturale', 'figli' => []],
+                    'MIS-ART' => ['nome' => 'Artificiale che intercetta vuoti naturali', 'icona' => 'cat-mista-artificiale', 'figli' => []],
                 ],
             ],
         ];

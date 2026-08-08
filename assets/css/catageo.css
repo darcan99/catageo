@@ -908,7 +908,7 @@ svg.catageo-icona {
 
 /* Anteprima nell'elenco dei vocabolari e accanto al campo. */
 .catageo-anteprima-icona {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     line-height: 1;
 }
 
@@ -922,11 +922,11 @@ svg.catageo-icona {
 .catageo-glifo {
     /* Quadrati e tutti uguali: e una tavolozza, non un elenco di comandi, e
        pulsanti di larghezza diversa la farebbero sembrare disordinata. */
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 2.5rem;
+    height: 2.5rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    font-size: 1.05rem;
+    font-size: 1.4rem;
 }

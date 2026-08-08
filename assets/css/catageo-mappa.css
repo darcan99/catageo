@@ -8,7 +8,7 @@
  *                  Caricato solo dalle pagine che mostrano una mappa, insieme a
  *                  leaflet.css. I colori usano le variabili di Bootstrap, cosi
  *                  che i controlli restino leggibili anche in tema scuro.
- *  Versione .....: 0.6.0
+ *  Versione .....: 1.8.0
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: (c) 2026 Dario Candela
@@ -48,16 +48,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
     border: 2px solid rgba(255, 255, 255, 0.95);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
     color: #fff;
 }
 
-.catageo-marker-corpo > i {
-    font-size: 0.82rem;
+/* Il glifo deve RIEMPIRE la pastiglia. Con 0,82rem dentro 30 px restava un
+   bordo di aria larga quanto il simbolo, e a distanza d occhio non si
+   distingueva un acquedotto da una cava: si vedeva solo il colore.
+   1,45rem dentro 34 px lascia il margine minimo che serve al contorno bianco
+   per staccare dal fondo cartografico. Vale per entrambe le provenienze: il
+   font di Bootstrap e i nostri glifi, che sono <svg> e senza questa regola
+   ereditavano la misura del carattere della pagina. */
+.catageo-marker-corpo > i,
+.catageo-marker-corpo > svg {
+    font-size: 1.45rem;
+    width: 1em;
+    height: 1em;
     line-height: 1;
 }
 

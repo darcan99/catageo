@@ -6,6 +6,80 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.8.0] — 2026-08-08
+
+### Aggiunto
+- **Due regole, chieste da chi usa i glifi e ora scritte nel file.**
+  1. **Ogni voce della tassonomia ha un segno proprio.** Erano nove a non
+     averlo e prendevano quello della madre: una scheda «Passaggio di
+     collegamento» compariva in mappa come una galleria qualunque.
+     L'ereditarieta resta e serve alle voci che un catasto aggiunge da se, ma
+     il vocabolario consegnato non ne ha piu bisogno. Quarantanove voci,
+     quarantanove segni.
+  2. **Il glifo deve riempire la pastiglia.** Con 0,82rem dentro 30 px restava
+     un anello d'aria largo quanto il simbolo, e a distanza d'occhio si vedeva
+     solo il colore, cioe uno dei due canali su due. Ora la pastiglia e 34 px e
+     il glifo 1,45rem — e la regola vale anche per i nostri `<svg>`, che senza
+     una misura esplicita ereditavano quella del testo della pagina.
+- **Otto glifi nuovi** per le voci che ne erano prive: opere idrauliche (la
+  goccia sul condotto), opere estrattive (piccone e mazza incrociati),
+  passaggio di collegamento, camera di degassamento, cavita mista, naturale
+  adattata dall'uomo, artificiale che intercetta vuoti naturali, e «altro o non
+  determinato», che aveva tre puntini da menu.
+- La **cavita mista** ha finalmente un segno che dice cosa e: mezza montagna e
+  mezzo muro, senza che una delle due parti sia l'eccezione dell'altra. E il
+  punto in cui si vede che questo catasto tratta le artificiali alla pari.
+
+### Modificato
+- **L'acqua dentro i glifi e sempre una linea ondulata**, mai una massa piena.
+  In un condotto l'acqua scorre; una massa piatta sul fondo dice «allagato»,
+  che e un'altra cosa. Rifatti cunicolo, cisterna, fognatura, inghiottitoio,
+  risorgenza e tubo lavico.
+- **Il mare si disegna a tratti interrotti e sfalsati.** Righe continue che
+  attraversano tutto il riquadro sono la corrente di un fiume.
+- **Il contorno al posto del pieno dove il pieno mente.** Una neviera e un
+  guscio vuoto, una camera di gas e un vuoto isolato, una bocca di grotta
+  glaciale e un'apertura: pieni dicevano «collina», «palla», «masso». Regola
+  pratica: pieno per la roccia, contorno per il vuoto costruito o per la bocca.
+- **Pozzo**: la corona di mattoni e ora irregolare, perche una vera lo e. Sono
+  ventidue quadrilateri in coordinate polari, calcolati e non scritti a mano,
+  con gli scostamenti presi da una tabella fissa: irregolari ma
+  **deterministici**, cosi il file rigenerato resta identico e la differenza in
+  git resta leggibile. Le fughe tutte uguali del primo tentativo facevano
+  sembrare il glifo una tavolozza di colori.
+- **Fiocco di neve** ridisegnato con le barbe, come il simbolo del ghiaccio
+  vero. E definito una volta e ruotato sei volte: scritto per esteso sarebbero
+  trentasei tracciati, e una correzione andrebbe fatta in trentasei punti.
+- **Grotta glaciale e mitreo diventano una famiglia**, su schizzo di chi li
+  usa: lo stesso arco, e dentro il segno che dice di quale ipogeo si tratta —
+  l'asterisco del ghiaccio per la prima, il berretto frigio per il secondo.
+  L'arco e la bocca o la volta; il simbolo dentro e il contenuto.
+- Il berretto segue le fotografie: falda alta e punta che ricade in avanti.
+  La tauroctonia non sta in sedici pixel — un uomo che pugnala un toro diventa
+  una macchia — e nel repertorio antico il berretto e *il* segno di Mitra: lo
+  portano lui e i dadofori, nessun altro dio romano.
+- **Postazione fortificata**: la garitta cilindrica con la feritoia, come
+  quelle sulle coste, invece del blocco prismatico.
+- **Deposito munizioni**: l'ogiva staccata dal bossolo. Attaccata, la sagoma
+  era una pastiglia.
+- **Catacomba**: due loculi e non tre. Il terzo, appoggiato al bordo inferiore,
+  faceva leggere l'insieme come una serranda.
+- **Ipogeo funerario**: la camera a contorno con il dromos e la nicchia
+  dentro. Il tumulo pieno era una collina con una fessura.
+- **Butto**: il collo d'anfora si spezza **dopo la spalla**, perche e la spalla
+  che dice «anfora»; il solo collo era un pezzo di tubo.
+
+### Note di progetto
+- **Il pieno e il contorno dicono cose diverse**, ed e questa la regola che
+  mancava. Il progetto era partito da «forme piene sempre», che era giusto per
+  la roccia e sbagliato per tutto cio che e vuoto: dieci glifi su quaranta
+  raccontavano una massa dove c'era un'assenza.
+- La prova ora controlla **entrambe le regole**: che nessuna voce predefinita
+  resti senza segno proprio — sull'attributo, non sul valore risolto, che
+  passerebbe sempre — e che la misura del glifo nella pastiglia non scenda.
+  Sono strutturali, non estetiche: se somiglia a quello che nomina lo dice solo
+  chi guarda.
+
 ## [1.7.0] — 2026-08-08
 
 ### Modificato

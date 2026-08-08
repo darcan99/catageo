@@ -192,7 +192,7 @@
                  + simboloHtml(glifo(prop))
                  + '</span>';
 
-        return mappa.simbolo(elemento.punto, html, classe, 30);
+        return mappa.simbolo(elemento.punto, html, classe, 34);
     }
 
     /** Contenuto del popup di un ipogeo. */
@@ -229,7 +229,7 @@
     function creaCluster(mappa, gruppo, centro) {
         var n = gruppo.length;
         var classe = n < 10 ? 'catageo-cluster-p' : (n < 100 ? 'catageo-cluster-m' : 'catageo-cluster-g');
-        var lato = n < 10 ? 30 : (n < 100 ? 36 : 44);
+        var lato = n < 10 ? 34 : (n < 100 ? 40 : 48);
 
         return mappa.simbolo(centro, '<div>' + n + '</div>', 'catageo-cluster ' + classe, lato);
     }
