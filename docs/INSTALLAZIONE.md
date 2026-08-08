@@ -1,7 +1,7 @@
 # Installazione di CATAGEO
 
 Guida all'installazione, all'aggiornamento e allo spostamento di un archivio.
-Aggiornata a CATAGEO **1.0.0**.
+Aggiornata a CATAGEO **1.5.1**.
 
 CATAGEO gira su un hosting condiviso da pochi euro l'anno. Non serve un
 database, non serve una shell, non serve `mod_rewrite`, non serve Composer:
@@ -129,6 +129,11 @@ due viene toccato da un aggiornamento**, che riguarda solo il codice.
 Confronta `config.xml.dist` con il tuo `config.xml`: le chiavi nuove non
 compaiono da sole, e l'applicativo usa il valore predefinito finché non le
 aggiungi.
+
+Lo stesso vale per i **simboli delle tipologie**: dalla 1.5.0 le voci della
+tassonomia hanno un'icona per la mappa, ma il vocabolario di un archivio già in
+uso non viene toccato. Il comando **Strumenti › Simboli delle tipologie**
+completa le voci che ne sono prive, senza sovrascrivere le scelte già fatte.
 
 Lo stesso vale per i **layer cartografici**. Dalla 1.2.0 `config.xml.dist`
 contiene 26 layer WMS già pronti (geologia ISPRA, catasto, vincoli

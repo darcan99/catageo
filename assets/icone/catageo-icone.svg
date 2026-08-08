@@ -10,12 +10,15 @@
                   Si usano insieme a Bootstrap Icons, non al posto: dove
                   esiste gia un simbolo adatto (fuoco per il vulcanismo, neve
                   per il glaciale) si usa quello.
-  Versione .....: 1.5.0
+  Versione .....: 1.5.1
   Sviluppatore .: Dario Candela <darcan99@gmail.com>
   Licenza ......: GNU GPL v3.0 — vedi LICENSE
   Copyright ....: (c) 2026 Dario Candela
- ----------------------------------------------------------------------------
+ ............................................................................
   CRONOLOGIA
+  1.5.1  2026-08-08  D.Candela  Separatori a puntini: il doppio trattino e
+                                vietato dentro un commento XML, e il file da
+                                solo non si apriva.
   1.5.0  2026-08-08  D.Candela  Prima stesura.
  ============================================================================
 

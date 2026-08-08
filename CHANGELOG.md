@@ -6,6 +6,36 @@ Tutte le modifiche rilevanti a CATAGEO sono annotate qui, in formato
 
 ## [Non rilasciato]
 
+## [1.5.1] — 2026-08-08
+
+### Corretto
+- **Lo sprite dei glifi non era XML valido.** Un separatore di commento fatto
+  di trattini contiene `--`, che dentro un commento XML e vietato: aperto da
+  solo, `catageo-icone.svg` dava «Comment must not contain double-hyphen» e non
+  mostrava niente. In applicativo funzionava lo stesso, perche il file viene
+  incluso nella pagina e a leggerlo e l'analizzatore HTML, che quel doppio
+  trattino lo tollera — ma qualunque strumento che lo tratti come SVG si
+  sarebbe fermato allo stesso punto. Separatori a puntini.
+- La prova ora carica lo sprite con `DOMDocument` e conta i simboli, invece di
+  cercarci dentro delle stringhe. **Un file si verifica con il parser del suo
+  formato**: la vecchia prova passava su un file rotto perche lo leggeva come
+  testo, ed e esattamente cosi che il difetto e arrivato fino a un rilascio.
+
+### Aggiunto
+- **Strumenti › Simboli delle tipologie**, per gli archivi nati prima dei
+  glifi. Il vocabolario si crea alla prima installazione e da quel momento e
+  del catasto: un aggiornamento del codice non lo tocca, altrimenti
+  cancellerebbe le voci aggiunte e le scelte fatte. Percio i simboli non
+  arrivano da soli, e chi aggiorna vedeva la mappa esattamente come prima.
+- Il comando **completa, non sostituisce**: mette il simbolo solo dove manca,
+  lascia stare le voci che ne hanno gia uno anche se diverso dal predefinito, e
+  ignora i codici che il catasto si e inventato — quelli continuano a ereditare
+  dalla madre, che e il comportamento giusto. Lanciarlo due volte non cambia
+  nulla la seconda volta.
+- Documentato in `INSTALLAZIONE.md` fra le cose che un aggiornamento **non**
+  porta con se, accanto ai layer cartografici: sono la stessa classe di
+  problema, e chi aggiorna deve trovarli nello stesso posto.
+
 ## [1.5.0] — 2026-08-08
 
 ### Aggiunto

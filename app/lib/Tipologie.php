@@ -12,12 +12,17 @@ declare(strict_types=1);
  *                  con id progressivo, qui servono un albero e codici parlanti.
  *                  L'albero viene appiattito in memoria una volta per richiesta,
  *                  cosi le tendine e le etichette non ricaricano il file.
- *  Versione .....: 0.2.0
+ *  Versione .....: 1.5.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.5.1  2026-08-08  D.Candela  applicaIconePredefinite(): porta i simboli
+ *                                nei vocabolari gia esistenti, che un
+ *                                aggiornamento del codice non tocca.
+ *  1.4.0  2026-08-08  D.Candela  Attributo «icona» con ereditarieta lungo
+ *                                l'albero, per il simbolo in mappa.
  *  0.2.0  2026-08-04  D.Candela  Prima stesura (fase 2).
  * ============================================================================
  */
@@ -329,6 +334,70 @@ final class Tipologie
         }
 
         return '';
+    }
+
+    /**
+     * Completa le icone mancanti confrontando con la tassonomia predefinita.
+     *
+     * Serve alle installazioni che esistevano prima delle icone. Il vocabolario
+     * si crea una volta sola, alla prima richiesta, e da quel momento e roba di
+     * chi lo usa: un aggiornamento del codice non lo tocca, ed e giusto cosi —
+     * altrimenti ogni aggiornamento riscriverebbe le scelte di chi l'ha
+     * personalizzato. Il prezzo e che le novita non arrivano da sole, e questa
+     * e la strada per farle arrivare quando si vuole.
+     *
+     * NON sovrascrive nulla: tocca solo le voci che l'icona non ce l'hanno, e
+     * solo quelle il cui codice esiste nella tassonomia predefinita. Una voce
+     * inventata dall'utente resta senza, ed erediterà dalla madre.
+     *
+     * @return array{aggiornate:int,gia:int,ignote:int}
+     */
+    public static function applicaIconePredefinite(): array
+    {
+        // La tassonomia predefinita si legge come documento e non si duplica:
+        // e la stessa fonte che usa l'installazione nuova, quindi le due non
+        // possono divergere.
+        $modello = VocabolariPredefiniti::tipologie();
+        $attese  = [];
+        foreach (['natura', 'tipologia', 'sotto'] as $livello) {
+            foreach (Xml::elenco($modello, '//' . $livello) as $nodo) {
+                $icona = trim($nodo->getAttribute('icona'));
+                if ($icona !== '') {
+                    $attese[$nodo->getAttribute('codice')] = $icona;
+                }
+            }
+        }
+
+        $esito = ['aggiornate' => 0, 'gia' => 0, 'ignote' => 0];
+
+        Xml::conLock(self::percorso(), static function () use ($attese, &$esito): void {
+            self::assicuraFile();
+            $doc = Xml::carica(self::percorso());
+
+            foreach (self::LIVELLI as $livello) {
+                foreach (Xml::elenco($doc, '//' . $livello) as $nodo) {
+                    $codice = $nodo->getAttribute('codice');
+
+                    if (trim($nodo->getAttribute('icona')) !== '') {
+                        $esito['gia']++;
+                        continue;
+                    }
+                    if (!isset($attese[$codice])) {
+                        $esito['ignote']++;
+                        continue;
+                    }
+
+                    $nodo->setAttribute('icona', $attese[$codice]);
+                    $esito['aggiornate']++;
+                }
+            }
+
+            Xml::salva($doc, self::percorso(), self::xsd());
+        });
+
+        self::$cache = null;
+
+        return $esito;
     }
 
     /**

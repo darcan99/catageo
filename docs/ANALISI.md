@@ -1454,6 +1454,10 @@ Chi compila un vocabolario scrive **un nome solo**: se comincia per `cat-` e nos
 
 **Nel vocabolario si vede cosa si otterra.** L'elenco ha una colonna con il simbolo **risolto**, cioe quello che comparira in mappa, non l'attributo grezzo: mostrare solo l'attributo proprio lascerebbe vuote quasi tutte le righe e non risponderebbe alla sola domanda per cui si guarda quella colonna. Le voci che lo ereditano sono in grigio. Nel modulo di modifica i glifi propri si scelgono **cliccandoli**: sono una dozzina e non esistono altrove, e chiedere di digitarne il nome a memoria significherebbe che nessuno li userebbe.
 
+**Lo sprite deve essere XML valido, non solo funzionante.** Nella 1.5.0 non lo era: un separatore di commento fatto di trattini contiene `--`, che dentro un commento XML e vietato. In applicativo non si vedeva nulla, perche il file viene incluso nella pagina e a parsarlo e l'analizzatore HTML, che quel doppio trattino lo tollera; ma aperto da solo nel browser il file dava errore, e ogni strumento che lo tratti come SVG — un editor vettoriale, un ottimizzatore, un altro applicativo — si sarebbe fermato allo stesso punto. La prova ora lo carica con `DOMDocument` e conta i simboli, invece di cercarci dentro delle stringhe: un file si verifica con il parser del suo formato, non con `grep`.
+
+**Un archivio gia in uso non riceve i simboli.** Il vocabolario delle tipologie si crea alla prima installazione e da quel momento appartiene al catasto: sovrascriverlo a ogni aggiornamento cancellerebbe le voci aggiunte e le scelte fatte, e questo vale per i simboli come per tutto il resto. Percio i glifi arrivano con un comando esplicito — `Tipologie::applicaIconePredefinite()`, in Strumenti — che **completa e non sostituisce**: tocca solo le voci prive di `icona`, lascia stare quelle che ce l'hanno anche se diversa dalla predefinita, e ignora i codici che il catasto si e inventato, i quali continuano a ereditare dalla madre. Lanciarlo due volte non cambia nulla la seconda, e questo e cio che lo rende innocuo da lanciare quando si e in dubbio.
+
 ---
 
 #### 7.2.3 Layer preconfigurati per l'Italia centrale (fase 6b)

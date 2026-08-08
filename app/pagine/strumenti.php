@@ -13,12 +13,14 @@ declare(strict_types=1);
  *                  e una correzione automatica che indovina male su un catasto
  *                  di trent'anni fa piu danni del problema. L'unica cosa che si
  *                  offre di rifare e l'indice, che e una cache.
- *  Versione .....: 1.1.0
+ *  Versione .....: 1.5.1
  *  Sviluppatore .: Dario Candela <darcan99@gmail.com>
  *  Licenza ......: GNU GPL v3.0 — vedi LICENSE
  *  Copyright ....: © 2026 Dario Candela
  * ----------------------------------------------------------------------------
  *  CRONOLOGIA
+ *  1.5.1   2026-08-08  D.Candela  Comando «Simboli delle tipologie», per gli
+ *                                 archivi nati prima dei glifi.
  *  1.1.0   2026-08-07  D.Candela  Report di completezza delle schede (fase 12).
  *  0.16.0  2026-08-06  D.Candela  Riquadro dell'importazione da CSV (fase 9b).
  *  0.15.0  2026-08-06  D.Candela  Prima stesura (fase 9).
@@ -59,6 +61,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         . ' problemi: ' . implode('; ', array_slice($esito['errori'], 0, 5)));
                 } else {
                     Auth::messaggio('successo', 'Indici ricostruiti: ' . $messaggio);
+                }
+                break;
+
+            case 'iconePredefinite':
+                $esito = Tipologie::applicaIconePredefinite();
+                Log::modifica('icone_predefinite', '', '', 'tipologie',
+                    $esito['aggiornate'] . ' completate');
+                if ($esito['aggiornate'] === 0) {
+                    Auth::messaggio('avviso', 'Nessuna icona da completare: '
+                        . $esito['gia'] . ' voci ne avevano gia una, '
+                        . $esito['ignote'] . ' non sono nella tassonomia predefinita.');
+                } else {
+                    Auth::messaggio('successo', $esito['aggiornate'] . ' voci hanno ora un\x27icona. '
+                        . 'Lasciate come stavano: ' . $esito['gia'] . ' che ne avevano gia una e '
+                        . $esito['ignote'] . ' fuori dalla tassonomia predefinita.');
                 }
                 break;
 
@@ -138,6 +155,35 @@ $cataloghi = Cataloghi::elenco();
           <input type="hidden" name="operazione" value="ricostruisciIndici">
           <button type="submit" class="btn btn-primary">
             <i class="bi bi-arrow-repeat"></i> Ricostruisci gli indici
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ icone in mappa -->
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header"><h2 class="h6 mb-0">Simboli delle tipologie</h2></div>
+      <div class="card-body">
+        <p class="text-body-secondary">
+          I simboli che le cavità mostrano in mappa stanno nel <strong>vocabolario
+          delle tipologie</strong>, che si crea una volta sola alla prima
+          installazione e da quel momento è roba tua: un aggiornamento del codice
+          non lo tocca, altrimenti riscriverebbe le scelte di chi lo ha
+          personalizzato. Il prezzo è che le novità non arrivano da sole.
+        </p>
+        <p class="text-body-secondary">
+          Questo comando completa le voci <strong>senza</strong> simbolo con quello
+          previsto dalla tassonomia predefinita. Non sovrascrive nulla: le voci che
+          un simbolo ce l'hanno già restano come stanno, e quelle che hai aggiunto
+          tu erediteranno da quella superiore.
+        </p>
+        <form method="post" action="<?= Testo::esc($ritorno) ?>">
+          <?= Auth::campoToken() ?>
+          <input type="hidden" name="operazione" value="iconePredefinite">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-palette"></i> Completa i simboli mancanti
           </button>
         </form>
       </div>

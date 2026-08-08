@@ -1,6 +1,6 @@
 # Manuale di CATAGEO
 
-Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.0.0**.
+Manuale d'uso del catasto degli ipogei. Aggiornato a CATAGEO **1.5.1**.
 
 Per installare, aggiornare o spostare un archivio vedi
 [INSTALLAZIONE.md](INSTALLAZIONE.md). Per le scelte di progetto e il modello
@@ -511,6 +511,13 @@ Aprendo una voce si può cambiarlo. Ci sono due insiemi di simboli:
 - tutte le icone di [Bootstrap Icons](https://icons.getbootstrap.com/), scrivendone
   il nome senza il prefisso `bi-`: utili per quello che non è una cavità in sé,
   come la fiamma del vulcanismo o il fiocco di neve del glaciale.
+
+**Su un archivio già in uso i simboli non arrivano da soli.** Il vocabolario si
+crea una volta sola, alla prima installazione, e da quel momento è tuo: un
+aggiornamento del codice non lo tocca, altrimenti riscriverebbe le scelte di chi
+lo ha personalizzato. Per portarci i simboli nuovi c'è un comando in
+**Strumenti › Simboli delle tipologie**, che completa solo le voci che un
+simbolo non ce l'hanno: quelle che l'hanno già restano come stanno.
 
 Lasciando il campo vuoto la voce **eredita** il simbolo di quella superiore,
 quindi una sottotipologia nuova compare in mappa da subito con il simbolo
